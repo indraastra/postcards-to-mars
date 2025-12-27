@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-[#050505] text-gray-300 relative overflow-hidden font-sans selection:bg-rose-900 selection:text-rose-100">
+  
+  <!-- Global Scanline Overlay -->
+  <div class="fixed inset-0 pointer-events-none z-0 opacity-10" 
+       style="background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); background-size: 100% 2px, 3px 100%;">
+  </div>
+  
+  <!-- Vignette -->
+  <div class="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]"></div>
+
+  <!-- Header -->
+  <header class="absolute top-0 left-0 w-full p-6 z-30 flex justify-between items-start">
+    <div class="flex flex-col cursor-pointer group" (click)="toggleLore()">
+      <span class="text-[10px] font-mono font-bold tracking-[0.2em] text-rose-600 uppercase leading-none hover:text-rose-400 transition-colors">
+        Postcards To Mars
+      </span>
+      <span class="text-[8px] font-mono text-gray-400 leading-none mt-1 tracking-wider group-hover:text-gray-300">
+        {{ showLore() ? 'TERMINATE SESSION' : 'SYSTEM STATUS: DEGRADED' }}
+      </span>
+    </div>
+    
+    <button (click)="reset()" class="text-[10px] font-mono text-gray-500 hover:text-rose-500 uppercase tracking-widest transition-colors">
+      [ RESET UPLINK ]
+    </button>
+  </header>
+
+  <!-- Lore Overlay (Terminal Style) -->
+  @if (showLore()) {
+    <div class="fixed inset-0 z-40 bg-black/95 flex items-center justify-center p-6 animate-fade-in" (click)="toggleLore()">
+      <div class="max-w-md w-full border-l border-rose-800/60 pl-6 py-2 relative" (click)="$event.stopPropagation()">
+        
+        <h3 class="text-rose-500 font-mono text-[10px] mb-6 tracking-[0.25em] uppercase shadow-rose-500/20 drop-shadow-sm">
+          >>> ARCHIVE_LOG_74.2 // EARTH_ABANDONED
+        </h3>
+        
+        <div class="space-y-6 font-mono text-[12px] text-gray-300 leading-relaxed">
+          <p>
+            It has been 84 cycles since the evacuation. The automated uplinks are failing.
+          </p>
+          <p>
+            You have located an active terminal. We are transmitting the last visual memories to the Martian colonies before the grid fails completely.
+          </p>
+          <p>
+            The bandwidth is critically low. We cannot send high-fidelity data. The compression algorithm extracts the "feeling" of the image and reconstructs it as a digital souvenir.
+          </p>
+          <p class="text-rose-400 mt-4 font-bold">
+            INPUT: VISUAL DATA<br>
+            OUTPUT: MEMORY ARTIFACT
+          </p>
+        </div>
+
+        <button (click)="toggleLore()" class="mt-12 text-gray-400 hover:text-white text-[10px] font-mono uppercase tracking-widest transition-colors border border-transparent hover:border-gray-700 px-2 py-1 -ml-2">
+          < Click to Resume Uplink >
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Main Content Area -->
+  <main class="relative z-10 flex flex-col items-center justify-center min-h-screen w-full max-w-2xl mx-auto px-4">
+    
+    @switch (state()) {
+      
+      @case ('upload') {
+        <app-camera-upload (imageSelected)="onImageSelected($event)"></app-camera-upload>
+      }
+
+      @case ('analyzing') {
+        <div class="flex flex-col items-center gap-4 animate-pulse font-mono">
+          <div class="w-16 h-px bg-gray-700 relative overflow-hidden">
+             <!-- Use the explicit class 'animate-progress' defined in AppComponent styles -->
+             <div class="absolute h-full bg-rose-500 animate-progress"></div>
+          </div>
+          <p class="text-rose-500 text-[10px] tracking-[0.3em] uppercase">Processing Signal...</p>
+        </div>
+      }
+
+      @case ('dialogue') {
+        <app-dialogue 
+          [imageSrc]="originalImage()!" 
+          [starterText]="currentStarter()"
+          [history]="poemHistory()"
+          [suggestions]="currentSuggestions()"
+          [loading]="loadingNextLine()"
+          [isLastLine]="poemHistory().length === 2"
+          (lineCompleted)="onLineCompleted($event)"
+          (finished)="finishCreation($event)"
+        ></app-dialogue>
+      }
+
+      @case ('generating') {
+        <div class="flex flex-col items-center gap-6 text-center px-6">
+          <div class="w-8 h-8 border border-rose-800/50 border-t-rose-500 rounded-full animate-spin"></div>
+          <div class="font-mono space-y-2">
+            <h3 class="text-xs text-rose-500 tracking-widest uppercase">Compressing Artifact</h3>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider">Packet loss detected... Retrying...</p>
+          </div>
+        </div>
+      }
+
+      @case ('result') {
+        <app-postcard-result 
+          [poem]="finalPoem()" 
+          [stylizedImageSrc]="stylizedImage()"
+        ></app-postcard-result>
+      }
+
+    }
+
+  </main>
+</div>

@@ -1,0 +1,7 @@
+{
+  "name": "Postcards To Mars",
+  "description": "A wistful, single-player creative tool that compresses Earth memories into digital souvenirs for a distant colony.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
