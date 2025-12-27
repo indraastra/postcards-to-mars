@@ -12,7 +12,7 @@ import { Component, output, signal } from '@angular/core';
         </h1>
         
         <div class="flex flex-col gap-1 text-[10px] md:text-[11px] font-mono text-rose-400/80 uppercase tracking-widest">
-          <p>TERMINAL: E-99 (OFFLINE)</p>
+          <p>TERMINAL: E-99 (ACTIVE)</p>
           <p>STATUS: WAITING FOR INPUT</p>
           <p>PROTOCOL: MEMORY_COMPRESSION</p>
         </div>

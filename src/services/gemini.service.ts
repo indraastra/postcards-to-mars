@@ -7,6 +7,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 export class GeminiService {
   private ai: GoogleGenAI;
   
+  // Specific model versions requested
   private readonly TEXT_MODEL = 'gemini-3-flash-preview'; 
   private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
 
@@ -23,24 +24,26 @@ export class GeminiService {
 **Voice:** Liminal spaces, quiet americana, the poetry of distance. Wistful but warm. Tender observation of the uncanny. Things that glow in the dark.
 
 **Your Task:**
-Study this image from Earth. Write one incomplete sentence (under 15 words) starting with "Today I..." in past tense, ending with "____". 
+Study this image. Write one incomplete sentence (under 15 words) starting with "Today I..." in past tense, ending with "____". 
 
-Capture something specific but dreamlike from what you see—the kind of detail that feels like it means more than it says. A moment between sleep and waking. Ordinary things made strange by attention.
+**The Lens:**
+Look at the image through a dreamlike filter. Don't just list objects. Describe the *quality* of the scene.
+- If it's a person: Describe the light on them, or the quiet of their pose.
+- If it's nature: Describe the movement or the stillness.
+- If it's an object: Describe its texture or presence.
 
-Then provide 3 phrases to complete the blank:
-- MUST relate to what's visible in this image
-- Abstract, textural descriptions of Earth things
-- Strange but comforting
-- Turn ordinary Earth details into poetry
+**Suggestions:**
+Provide 3 phrases to complete the blank.
+- MUST relate to visual details in *this specific image*.
+- Turn ordinary details into poetry.
+- Strange but comforting.
 
 **Examples:**
-"Today I watched the overpass lights bend into ____"
-→ ["a question nobody asked", "the static between stations", "tomorrow's architecture"]
+"Today I watched the light settle on the floor like ____"
+→ ["dust from a previous life", "warm water", "gold spilled from a jar"]
 
-"Today I found the parking lot had grown ____"
-→ ["a second sky", "the bones of a song", "its own weather"]
-
-IMPORTANT: Your suggestions must describe things FROM THIS IMAGE, not Mars or space. You're documenting Earth.
+"Today I found the silence in the room felt like ____"
+→ ["a heavy blanket", "holding your breath", "the space between notes"]
 
 Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
 
@@ -59,7 +62,7 @@ Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
           ]
         },
         config: {
-          temperature: 0.8, 
+          temperature: 0.9, 
           responseMimeType: 'application/json',
           responseSchema: {
             type: Type.OBJECT,
@@ -98,7 +101,7 @@ Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
   }
 
   // ---------------------------------------------------------------------------
-  // 2. GENERATE NEXT LINE (Lines 2, 3)
+  // 2. GENERATE NEXT LINE (Lines 2 & 3)
   // ---------------------------------------------------------------------------
   async generateNextLine(
     history: string[], 
@@ -111,68 +114,53 @@ Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
       const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
       const isFinalLine = history.length >= 2;
 
+      // --- UNIVERSAL PROMPTS ---
       const promptText = isFinalLine 
-        ? `You're writing the closing line of a postcard from Earth to Mars. The story so far:
+        ? `You're writing the closing line of a postcard from Earth to Mars.
+        
+**Context:**
+- **Story so far:** "${history.join(' ')}"
+- **Theme:** ${narrativeArc}
+- **Mood:** ${mood}
 
-"${history.join(' ')}"
+**Final Line Task: THE ANCHOR**
+1. **Look at the image one last time.** Find the *main focal point*—whatever it is (a face, a tree, a shadow, a messy desk, a building).
+2. **The Sentence Stem:** Describe that focal point simply. "The [subject] looked...", "I realized the [subject] was...", "The way the [subject] moved..."
+3. **The Blank:** The blank is for the *feeling* that this subject evokes about distance and connection.
 
-**Final Line Structure:** Create an INCOMPLETE sentence that needs the blank filled.
+**Style:** - Wistful, warm, intimate.
+- **Do not be too abstract.** Ground the feeling in the image.
+- **Do not be too literal.** The image is a metaphor for missing someone.
 
-Your sentence stem must:
-- Be 8-12 words maximum
-- Use past tense
-- End with " ____" (with space before it)
-- Be grammatically incomplete—it MUST need the suggestions to make sense
-
-**Good incomplete sentences:**
-✓ "It felt like ____"
-✓ "I remembered ____"
-✓ "It reminded me of ____"
-✓ "I could almost touch ____"
-
-**Bad (already complete):**
-✗ "It felt like a whispered secret traveling light-years"
-This doesn't need the blank—it's already done.
-
-**Pivot inward:** Shift from what you saw to what you felt. Connection across distance. The feeling of driving through night toward something you can't name.
-
-Provide 3 phrases (5-10 words each) to complete it:
-- Warm, hopeful metaphors about connection and memory
-- Distance and intimacy between Earth and Mars
-- NOT literal Mars descriptions—focus on the feeling
-- Examples: "a voice carried on light", "warmth that travels forever", "the shape of your laughter"
+**Suggestions (The Connection):**
+Provide 3 phrases (5-10 words each) to complete it.
+- **Goal:** Connect the visual details to the theme of "${narrativeArc}".
+- **Examples:** "like a promise kept", "the shape of your laughter", "a signal waiting to be caught", "warmth that travels forever".
 
 Return JSON: starter, suggestions`
-        : `You're writing line two of a postcard from Earth to Mars. The story begins:
+        : `You're writing line two of a postcard from Earth to Mars.
 
-"${history.join(' ')}"
+**Context:**
+- **Story so far:** "${history.join(' ')}"
+- **Image Context:** ${visualDescription}
+- **Theme:** ${narrativeArc}
 
-**Image context:** ${visualDescription}
+**Second Line Task: DEEPENING THE ATMOSPHERE**
+Create an incomplete sentence that focuses on a **sensory detail** in the image (Light, Texture, Color, Sound) that reinforces the theme of "${narrativeArc}".
 
-**Second Line Structure:** Create an INCOMPLETE sentence that needs the blank filled.
+**The Vibe:**
+- If the image is busy, find the stillness.
+- If the image is empty, find the presence.
+- If the image is dark, find the glow.
 
-Your sentence stem must:
-- Be 8-12 words maximum
-- Use past tense
-- End with " ____" (with space before it)
-- Be grammatically incomplete—it MUST need the suggestions to make sense
-- Find a dreamlike detail in the image
+**Sentence Stem:**
+- Past tense.
+- End with " ____".
+- Must be incomplete.
 
-**Good incomplete sentences:**
-✓ "The shadows stretched toward ____"
-✓ "The light seemed to hum with ____"
-✓ "Everything glowed like ____"
-
-**Bad (already complete):**
-✗ "Its bright orange path seemed to glow against the muted grass"
-This doesn't need the blank.
-
-Go deeper into the scene. Find what glows, the wrong color, the uncanny geometry. Build atmosphere without repeating.
-
-Provide 3 sensory phrases that describe things FROM THIS EARTH IMAGE:
-- Textures, colors, sounds you can see in the photo
-- Turn concrete details into poetic abstractions
-- NOT Mars imagery—describe Earth things made strange
+**Suggestions:**
+- 3 poetic phrases describing that sensory detail.
+- Strange, dreamy, specific to Earth.
 
 Return JSON: starter, suggestions`;
 
@@ -190,7 +178,7 @@ Return JSON: starter, suggestions`;
           ]
         },
         config: {
-          temperature: 0.8, 
+          temperature: 0.9, 
           responseMimeType: 'application/json',
           responseSchema: {
             type: Type.OBJECT,
@@ -208,7 +196,7 @@ Return JSON: starter, suggestions`;
       if (result.starter) {
         let s = result.starter.trim();
         
-        // Safety cleanup
+        // Safety cleanup for repeated history
         const historyStr = history.join(' ');
         if (history.length > 0 && s.startsWith(historyStr.substring(0, 20))) {
           s = s.replace(historyStr, '').trim();
@@ -237,92 +225,105 @@ Return JSON: starter, suggestions`;
   }
 
   // ---------------------------------------------------------------------------
-  // 3. CREATE VISUAL PROMPT
+  // 3. IDENTIFY KEY ELEMENTS TO PRESERVE
   // ---------------------------------------------------------------------------
-  private async createVisualPrompt(mood: string, poem: string): Promise<string> {
-    const promptText = `You're describing how to apply a stylized visual treatment to an existing photograph.
+  private async identifyKeyElements(imageBase64: string, poem: string): Promise<string> {
+    const promptText = `You're analyzing a photograph to identify what must be preserved when applying artistic stylization.
 
-**The Poem:**
+**The Poem about this image:**
 "${poem.replace(/\[|\]/g, '').substring(0, 300)}"
 
-**Visual Treatment (Applied to Existing Content):**
-- Keep all key subjects, poses, and spatial relationships from the original
-- Apply theatrical lighting: enhance existing light sources into amber/gold glows against deep blue-teal shadows
-- Stylize edges into cleaner geometric shapes while preserving recognizable details
-- Use flat color areas with hard-edged shadows instead of gradients
-- Create atmospheric mood through color temperature shifts
+**Your Task:**
+List the 3-5 most important visual elements that must remain recognizable.
+- **IGNORE TEXT:** Do NOT list signage, street names, logos, or text.
+- **Focus on Forms:** Identify main subjects (people, animals, objects) and key spatial relationships.
+- **Atmosphere:** Note the light source if it's prominent.
 
-**Style Reference:**
-Flat vector aesthetic, low poly geometry, minimalist theatrical lighting, silhouetted figures against glowing backgrounds. Deep indigos and teals punctured by warm amber highlights.
-
-Write 2-3 sentences describing how to apply this visual filter while keeping the original composition and subjects intact.`;
+Be specific but concise. Format as a comma-separated list.`;
 
     try {
       const response = await this.ai.models.generateContent({
         model: this.TEXT_MODEL,
-        contents: promptText,
-        config: { temperature: 0.7 }
+        contents: {
+          role: 'user',
+          parts: [
+            { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
+            { text: promptText }
+          ]
+        },
+        config: { temperature: 0.5 }
       });
       
-      return response.text?.trim() || "Preserve the original composition, poses, and key subjects exactly. Apply a visual filter that shifts colors toward deep cyan-blue shadows with warm amber highlights, simplifies edges into cleaner geometric forms, and replaces gradients with flat color planes and hard shadows.";
+      return response.text?.trim() || "Main subject and composition";
     } catch (e) {
-      console.error('Visual prompt generation failed', e);
-      return "Preserve the original composition, poses, and key subjects exactly. Apply a visual filter that shifts colors toward deep cyan-blue shadows with warm amber highlights, simplifies edges into cleaner geometric forms, and replaces gradients with flat color planes and hard shadows.";
+      console.error('Element identification failed', e);
+      return "Main subject and composition";
     }
   }
 
   // ---------------------------------------------------------------------------
   // 4. GENERATE STYLIZED IMAGE
   // ---------------------------------------------------------------------------
-  async generateStylizedImage(originalBase64: string, mood: string, poem: string): Promise<string | null> {
+  async generateStylizedImage(originalBase64: string, mood: string, poem: string): Promise<{ image: string | null; prompt: string }> {
     try {
-      console.log('Step 1: Generating style description...');
-      const visualPrompt = await this.createVisualPrompt(mood, poem);
-      
-      console.log('=== [Gemini] STYLE DESCRIPTION ===');
-      console.log(visualPrompt);
-      console.log('==================================\n');
-
+      console.log('Step 1: Identifying key elements to preserve...');
       const cleanBase64 = originalBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+      const keyElements = await this.identifyKeyElements(cleanBase64, poem);
       
-      const fullPrompt = `Apply a stylized visual treatment to this photograph as a filter.
+      console.log('=== [Gemini] KEY ELEMENTS ===');
+      console.log(keyElements);
+      console.log('=============================\n');
 
-**CRITICAL: Preserve the Original**
-- Keep all subjects, figures, poses, and spatial relationships exactly as they are
-- Maintain the original composition and framing
-- Preserve recognizable details and key characteristics
-- This is STYLIZATION, not reimagining
+      const fullPrompt = `Apply stylized visual treatment to this photograph while preserving its content.
 
-**Style Treatment to Apply:**
-${visualPrompt}
+**CRITICAL: Preserve These Elements**
+${keyElements}
 
-**Visual Adjustments:**
-- Shift color palette: deepen shadows to blue-teal, warm highlights to amber-gold
-- Simplify edges and forms into cleaner geometric shapes while keeping subjects recognizable
-- Replace subtle gradients with flat color areas and hard-edged shadows
-- Enhance contrast between lit and shadowed areas
-- Add theatrical mood through lighting and color temperature
+Keep these recognizable. Do not add new objects.
+
+**Style to Apply: "Mars-Tinged Memory Postcard"**
+- **Palette:** Deep Indigo/Black shadows vs. Warm Rust/Amber/Gold highlights.
+- **Aesthetic:** Flat vector shapes + Aged Analog Texture.
+- **Lighting:** Theatrical "stage" lighting. High contrast.
+- **Texture:** Apply heavy **film grain, dust, scratches, and worn paper texture** to simulate an aged physical postcard found on Mars.
+- **Forms:** Simplify details into cleaner geometric shapes (Low Poly/Vector) but keep the organic feel of the subject.
 
 **Technical Requirements:**
 - 1:1 square aspect ratio
-- Flat vector aesthetic with geometric shapes
-- High contrast between deep shadow planes and isolated warm light sources
-- Minimalist: remove small details, focus on shape and light
+- Same composition and framing as original
+- Subjects remain recognizable
+- NO photorealism. Target look: "A vector illustration printed on old, coarse cardstock."
 
 **The Goal:**
-Same scene, same subjects, same composition—but rendered through a stylized visual language. Like applying an artistic filter that transforms the mood while preserving the content.`;
+Transform the photo's visual style (colors, edges, lighting) while preserving what's actually in it. Like an artistic filter, not a reimagining.`;
 
-      console.log('\n=== [Gemini] IMAGE GENERATION PROMPT ===');
-      console.log(fullPrompt);
-      console.log('========================================\n');
+      const image = await this.generateImageFromPrompt(originalBase64, fullPrompt);
+      return { image, prompt: fullPrompt };
 
-      const response = await this.ai.models.generateContent({
+    } catch (error) {
+      console.error('Image stylization failed', error);
+      return { image: null, prompt: '' };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5. GENERATE FROM PROMPT (Helper)
+  // ---------------------------------------------------------------------------
+  async generateImageFromPrompt(originalBase64: string, prompt: string): Promise<string | null> {
+    try {
+       const cleanBase64 = originalBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+       
+       console.log('\n=== [Gemini] GENERATE FROM PROMPT ===');
+       console.log(prompt);
+       console.log('=====================================\n');
+
+       const response = await this.ai.models.generateContent({
         model: this.IMAGE_MODEL,
         contents: {
           role: 'user',
           parts: [
             { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
-            { text: fullPrompt }
+            { text: prompt }
           ]
         }
       });
@@ -333,11 +334,9 @@ Same scene, same subjects, same composition—but rendered through a stylized vi
         const { mimeType, data } = imagePartFromResponse.inlineData;
         return `data:${mimeType};base64,${data}`;
       }
-      
-      console.warn('No image in response, returning null');
       return null;
     } catch (error) {
-      console.error('Image stylization failed', error);
+      console.error('Generation from prompt failed', error);
       return null;
     }
   }

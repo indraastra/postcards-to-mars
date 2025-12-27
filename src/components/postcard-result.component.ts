@@ -1,4 +1,5 @@
-import { Component, input, signal, effect, ElementRef, ViewChild } from '@angular/core';
+import { Component, input, output, signal, effect, ElementRef, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 interface TextSegment {
   text: string;
@@ -7,16 +8,17 @@ interface TextSegment {
 
 @Component({
   selector: 'app-postcard-result',
+  imports: [FormsModule],
   template: `
-    <div class="flex flex-col items-center justify-center min-h-[80vh] p-4 animate-fade-in pb-12">
+    <div class="flex flex-col items-center justify-center min-h-[80vh] p-4 pt-24 animate-fade-in pb-12">
       
       <div class="mb-8 text-center space-y-2 opacity-90">
-        <h2 class="text-xl font-mono text-rose-500 tracking-widest uppercase">Encryption Complete</h2>
+        <h2 class="text-xl font-mono text-rose-500 tracking-widest uppercase">Transmission Complete</h2>
         <p class="text-[10px] text-gray-400 font-mono">ARTIFACT_ID: {{ randomId }}</p>
       </div>
 
       <!-- The Card Container (Preview) -->
-      <div class="relative bg-[#f4f1ea] p-5 pb-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] transform rotate-1 transition-transform hover:rotate-0 duration-700 max-w-sm w-full mx-auto rounded-sm border border-white/10">
+      <div class="relative bg-[#f4f1ea] p-5 pb-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] transform rotate-1 transition-transform hover:rotate-0 duration-700 max-w-sm w-full mx-auto rounded-sm border border-white/10 group">
         
         <!-- Header text on card -->
         <div class="w-full text-center mb-4 pt-2">
@@ -24,20 +26,39 @@ interface TextSegment {
         </div>
 
         <!-- Main Art Image Area -->
-        <div class="bg-white p-2 shadow-inner mb-6">
+        <div class="bg-white p-2 shadow-inner mb-6 relative">
            <div class="aspect-square w-full bg-zinc-100 overflow-hidden relative grayscale-[0.1] contrast-105 sepia-[0.15]">
             @if (stylizedImageSrc()) {
-              <img [src]="stylizedImageSrc()" class="w-full h-full object-cover" alt="AI Art" (load)="onImageLoad()">
+              <img [src]="stylizedImageSrc()" class="w-full h-full object-cover transition-opacity duration-500" [class.opacity-50]="isRegenerating()" alt="AI Art" (load)="onImageLoad()">
             } @else {
               <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-200 text-zinc-400 gap-2">
                 <div class="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
                 <span class="text-[10px] uppercase tracking-widest">Developing...</span>
               </div>
             }
+
+            @if (isRegenerating()) {
+               <div class="absolute inset-0 flex items-center justify-center z-10">
+                 <div class="bg-black/70 backdrop-blur-sm px-4 py-2 rounded border border-rose-500/50 flex items-center gap-3">
+                   <div class="w-3 h-3 border border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+                   <span class="text-[10px] font-mono text-rose-400 tracking-widest uppercase">Tuning Signal...</span>
+                 </div>
+               </div>
+            }
+
             <div class="absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay" 
                  style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%221%22/%3E%3C/svg%3E');">
             </div>
           </div>
+          
+          <!-- Tune Signal Button -->
+          <button 
+             (click)="openEditor()"
+             [disabled]="isRegenerating()"
+             class="absolute -bottom-3 right-2 bg-black/80 hover:bg-rose-900/90 text-gray-400 hover:text-white text-[9px] font-mono uppercase tracking-widest px-2 py-1 border border-gray-700 hover:border-rose-500 transition-colors z-20 opacity-0 group-hover:opacity-100 focus:opacity-100"
+          >
+            [ Tune_Signal_Data ]
+          </button>
         </div>
 
         <!-- The Poem Preview -->
@@ -76,6 +97,44 @@ interface TextSegment {
         </button>
       </div>
 
+      <!-- Prompt Editor Modal -->
+      @if (showEditor()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 animate-fade-in">
+           <div class="w-full max-w-lg bg-[#0f0f11] border border-rose-900/40 p-1 shadow-2xl shadow-rose-900/20">
+              <div class="bg-[#1a1a1d] p-4 flex flex-col gap-4">
+                 <div class="flex justify-between items-center border-b border-rose-900/30 pb-2">
+                    <h3 class="text-rose-500 font-mono text-xs tracking-widest uppercase">/// VISUAL_DATA_OVERRIDE ///</h3>
+                    <button (click)="closeEditor()" class="text-gray-500 hover:text-white font-mono text-xs">[X]</button>
+                 </div>
+                 
+                 <div class="relative">
+                    <textarea 
+                      [(ngModel)]="editablePrompt" 
+                      class="w-full h-64 bg-black border border-gray-800 p-3 font-mono text-[11px] text-gray-300 focus:outline-none focus:border-rose-500/50 leading-relaxed resize-none custom-scrollbar"
+                      spellcheck="false"
+                    ></textarea>
+                    <div class="absolute bottom-2 right-2 text-[9px] text-gray-600 font-mono pointer-events-none">RAW_DATA_INPUT</div>
+                 </div>
+
+                 <div class="flex gap-2 pt-2">
+                    <button 
+                       (click)="closeEditor()"
+                       class="flex-1 py-3 border border-gray-700 hover:bg-gray-800 text-gray-400 font-mono text-[10px] uppercase tracking-widest transition-colors"
+                    >
+                       Cancel
+                    </button>
+                    <button 
+                       (click)="submitRegeneration()"
+                       class="flex-1 py-3 bg-rose-900/20 hover:bg-rose-900/40 border border-rose-800/50 text-rose-400 font-mono text-[10px] uppercase tracking-widest transition-colors"
+                    >
+                       Execute_Changes
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      }
+
       <canvas #canvas class="hidden"></canvas>
     </div>
   `,
@@ -87,17 +146,54 @@ interface TextSegment {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #333;
+    }
   `]
 })
 export class PostcardResultComponent {
   poem = input.required<string>();
   stylizedImageSrc = input.required<string | null>();
+  imagePrompt = input<string>(''); // The full prompt used
+  isRegenerating = input<boolean>(false);
+  
+  regenerate = output<string>(); // Emits new prompt
   
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   
   imageLoaded = false;
   dateDisplay = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   randomId = Math.floor(Math.random() * 90000) + 10000;
+
+  // Editor State
+  showEditor = signal(false);
+  editablePrompt = signal('');
+
+  constructor() {
+    effect(() => {
+        // Sync editable prompt when input changes, but only if not currently editing
+        if (!this.showEditor() && this.imagePrompt()) {
+            this.editablePrompt.set(this.imagePrompt());
+        }
+    });
+  }
+
+  openEditor() {
+    this.editablePrompt.set(this.imagePrompt());
+    this.showEditor.set(true);
+  }
+
+  closeEditor() {
+    this.showEditor.set(false);
+  }
+
+  submitRegeneration() {
+    this.showEditor.set(false);
+    this.regenerate.emit(this.editablePrompt());
+  }
 
   onImageLoad() {
     this.imageLoaded = true;
@@ -119,7 +215,7 @@ export class PostcardResultComponent {
         await navigator.share({
           files: [file],
           title: 'Postcard from Mars',
-          text: 'A memory from Earth, encrypted for the colony.'
+          text: 'A memory from Earth, transmitted to the Mars colony.'
         });
       } catch (err) {
         console.log('Share failed', err);

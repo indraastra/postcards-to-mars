@@ -102,6 +102,9 @@
         <app-postcard-result 
           [poem]="finalPoem()" 
           [stylizedImageSrc]="stylizedImage()"
+          [imagePrompt]="generatedPrompt()"
+          [isRegenerating]="isRegenerating()"
+          (regenerate)="onRegenerateImage($event)"
         ></app-postcard-result>
       }
 

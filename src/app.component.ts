@@ -34,6 +34,7 @@ export class AppComponent {
 
   state = signal<AppState>('upload');
   loadingNextLine = signal(false);
+  isRegenerating = signal(false);
   
   // Lore State
   showLore = signal(false);
@@ -49,6 +50,7 @@ export class AppComponent {
   
   finalPoem = signal<string>('');
   stylizedImage = signal<string | null>(null);
+  generatedPrompt = signal<string>('');
 
   toggleLore() {
     this.showLore.update(v => !v);
@@ -119,17 +121,34 @@ export class AppComponent {
     // Generate AI Art (Nano Banana) - Image to Image
     const analysis = this.analysisResult();
     const original = this.originalImage();
-    let generatedImage: string | null = null;
-
+    
     if (analysis && original) {
       // Pass the original image AND poem to be stylized
-      generatedImage = await this.geminiService.generateStylizedImage(original, analysis.mood, finalPoemStr);
+      const result = await this.geminiService.generateStylizedImage(original, analysis.mood, finalPoemStr);
+      this.stylizedImage.set(result.image || original); // Fallback to original
+      this.generatedPrompt.set(result.prompt);
+    } else {
+      this.stylizedImage.set(original);
     }
-
-    // Fallback to original if generation fails
-    this.stylizedImage.set(generatedImage || original);
     
     this.state.set('result');
+  }
+
+  async onRegenerateImage(newPrompt: string) {
+    const original = this.originalImage();
+    if (!original) return;
+
+    this.isRegenerating.set(true);
+    this.generatedPrompt.set(newPrompt); // Update prompt state
+
+    const newImage = await this.geminiService.generateImageFromPrompt(original, newPrompt);
+    
+    if (newImage) {
+      this.stylizedImage.set(newImage);
+    }
+    // If it fails, we keep the old image but prompt is updated, which is fine for retry
+    
+    this.isRegenerating.set(false);
   }
 
   reset() {
@@ -139,5 +158,6 @@ export class AppComponent {
     this.poemHistory.set([]);
     this.currentSuggestions.set([]);
     this.stylizedImage.set(null);
+    this.generatedPrompt.set('');
   }
 }
