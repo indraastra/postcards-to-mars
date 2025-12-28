@@ -18,6 +18,7 @@ interface TextSegment {
       </div>
 
       <!-- The Card Container (Preview) -->
+      <!-- Added p-5 back to create the paper margin around the image -->
       <div class="relative bg-[#f4f1ea] p-5 pb-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] transform rotate-1 transition-transform hover:rotate-0 duration-700 max-w-sm w-full mx-auto rounded-sm border border-white/10 group">
         
         <!-- Header text on card -->
@@ -26,22 +27,29 @@ interface TextSegment {
         </div>
 
         <!-- Main Art Image Area -->
-        <div class="bg-white p-2 shadow-inner mb-6 relative">
+        <!-- Image sits inside the parent padding. Added shadow-lg for depth. -->
+        <div class="w-full relative shadow-lg mb-6">
            <div class="aspect-square w-full bg-zinc-100 overflow-hidden relative grayscale-[0.1] contrast-105 sepia-[0.15]">
             @if (stylizedImageSrc()) {
               <img [src]="stylizedImageSrc()" class="w-full h-full object-cover transition-opacity duration-500" [class.opacity-50]="isRegenerating()" alt="AI Art" (load)="onImageLoad()">
             } @else {
-              <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-200 text-zinc-400 gap-2">
-                <div class="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-[10px] uppercase tracking-widest">Developing...</span>
+              <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-200 text-zinc-400 gap-3">
+                 <!-- Linear Loader -->
+                 <div class="w-12 h-px bg-zinc-300 relative overflow-hidden">
+                    <div class="absolute h-full bg-zinc-500 animate-progress"></div>
+                 </div>
+                 <span class="text-[10px] uppercase tracking-widest">Developing...</span>
               </div>
             }
 
             @if (isRegenerating()) {
                <div class="absolute inset-0 flex items-center justify-center z-10">
-                 <div class="bg-black/70 backdrop-blur-sm px-4 py-2 rounded border border-rose-500/50 flex items-center gap-3">
-                   <div class="w-3 h-3 border border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-                   <span class="text-[10px] font-mono text-rose-400 tracking-widest uppercase">Tuning Signal...</span>
+                 <div class="bg-black/80 backdrop-blur-sm px-4 py-3 rounded border border-rose-500/50 flex flex-col items-center gap-2 shadow-lg">
+                   <!-- Linear Loader for Regeneration -->
+                   <div class="w-8 h-[2px] bg-rose-900/50 relative overflow-hidden rounded-full">
+                      <div class="absolute h-full bg-rose-500 animate-progress"></div>
+                   </div>
+                   <span class="text-[9px] font-mono text-rose-400 tracking-widest uppercase">Tuning Signal...</span>
                  </div>
                </div>
             }
@@ -62,7 +70,8 @@ interface TextSegment {
         </div>
 
         <!-- The Poem Preview -->
-        <div class="px-3 text-left">
+        <!-- Removed extra horizontal padding to align text with image edge -->
+        <div class="px-1 text-left">
           <div class="font-serif text-[#1a1a1d] text-lg leading-relaxed italic whitespace-pre-wrap pl-4 border-l-2 border-rose-900/10 mb-8" [innerHTML]="formattedPoemHtml()">
           </div>
           
@@ -145,6 +154,14 @@ interface TextSegment {
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-progress {
+      animation: progress 2s ease-in-out infinite;
+    }
+    @keyframes progress {
+      0% { width: 0%; transform: translateX(-100%); }
+      50% { width: 100%; transform: translateX(0); }
+      100% { width: 0%; transform: translateX(100%); }
     }
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
@@ -239,6 +256,56 @@ export class PostcardResultComponent {
     URL.revokeObjectURL(url);
   }
 
+  private parsePoemToWords(poem: string): TextSegment[] {
+    const segments: TextSegment[] = [];
+    const lines = poem.split('\n');
+
+    lines.forEach((line, lineIndex) => {
+      // Split by brackets to find highlighted parts
+      // Example: "Text [Highlight] Text" -> ["Text ", "[Highlight]", " Text"]
+      const parts = line.split(/(\[.*?\])/g);
+
+      parts.forEach(part => {
+        if (!part) return;
+
+        const isHighlight = part.startsWith('[') && part.endsWith(']');
+        const content = isHighlight ? part.slice(1, -1) : part;
+
+        // Split content by whitespace to get individual words
+        const words = content.trim().split(/\s+/);
+
+        words.forEach(word => {
+            if (!word) return;
+            segments.push({ text: word, isHighlight });
+        });
+      });
+
+      // Add newline segment if this isn't the last line
+      if (lineIndex < lines.length - 1) {
+        segments.push({ text: '\n', isHighlight: false });
+      }
+    });
+
+    return segments;
+  }
+
+  private drawGrain(ctx: CanvasRenderingContext2D, width: number, height: number) {
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    
+    // Simple noise algorithm
+    for (let i = 0; i < data.length; i += 4) {
+      const noise = (Math.random() - 0.5) * 30; // Intensity
+      
+      data[i] = Math.min(255, Math.max(0, data[i] + noise));     // R
+      data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise)); // G
+      data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise)); // B
+      // data[i+3] is Alpha, leave it alone
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+  }
+
   async bakeImage(): Promise<Blob | null> {
     if (!this.stylizedImageSrc() || !this.imageLoaded) return null;
     await document.fonts.ready;
@@ -273,17 +340,10 @@ export class PostcardResultComponent {
     ctx.letterSpacing = '0px';
 
     // 3. Image
-    const padding = 80;
-    const topMargin = 140; 
+    // Padding 60 matches the approx 5% padding in the UI (p-5 on ~400px card)
+    const padding = 60; 
+    const topMargin = 160; 
     const imgSize = width - (padding * 2);
-
-    // Image Border
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = "rgba(0,0,0,0.1)";
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 5;
-    ctx.fillRect(padding - 20, topMargin - 20, imgSize + 40, imgSize + 40);
-    ctx.shadowColor = "transparent";
 
     // Draw Image
     const img = new Image();
@@ -306,15 +366,26 @@ export class PostcardResultComponent {
         sourceY = (img.height - img.width) / 2;
     }
     
+    // Add Drop Shadow to the generated image in Canvas to match UI
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 10;
+    
     ctx.drawImage(img, sourceX, sourceY, sourceSide, sourceSide, padding, topMargin, imgSize, imgSize);
+    
+    ctx.restore();
     ctx.filter = 'none';
 
     // 4. Text - Shrink to Fit Logic
+    const textBorderX = padding + 15;
+    const textContentX = textBorderX + 45;
+    const textWidth = (width - padding) - textContentX; // Align right side with image right
+    
     const textAreaY = topMargin + imgSize + 60;
     const footerY = height - 120;
     const maxTextHeight = footerY - textAreaY - 20;
-    const textWidth = width - (padding * 2);
-    const textX = padding;
 
     // Reset settings
     ctx.textAlign = 'left';
@@ -337,18 +408,17 @@ export class PostcardResultComponent {
       ctx.font = `italic 400 ${fontSize}px "Playfair Display", serif`;
       const spaceW = ctx.measureText(' ').width;
 
-      let cursorX = 0; // Relative to textX
+      let cursorX = 0; // Relative to textContentX
       let cursorY = lineHeight; // Relative to textAreaY
       let currentLineWords: any[] = [];
       let lines = [];
-      let overflow = false;
 
       for (const word of words) {
         if (word.text === '\n') {
            lines.push({ words: currentLineWords, y: cursorY });
            currentLineWords = [];
            cursorX = 0;
-           cursorY += lineHeight * 1.2; // Paragraph gap
+           cursorY += lineHeight; // Standard line break spacing for newline
            continue;
         }
 
@@ -397,9 +467,9 @@ export class PostcardResultComponent {
     ctx.beginPath();
     ctx.strokeStyle = "rgba(136, 19, 55, 0.2)";
     ctx.lineWidth = 4;
-    ctx.moveTo(textX - 25, startY + 10);
+    ctx.moveTo(textBorderX, startY + 10);
     const contentHeight = finalLines.length > 0 ? finalLines[finalLines.length-1].y : 0;
-    ctx.lineTo(textX - 25, startY + contentHeight);
+    ctx.lineTo(textBorderX, startY + contentHeight);
     ctx.stroke();
 
     for (const line of finalLines) {
@@ -408,7 +478,7 @@ export class PostcardResultComponent {
              ? `italic 600 ${fontSize}px "Playfair Display", serif`
              : `italic 400 ${fontSize}px "Playfair Display", serif`;
          ctx.fillStyle = w.highlight ? '#9f1239' : '#1a1a1d';
-         ctx.fillText(w.text, textX + w.x, startY + line.y - (lineHeight * 0.2)); // Adjust baseline slightly
+         ctx.fillText(w.text, textContentX + w.x, startY + line.y - (lineHeight * 0.2)); // Adjust baseline slightly
       }
     }
 
@@ -435,53 +505,5 @@ export class PostcardResultComponent {
     this.drawGrain(ctx, width, height);
 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.90));
-  }
-
-  parsePoemToWords(rawPoem: string): TextSegment[] {
-    const segments: TextSegment[] = [];
-    const lines = rawPoem.split(/\r?\n/);
-
-    lines.forEach((line, index) => {
-       const regex = /\[(.*?)\]/g;
-       let lastIndex = 0;
-       let match;
-       
-       const addWords = (str: string, isHigh: boolean) => {
-          const w = str.split(' ').filter(s => s.length > 0);
-          w.forEach(word => segments.push({ text: word, isHighlight: isHigh }));
-       };
-
-       while ((match = regex.exec(line)) !== null) {
-          if (match.index > lastIndex) {
-             addWords(line.substring(lastIndex, match.index), false);
-          }
-          addWords(match[1], true);
-          lastIndex = regex.lastIndex;
-       }
-
-       if (lastIndex < line.length) {
-          addWords(line.substring(lastIndex), false);
-       }
-
-       if (index < lines.length - 1) {
-          segments.push({ text: '\n', isHighlight: false });
-       }
-    });
-    return segments;
-  }
-
-  drawGrain(ctx: CanvasRenderingContext2D, w: number, h: number) {
-    ctx.save();
-    ctx.globalAlpha = 0.05; 
-    ctx.fillStyle = '#1a1a1d';
-    for (let i = 0; i < 40000; i++) {
-        const x = Math.random() * w;
-        const y = Math.random() * h;
-        const r = Math.random() * 1.5;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.restore();
   }
 }

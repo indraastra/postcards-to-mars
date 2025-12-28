@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CameraUploadComponent } from './components/camera-upload.component';
 import { DialogueComponent, PoemLine } from './components/dialogue.component';
@@ -29,19 +29,19 @@ type AppState = 'upload' | 'analyzing' | 'dialogue' | 'generating' | 'result';
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   geminiService = inject(GeminiService);
 
   state = signal<AppState>('upload');
   loadingNextLine = signal(false);
   isRegenerating = signal(false);
   
-  // Lore State
+  // Lore/Info State
   showLore = signal(false);
+  showAbout = signal(false);
   
   // Data State
   originalImage = signal<string | null>(null);
-  analysisResult = signal<{ starter: string; mood: string; visualDescription: string; narrativeArc: string } | null>(null);
   
   poemHistory = signal<PoemLine[]>([]);
   
@@ -52,8 +52,47 @@ export class AppComponent {
   stylizedImage = signal<string | null>(null);
   generatedPrompt = signal<string>('');
 
+  // Loading State
+  loadingMessage = signal('Compressing Artifact');
+  private intervalId: any;
+  private readonly LOADING_MESSAGES = [
+    "Compressing visual data...",
+    "Allocating bandwidth...",
+    "Packet loss detected... Retrying...",
+    "Encrypting memory artifact...",
+    "Bypassing atmospheric interference...",
+    "Handshake with Colony 7 verified...",
+    "Uploading to deep space network...",
+    "Optimizing signal-to-noise ratio..."
+  ];
+
+  ngOnDestroy() {
+    this.stopLoadingCycle();
+  }
+
   toggleLore() {
     this.showLore.update(v => !v);
+  }
+
+  toggleAbout() {
+    this.showAbout.update(v => !v);
+  }
+
+  startLoadingCycle() {
+    let i = 0;
+    this.loadingMessage.set(this.LOADING_MESSAGES[0]);
+    this.stopLoadingCycle();
+    this.intervalId = setInterval(() => {
+      i = (i + 1) % this.LOADING_MESSAGES.length;
+      this.loadingMessage.set(this.LOADING_MESSAGES[i]);
+    }, 1800);
+  }
+
+  stopLoadingCycle() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   async onImageSelected(base64: string) {
@@ -62,10 +101,9 @@ export class AppComponent {
     
     const cleanBase64 = base64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
 
-    const analysis = await this.geminiService.analyzeImage(cleanBase64);
-    this.analysisResult.set(analysis);
-    this.currentStarter.set(analysis.starter);
-    this.currentSuggestions.set(analysis.suggestions || []);
+    const result = await this.geminiService.generateFirstLine(cleanBase64);
+    this.currentStarter.set(result.starter);
+    this.currentSuggestions.set(result.suggestions || []);
     this.poemHistory.set([]); 
     this.state.set('dialogue');
   }
@@ -81,16 +119,12 @@ export class AppComponent {
     }
 
     this.loadingNextLine.set(true);
-    const analysis = this.analysisResult();
     const currentTextHistory = this.poemHistory().map(l => l.fullText);
     const image = this.originalImage();
     
-    if (analysis && image) {
+    if (image) {
       const next = await this.geminiService.generateNextLine(
         currentTextHistory,
-        analysis.mood,
-        analysis.visualDescription,
-        analysis.narrativeArc,
         image
       );
       this.currentStarter.set(next.starter);
@@ -105,6 +139,7 @@ export class AppComponent {
     }
 
     this.state.set('generating');
+    this.startLoadingCycle();
     
     const historyLines = this.poemHistory();
 
@@ -112,25 +147,35 @@ export class AppComponent {
       .map(line => {
         // Smart spacing for final construction
         const sep = /^[\.,;:\?!]/.test(line.suffix) ? '' : ' ';
-        return `${line.prefix} [${line.userInput}]${sep}${line.suffix}`;
+        let fullLine = `${line.prefix} [${line.userInput}]${sep}${line.suffix}`.trim();
+        
+        // Ensure line ends with punctuation, checking both the very end AND inside the bracket
+        // Matches: "sentence." or "sentence [word.]" or "sentence [word!]"
+        const hasPunctuation = /[.!?]$/.test(fullLine) || /[.!?]\]$/.test(fullLine);
+
+        if (!hasPunctuation) {
+            fullLine += '.';
+        }
+        return fullLine;
       })
       .join('\n');
       
     this.finalPoem.set(finalPoemStr);
     
     // Generate AI Art (Nano Banana) - Image to Image
-    const analysis = this.analysisResult();
     const original = this.originalImage();
     
-    if (analysis && original) {
+    if (original) {
       // Pass the original image AND poem to be stylized
-      const result = await this.geminiService.generateStylizedImage(original, analysis.mood, finalPoemStr);
+      // Passing default 'nostalgic' mood as arg is unused but required by signature
+      const result = await this.geminiService.generateStylizedImage(original, 'nostalgic', finalPoemStr);
       this.stylizedImage.set(result.image || original); // Fallback to original
       this.generatedPrompt.set(result.prompt);
     } else {
       this.stylizedImage.set(original);
     }
     
+    this.stopLoadingCycle();
     this.state.set('result');
   }
 
@@ -152,9 +197,9 @@ export class AppComponent {
   }
 
   reset() {
+    this.stopLoadingCycle();
     this.state.set('upload');
     this.originalImage.set(null);
-    this.analysisResult.set(null);
     this.poemHistory.set([]);
     this.currentSuggestions.set([]);
     this.stylizedImage.set(null);

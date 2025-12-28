@@ -7,49 +7,54 @@ import { GoogleGenAI, Type } from '@google/genai';
 export class GeminiService {
   private ai: GoogleGenAI;
   
-  // Specific model versions requested
-  private readonly TEXT_MODEL = 'gemini-3-flash-preview'; 
+  private readonly TEXT_MODEL = 'gemini-3-flash-preview';
   private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
+
+  // FIX: Added backticks for multi-line string
+  private readonly SYSTEM_VOICE = `
+    **ROLE:** You are writing a postcard to someone you miss—someone who feels far away.
+    **CONTEXT:** You're looking at a photograph that makes you think of them. The distance between you might be physical, emotional, or something else entirely.
+    **VOICE:** Warm, wistful, tender. Slightly surreal but grounded in concrete details. Quiet americana. Things that glow in the dark. The feeling of reaching across distance through small observations.
+    **STYLE:** - **Past Tense ONLY.**
+    - **Concrete imagery** that spirals into feeling
+    - **Show, don't tell**—let images do the emotional work
+    - **Never use "you" in Acts 1 & 2**—save it for Act 3
+  `;
 
   constructor() {
     this.ai = new GoogleGenAI({ apiKey: process.env['API_KEY'] });
   }
 
   // ---------------------------------------------------------------------------
-  // 1. ANALYZE IMAGE (Line 1)
+  // 1. GENERATE FIRST LINE (Act 1)
   // ---------------------------------------------------------------------------
-  async analyzeImage(imageBase64: string): Promise<{ starter: string; mood: string; visualDescription: string; narrativeArc: string; suggestions: string[] }> {
-    const promptText = `You're writing a postcard from Earth to a colony on Mars. You're documenting what remains.
+  async generateFirstLine(imageBase64: string): Promise<{ starter: string; suggestions: string[] }> {
+    const randomSeed = Math.floor(Math.random() * 1000000000);
+    const promptText = `${this.SYSTEM_VOICE}
 
-**Voice:** Liminal spaces, quiet americana, the poetry of distance. Wistful but warm. Tender observation of the uncanny. Things that glow in the dark.
+ACT 1: THE OBSERVATION
+Write the opening line based on this photograph.
 
-**Your Task:**
-Study this image. Write one incomplete sentence (under 15 words) starting with "Today I..." in past tense, ending with "____". 
+GOAL: Describe one specific, dreamlike detail from the image. Ground us in the moment.
+This is what caught your eye when you looked at the photo. Simple observation made strange by attention.
 
-**The Lens:**
-Look at the image through a dreamlike filter. Don't just list objects. Describe the *quality* of the scene.
-- If it's a person: Describe the light on them, or the quiet of their pose.
-- If it's nature: Describe the movement or the stillness.
-- If it's an object: Describe its texture or presence.
+TONE: Warm and wistful. Concrete but slightly uncanny. Ordinary things made luminous.
 
-**Suggestions:**
-Provide 3 phrases to complete the blank.
-- MUST relate to visual details in *this specific image*.
-- Turn ordinary details into poetry.
-- Strange but comforting.
+EXAMPLES:
+* "Today I noticed the light falling across the table was ____"
+    -> ["soft as fog.", "amber and patient.", "the color of slow evenings."]
+* "Today I watched the way shadows pooled in the corner like ____"
+    -> ["spilled ink.", "something waiting to be named.", "quiet gathered in a glass."]
+* "Today I saw the steam from the cup curl into ____"
+    -> ["a question mark.", "the space between words.", "something almost like smoke signals."]
 
-**Examples:**
-"Today I watched the light settle on the floor like ____"
-→ ["dust from a previous life", "warm water", "gold spilled from a jar"]
+YOUR TASK:
+1. Starter: MUST start with "Today I..." followed by a concrete observation from the image (under 12 words, past tense). End with " ____".
+2. Suggestions: Provide 3 phrases that complete the observation—concrete but slightly strange, warm but wistful. Must end with a period.
 
-"Today I found the silence in the room felt like ____"
-→ ["a heavy blanket", "holding your breath", "the space between notes"]
+CRITICAL: Do NOT use "you" anywhere. Describe what's in the image, not who it's for (yet).
 
-Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
-
-    console.log('\n=== [Gemini] ANALYZE IMAGE PROMPT ===');
-    console.log(promptText);
-    console.log('=====================================\n');
+Return JSON.`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -62,111 +67,135 @@ Return JSON: starter, mood, visualDescription, narrativeArc, suggestions`;
           ]
         },
         config: {
-          temperature: 0.9, 
+          temperature: 0.75,
+          seed: randomSeed,
           responseMimeType: 'application/json',
           responseSchema: {
             type: Type.OBJECT,
             properties: {
               starter: { type: Type.STRING },
-              mood: { type: Type.STRING },
-              visualDescription: { type: Type.STRING },
-              narrativeArc: { type: Type.STRING },
               suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
             },
-            required: ['starter', 'mood', 'visualDescription', 'narrativeArc', 'suggestions']
+            required: ['starter', 'suggestions']
           }
         }
       });
 
       const result = JSON.parse(response.text || '{}');
-      if (result.starter && !result.starter.includes('____')) {
-        result.starter = result.starter.replace(/[.,;!]+$/, '') + ' ____';
+      
+      if (result.starter) {
+        let s = result.starter.trim();
+        if (!s.toLowerCase().startsWith('today i')) {
+          s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, ''); 
+        }
+        if (!s.includes('____')) s += ' ____';
+        if (s.endsWith('.')) s = s.slice(0, -1);
+        result.starter = s;
+      }
+
+      if (result.suggestions && Array.isArray(result.suggestions)) {
+        result.suggestions = result.suggestions.map((s: string) => {
+          let clean = s.trim();
+          if (!clean.endsWith('.')) clean += '.';
+          return clean;
+        });
       }
       
-      console.log('=== [Gemini] ANALYZE RESULT ===');
-      console.log(result);
-      console.log('===============================\n');
-
       return result;
     } catch (error) {
-      console.error('Analysis failed', error);
+      console.error('First line generation failed', error);
       return {
-        starter: "Today the light hit the wall and looked like ____",
-        mood: "Surreal",
-        visualDescription: "A quiet scene on Earth.",
-        narrativeArc: "Connection",
-        suggestions: ["a forgotten code", "liquid glass", "a memory of rain"]
+        starter: "Today I noticed the light on the wall looked like ____",
+        suggestions: ["something borrowed.", "a memory made solid.", "warmth suspended in air."]
       };
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 2. GENERATE NEXT LINE (Lines 2 & 3)
+  // 2. GENERATE NEXT LINE (Act 2 & 3)
   // ---------------------------------------------------------------------------
   async generateNextLine(
-    history: string[], 
-    mood: string, 
-    visualDescription: string,
-    narrativeArc: string,
+    history: string[],
     imageBase64: string
   ): Promise<{ starter: string; suggestions: string[] }> {
     try {
       const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
       const isFinalLine = history.length >= 2;
+      const historyText = history.join(' ');
+      const randomSeed = Math.floor(Math.random() * 1000000000);
 
-      // --- UNIVERSAL PROMPTS ---
-      const promptText = isFinalLine 
-        ? `You're writing the closing line of a postcard from Earth to Mars.
+      let taskInstructions = '';
+
+      if (isFinalLine) {
+        // --- ACT 3: THE CONNECTION ---
+        taskInstructions = `
+        **ACT 3: THE CONNECTION**
         
-**Context:**
-- **Story so far:** "${history.join(' ')}"
-- **Theme:** ${narrativeArc}
-- **Mood:** ${mood}
+        **GOAL:** Pivot from observation to feeling. Connect the image to the distance between you and them.
+        This is the turn—from what's in the photograph to what it means that they're not here.
+        
+        **TONE:** Tender, hopeful, reaching across distance. Warm metaphors about connection and longing.
+        
+        **THE STEM (8-12 words, past tense, end with " ____"):**
+        - Can reference the distance: "The space between us felt like ____", "The distance seemed to ____"
+        - Can reference realization: "I understood then that missing them was ____", "It reminded me that ____"
+        - Can be abstract: "The silence left behind tasted like ____", "The emptiness held ____"
+        
+        **NOW you can use "you/them"** to address or reference the person you miss.
 
-**Final Line Task: THE ANCHOR**
-1. **Look at the image one last time.** Find the *main focal point*—whatever it is (a face, a tree, a shadow, a messy desk, a building).
-2. **The Sentence Stem:** Describe that focal point simply. "The [subject] looked...", "I realized the [subject] was...", "The way the [subject] moved..."
-3. **The Blank:** The blank is for the *feeling* that this subject evokes about distance and connection.
+        **THE SUGGESTIONS:**
+        - Warm, hopeful metaphors about connection across distance
+        - Focus on persistence, memory, the feeling of reaching toward something
+        - Concrete but ethereal—"light that travels forever", not "I'm sad"
 
-**Style:** - Wistful, warm, intimate.
-- **Do not be too abstract.** Ground the feeling in the image.
-- **Do not be too literal.** The image is a metaphor for missing someone.
+        **EXAMPLES:**
+        * "The distance between us felt like ____"
+            -> ["something I could fold smaller.", "a hand reaching through fog.", "the pause between thunder and lightning."]
+        * "I realized that missing them was like ____"
+            -> ["carrying light in my chest.", "a conversation happening across years.", "gravity pulling me toward home."]
+        * "The empty space beside me held ____"
+            -> ["the shape of their laughter.", "a warmth that hasn't faded.", "all the things I should have said."]
+        `;
+      } else {
+        // --- ACT 2: THE DETAIL ---
+        taskInstructions = `
+        **ACT 2: THE DETAIL**
+        
+        **GOAL:** Zoom into a sensory detail that makes the memory tangible.
+        Bridge the visual observation of Act 1 with the emotional turn of Act 3. Focus on texture, temperature, light quality—something you could almost touch.
+        
+        **TONE:** Warm, wistful, concrete. Slightly dreamlike but grounded in physical sensation.
+        
+        **INSTRUCTIONS:**
+        1.  Find a tactile or sensory element in the image (how light moves, what things feel like, the quality of air)
+        2.  Write a stem (8-12 words, past tense, end with " ____")
+        3.  Provide 3 concrete, sensory completions—warm and strange
 
-**Suggestions (The Connection):**
-Provide 3 phrases (5-10 words each) to complete it.
-- **Goal:** Connect the visual details to the theme of "${narrativeArc}".
-- **Examples:** "like a promise kept", "the shape of your laughter", "a signal waiting to be caught", "warmth that travels forever".
+        **CRITICAL:** Still NO "you"—keep observing the scene itself.
 
-Return JSON: starter, suggestions`
-        : `You're writing line two of a postcard from Earth to Mars.
+        **EXAMPLES:**
+        * "The glass caught the light and held it like ____"
+            -> ["a secret.", "amber in suspension.", "the last hour of daylight."]
+        * "The air between objects seemed to hum with ____"
+            -> ["the static of old film.", "patient waiting.", "the frequency of longing."]
+        * "The way the fabric fell across the chair reminded me of ____"
+            -> ["how time pools in corners.", "something soft giving way.", "the weight of absence."]
+        `;
+      }
 
-**Context:**
-- **Story so far:** "${history.join(' ')}"
-- **Image Context:** ${visualDescription}
-- **Theme:** ${narrativeArc}
+      const promptText = `${this.SYSTEM_VOICE}
 
-**Second Line Task: DEEPENING THE ATMOSPHERE**
-Create an incomplete sentence that focuses on a **sensory detail** in the image (Light, Texture, Color, Sound) that reinforces the theme of "${narrativeArc}".
+TASK: Write the NEXT sentence of this postcard.
+WHAT YOU'VE WRITTEN SO FAR: "${historyText}"
 
-**The Vibe:**
-- If the image is busy, find the stillness.
-- If the image is empty, find the presence.
-- If the image is dark, find the glow.
+CONTINUITY:
+- Flow naturally from what came before—maintain the same rhythm and wistful tone
+- Don't repeat nouns or images already used
+- Build the feeling progressively—observation → detail → connection
 
-**Sentence Stem:**
-- Past tense.
-- End with " ____".
-- Must be incomplete.
+${taskInstructions}
 
-**Suggestions:**
-- 3 poetic phrases describing that sensory detail.
-- Strange, dreamy, specific to Earth.
-
-Return JSON: starter, suggestions`;
-
-      console.log('\n=== [Gemini] NEXT LINE PROMPT ===');
-      console.log(promptText);
-      console.log('=================================\n');
+Return JSON.`;
 
       const response = await this.ai.models.generateContent({
         model: this.TEXT_MODEL,
@@ -178,7 +207,8 @@ Return JSON: starter, suggestions`;
           ]
         },
         config: {
-          temperature: 0.9, 
+          temperature: 0.75, 
+          seed: randomSeed,
           responseMimeType: 'application/json',
           responseSchema: {
             type: Type.OBJECT,
@@ -196,50 +226,49 @@ Return JSON: starter, suggestions`;
       if (result.starter) {
         let s = result.starter.trim();
         
-        // Safety cleanup for repeated history
-        const historyStr = history.join(' ');
-        if (history.length > 0 && s.startsWith(historyStr.substring(0, 20))) {
-          s = s.replace(historyStr, '').trim();
-          if (s.length < 5) s = "It felt like";
+        // Remove accidental history repetition
+        if (historyText.length > 0 && s.startsWith(historyText.substring(0, 15))) {
+          s = s.replace(historyText, '').trim();
         }
 
-        if (!s.includes('____')) {
-          s = s.replace(/[.,;!]+$/, '');
-          s += ' ____';
+        // For Act 2/3, prevent "Today I" from sneaking back in
+        if (s.toLowerCase().startsWith('today i ')) {
+          s = s.substring(8).trim();
+          s = s.charAt(0).toUpperCase() + s.slice(1);
         }
+
+        if (!s.includes('____')) s += ' ____';
+        if (s.endsWith('.')) s = s.slice(0, -1);
+        
         result.starter = s;
       }
 
-      console.log('=== [Gemini] NEXT LINE RESULT ===');
-      console.log(result);
-      console.log('=================================\n');
+      if (result.suggestions && Array.isArray(result.suggestions)) {
+        result.suggestions = result.suggestions.map((s: string) => {
+          let clean = s.trim();
+          if (!clean.endsWith('.')) clean += '.';
+          return clean;
+        });
+      }
 
       return result;
     } catch (error) {
       console.error('Next line generation failed', error);
       return { 
-        starter: "It felt like ____", 
-        suggestions: ["a dream waking up", "static on the line", "the color of time"] 
+        starter: "The distance felt like ____", 
+        suggestions: ["something I could almost touch.", "light traveling through years.", "a bridge made of memory."] 
       };
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 3. IDENTIFY KEY ELEMENTS TO PRESERVE
+  // 3. IDENTIFY KEY ELEMENTS
   // ---------------------------------------------------------------------------
   private async identifyKeyElements(imageBase64: string, poem: string): Promise<string> {
-    const promptText = `You're analyzing a photograph to identify what must be preserved when applying artistic stylization.
-
-**The Poem about this image:**
-"${poem.replace(/\[|\]/g, '').substring(0, 300)}"
-
-**Your Task:**
-List the 3-5 most important visual elements that must remain recognizable.
-- **IGNORE TEXT:** Do NOT list signage, street names, logos, or text.
-- **Focus on Forms:** Identify main subjects (people, animals, objects) and key spatial relationships.
-- **Atmosphere:** Note the light source if it's prominent.
-
-Be specific but concise. Format as a comma-separated list.`;
+    const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+    const randomSeed = Math.floor(Math.random() * 1000000000);
+    // FIX: Added backticks
+    const promptText = `List the 3 most prominent subjects in this image. Be specific. Format as comma-separated nouns.`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -247,17 +276,17 @@ Be specific but concise. Format as a comma-separated list.`;
         contents: {
           role: 'user',
           parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
+            { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
             { text: promptText }
           ]
         },
-        config: { temperature: 0.5 }
+        config: { temperature: 0.5, seed: randomSeed }
       });
       
-      return response.text?.trim() || "Main subject and composition";
+      const text = response.text?.trim();
+      return (text && text.length > 3) ? text : "the main subject and light";
     } catch (e) {
-      console.error('Element identification failed', e);
-      return "Main subject and composition";
+      return "the main subject and light";
     }
   }
 
@@ -265,76 +294,48 @@ Be specific but concise. Format as a comma-separated list.`;
   // 4. GENERATE STYLIZED IMAGE
   // ---------------------------------------------------------------------------
   async generateStylizedImage(originalBase64: string, mood: string, poem: string): Promise<{ image: string | null; prompt: string }> {
-    try {
-      console.log('Step 1: Identifying key elements to preserve...');
-      const cleanBase64 = originalBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-      const keyElements = await this.identifyKeyElements(cleanBase64, poem);
-      
-      console.log('=== [Gemini] KEY ELEMENTS ===');
-      console.log(keyElements);
-      console.log('=============================\n');
+    const keyElements = await this.identifyKeyElements(originalBase64);
+    const fullPrompt = `Stylize this photograph of ${keyElements} into a warm, wistful postcard illustration while preserving their recognizable features and spatial relationships.
+    
+    Style Treatment:
+    - Square 1:1 format (recompose if needed but keep subjects clear)
+    - Flat vector aesthetic with soft geometric shapes
+    - Color palette: deep indigo shadows with glowing amber-gold highlights
+    - Slightly dreamlike but grounded—think quiet americana, liminal spaces, things that glow
+    - Aged postcard texture: subtle crease lines, worn edges, fine halftone grain
+    - NO text, signs, or written language anywhere
+    
+    Preserve:
+    - The pose and position of ${keyElements}
+    - Key spatial relationships
+    - Recognizable features (simplified but identifiable)
+    
+    Goal: A tender, nostalgic illustration that feels like a memory made tangible—warm light in darkness, concrete but slightly ethereal.`;
 
-      const fullPrompt = `Apply stylized visual treatment to this photograph while preserving its content.
-
-**CRITICAL: Preserve These Elements**
-${keyElements}
-
-Keep these recognizable. Do not add new objects.
-
-**Style to Apply: "Mars-Tinged Memory Postcard"**
-- **Palette:** Deep Indigo/Black shadows vs. Warm Rust/Amber/Gold highlights.
-- **Aesthetic:** Flat vector shapes + Aged Analog Texture.
-- **Lighting:** Theatrical "stage" lighting. High contrast.
-- **Texture:** Apply heavy **film grain, dust, scratches, and worn paper texture** to simulate an aged physical postcard found on Mars.
-- **Forms:** Simplify details into cleaner geometric shapes (Low Poly/Vector) but keep the organic feel of the subject.
-
-**Technical Requirements:**
-- 1:1 square aspect ratio
-- Same composition and framing as original
-- Subjects remain recognizable
-- NO photorealism. Target look: "A vector illustration printed on old, coarse cardstock."
-
-**The Goal:**
-Transform the photo's visual style (colors, edges, lighting) while preserving what's actually in it. Like an artistic filter, not a reimagining.`;
-
-      const image = await this.generateImageFromPrompt(originalBase64, fullPrompt);
-      return { image, prompt: fullPrompt };
-
-    } catch (error) {
-      console.error('Image stylization failed', error);
-      return { image: null, prompt: '' };
-    }
+    const image = await this.generateImageFromPrompt(originalBase64, fullPrompt);
+    return { image, prompt: fullPrompt };
   }
 
-  // ---------------------------------------------------------------------------
-  // 5. GENERATE FROM PROMPT (Helper)
-  // ---------------------------------------------------------------------------
-  async generateImageFromPrompt(originalBase64: string, prompt: string): Promise<string | null> {
+  async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
+    const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+    const randomSeed = Math.floor(Math.random() * 1000000000);
     try {
-       const cleanBase64 = originalBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-       
-       console.log('\n=== [Gemini] GENERATE FROM PROMPT ===');
-       console.log(prompt);
-       console.log('=====================================\n');
-
-       const response = await this.ai.models.generateContent({
+      const response = await this.ai.models.generateContent({
         model: this.IMAGE_MODEL,
         contents: {
           role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
-            { text: prompt }
-          ]
+          parts: [{ inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }, { text: prompt }]
+        },
+        config: { 
+            seed: randomSeed,
+            // Note: If using gemini-2.0-flash-exp, you can often pass aspect ratio here
+            // responseMimeType: 'image/jpeg',
+            // aspectRatio: '1:1'
         }
       });
 
-      const imagePartFromResponse = response.candidates?.[0]?.content?.parts?.find(part => part.inlineData);
-
-      if (imagePartFromResponse?.inlineData) {
-        const { mimeType, data } = imagePartFromResponse.inlineData;
-        return `data:${mimeType};base64,${data}`;
-      }
-      return null;
+      const imagePart = response.candidates?.[0]?.content?.parts?.find(part => part.inlineData);
+      return imagePart?.inlineData ? `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}` : null;
     } catch (error) {
       console.error('Generation from prompt failed', error);
       return null;

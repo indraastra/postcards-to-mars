@@ -19,10 +19,46 @@
       </span>
     </div>
     
-    <button (click)="reset()" class="text-[10px] font-mono text-gray-500 hover:text-rose-500 uppercase tracking-widest transition-colors">
-      [ RESET UPLINK ]
-    </button>
+    <div class="flex items-center gap-6">
+      <button (click)="toggleAbout()" class="text-[10px] font-mono text-gray-500 hover:text-white uppercase tracking-widest transition-colors">
+        [ INFO ]
+      </button>
+      <button (click)="reset()" class="text-[10px] font-mono text-gray-500 hover:text-rose-500 uppercase tracking-widest transition-colors">
+        [ RESET UPLINK ]
+      </button>
+    </div>
   </header>
+
+  <!-- Info Modal (Experiment Description) -->
+  @if (showAbout()) {
+    <div class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in" (click)="toggleAbout()">
+       <div class="max-w-md w-full border border-gray-800 bg-[#0a0a0c] p-8 relative shadow-2xl shadow-rose-900/10" (click)="$event.stopPropagation()">
+          
+          <button (click)="toggleAbout()" class="absolute top-4 right-4 text-gray-600 hover:text-white font-mono text-[10px]">[ CLOSE ]</button>
+          
+          <h2 class="font-mono text-xs tracking-[0.2em] text-rose-500 uppercase mb-6 flex items-center gap-2">
+            <span class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
+            About This Experiment
+          </h2>
+          
+          <p class="font-serif italic text-xl text-gray-200 leading-relaxed mb-6">
+            "Ideally, a postcard is a bridge. It says 'I am here, you are there, and I am thinking of you.'"
+          </p>
+          
+          <div class="space-y-4 font-mono text-[11px] text-gray-400 leading-relaxed">
+             <p>
+               Sometimes the distance between people feels vast — like planets drifting apart. This project is a quiet attempt to close that gap.
+             </p>
+             <p>
+               It uses AI to help you translate a visual memory into something tangible. You provide the image; the system helps you find the words. Together, you create a digital souvenir to send through the static.
+             </p>
+             <p>
+               It's a way to slow down and send a signal to someone far away: <span class="text-rose-500 font-bold">I saw this, and I thought of you.</span>
+             </p>
+          </div>
+       </div>
+    </div>
+  }
 
   <!-- Lore Overlay (Terminal Style) -->
   @if (showLore()) {
@@ -89,11 +125,15 @@
       }
 
       @case ('generating') {
-        <div class="flex flex-col items-center gap-6 text-center px-6">
-          <div class="w-8 h-8 border border-rose-800/50 border-t-rose-500 rounded-full animate-spin"></div>
+        <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
+          <!-- Linear Loader -->
+          <div class="w-24 h-px bg-gray-800 relative overflow-hidden">
+             <div class="absolute h-full bg-rose-500 animate-progress"></div>
+          </div>
+          
           <div class="font-mono space-y-2">
-            <h3 class="text-xs text-rose-500 tracking-widest uppercase">Compressing Artifact</h3>
-            <p class="text-[10px] text-gray-400 uppercase tracking-wider">Packet loss detected... Retrying...</p>
+            <h3 class="text-xs text-rose-500 tracking-widest uppercase">Transmission in Progress</h3>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider min-h-[1rem]">{{ loadingMessage() }}</p>
           </div>
         </div>
       }

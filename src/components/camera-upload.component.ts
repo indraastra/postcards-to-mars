@@ -12,7 +12,7 @@ import { Component, output, signal } from '@angular/core';
         </h1>
         
         <div class="flex flex-col gap-1 text-[10px] md:text-[11px] font-mono text-rose-400/80 uppercase tracking-widest">
-          <p>TERMINAL: E-99 (ACTIVE)</p>
+          <p>TERMINAL: E-99 (<span class="text-amber-500 animate-pulse">WEAK SIGNAL</span>)</p>
           <p>STATUS: WAITING FOR INPUT</p>
           <p>PROTOCOL: MEMORY_COMPRESSION</p>
         </div>
@@ -94,7 +94,7 @@ export class CameraUploadComponent {
       
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        this.imageSelected.emit(result);
+        this.resizeImage(result);
       };
       
       reader.onerror = () => {
@@ -103,5 +103,48 @@ export class CameraUploadComponent {
       
       reader.readAsDataURL(file);
     }
+  }
+
+  private resizeImage(base64Str: string) {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+      const MAX_SIZE = 1600;
+
+      // Calculate new dimensions if image is larger than MAX_SIZE
+      if (width > MAX_SIZE || height > MAX_SIZE) {
+        if (width > height) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        } else {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        // Fallback if canvas context fails
+        this.imageSelected.emit(base64Str);
+        return;
+      }
+
+      // Draw resized image
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Export as JPEG with reasonable quality to reduce size further
+      const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      this.imageSelected.emit(resizedDataUrl);
+    };
+
+    img.onerror = () => {
+      this.errorMessage.set('IMAGE_PROCESSING_ERROR');
+    };
   }
 }
