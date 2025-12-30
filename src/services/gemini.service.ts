@@ -295,7 +295,7 @@ Be specific but concise. Format as a comma-separated list.`;
     return { image, prompt: fullPrompt };
   }
 
-  private async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
+  public async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
     const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
     try {
       const response = await this.ai.models.generateContent({
