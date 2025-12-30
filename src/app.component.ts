@@ -166,9 +166,7 @@ export class AppComponent implements OnDestroy {
     const original = this.originalImage();
     
     if (original) {
-      // Pass the original image AND poem to be stylized
-      // Passing default 'nostalgic' mood as arg is unused but required by signature
-      const result = await this.geminiService.generateStylizedImage(original, 'nostalgic', finalPoemStr);
+      const result = await this.geminiService.generateStylizedImage(original, finalPoemStr);
       this.stylizedImage.set(result.image || original); // Fallback to original
       this.generatedPrompt.set(result.prompt);
     } else {
