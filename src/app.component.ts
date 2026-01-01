@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CameraUploadComponent } from './components/camera-upload.component';
 import { DialogueComponent, PoemLine } from './components/dialogue.component';
 import { PostcardResultComponent } from './components/postcard-result.component';
-import { GeminiService } from './services/gemini.service';
+import { GeminiService, PoemAct } from './services/gemini.service';
 
 type AppState = 'upload' | 'analyzing' | 'dialogue' | 'generating' | 'result';
 
@@ -42,9 +42,16 @@ export class AppComponent implements OnDestroy {
   
   // Data State
   originalImage = signal<string | null>(null);
+  imageGenerationPromise: Promise<{ image: string | null; prompt: string; version: string }> | null = null;
+  promptVersion = signal<string>('');
   
+  // Poem Generation State
+  poemActs = signal<PoemAct[]>([]);
+  currentActIndex = signal<number>(0);
+
   poemHistory = signal<PoemLine[]>([]);
   
+  // Current Display Props
   currentStarter = signal<string>('');
   currentSuggestions = signal<string[]>([]);
   
@@ -99,38 +106,50 @@ export class AppComponent implements OnDestroy {
     this.originalImage.set(base64);
     this.state.set('analyzing');
     
-    const cleanBase64 = base64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-
-    const result = await this.geminiService.generateFirstLine(cleanBase64);
-    this.currentStarter.set(result.starter);
-    this.currentSuggestions.set(result.suggestions || []);
+    // Start parallel image generation
+    this.imageGenerationPromise = this.geminiService.generateStylizedImage(base64);
+    
+    // Generate the full poem structure (3 acts) at once
+    const acts = await this.geminiService.generatePoemStructure(base64);
+    
+    this.poemActs.set(acts);
+    this.currentActIndex.set(0);
     this.poemHistory.set([]); 
+    
+    // Load first act
+    if (acts.length > 0) {
+      this.currentStarter.set(acts[0].starter);
+      this.currentSuggestions.set(acts[0].suggestions);
+    }
+    
     this.state.set('dialogue');
   }
 
-  async onLineCompleted(line: PoemLine) {
+  onLineCompleted(line: PoemLine) {
     this.poemHistory.update(lines => [...lines, line]);
     
-    // Limit to 3 lines for a concise postcard
-    // After 3rd line is added, length is 3.
-    if (this.poemHistory().length >= 3) { 
-      this.finishCreation();
-      return;
-    }
+    const nextIndex = this.currentActIndex() + 1;
+    const allActs = this.poemActs();
 
-    this.loadingNextLine.set(true);
-    const currentTextHistory = this.poemHistory().map(l => l.fullText);
-    const image = this.originalImage();
-    
-    if (image) {
-      const next = await this.geminiService.generateNextLine(
-        currentTextHistory,
-        image
-      );
-      this.currentStarter.set(next.starter);
-      this.currentSuggestions.set(next.suggestions || []);
+    // Check if we have more acts to display
+    if (nextIndex < allActs.length) {
+      // Simulate "thinking" delay for the UX rhythm
+      this.loadingNextLine.set(true);
+      
+      // Random delay between 1s (1000ms) and 3s (3000ms)
+      const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+
+      setTimeout(() => {
+        this.currentActIndex.set(nextIndex);
+        this.currentStarter.set(allActs[nextIndex].starter);
+        this.currentSuggestions.set(allActs[nextIndex].suggestions);
+        this.loadingNextLine.set(false);
+      }, delay); 
+      
+    } else {
+      // Finished all acts
+      this.finishCreation();
     }
-    this.loadingNextLine.set(false);
   }
 
   async finishCreation(lastLine?: PoemLine) {
@@ -163,15 +182,34 @@ export class AppComponent implements OnDestroy {
     this.finalPoem.set(finalPoemStr);
     
     // Generate AI Art (Nano Banana) - Image to Image
+    // Ensure minimum random delay between 2s and 4s for UX pacing
+    const randomDelayMs = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
+    const minDelay = new Promise(resolve => setTimeout(resolve, randomDelayMs));
+    
+    let imageResult: { image: string | null; prompt: string; version: string };
     const original = this.originalImage();
     
-    if (original) {
-      const result = await this.geminiService.generateStylizedImage(original, finalPoemStr);
-      this.stylizedImage.set(result.image || original); // Fallback to original
-      this.generatedPrompt.set(result.prompt);
-    } else {
-      this.stylizedImage.set(original);
+    try {
+      if (this.imageGenerationPromise) {
+        // Wait for the parallel request to complete + the min delay
+        const [result] = await Promise.all([this.imageGenerationPromise, minDelay]);
+        imageResult = result;
+      } else if (original) {
+        // Fallback if promise missing
+        const [result] = await Promise.all([this.geminiService.generateStylizedImage(original), minDelay]);
+        imageResult = result;
+      } else {
+         await minDelay;
+         imageResult = { image: null, prompt: '', version: 'ERR-0.0' };
+      }
+    } catch (err) {
+      console.error('Image generation failed', err);
+      imageResult = { image: null, prompt: '', version: 'ERR-0.0' };
     }
+    
+    this.stylizedImage.set(imageResult.image || original); // Fallback to original
+    this.generatedPrompt.set(imageResult.prompt);
+    this.promptVersion.set(imageResult.version || 'SEQ-84.X');
     
     this.stopLoadingCycle();
     this.state.set('result');
@@ -189,7 +227,6 @@ export class AppComponent implements OnDestroy {
     if (newImage) {
       this.stylizedImage.set(newImage);
     }
-    // If it fails, we keep the old image but prompt is updated, which is fine for retry
     
     this.isRegenerating.set(false);
   }
@@ -198,9 +235,13 @@ export class AppComponent implements OnDestroy {
     this.stopLoadingCycle();
     this.state.set('upload');
     this.originalImage.set(null);
+    this.imageGenerationPromise = null;
     this.poemHistory.set([]);
+    this.poemActs.set([]);
+    this.currentActIndex.set(0);
     this.currentSuggestions.set([]);
     this.stylizedImage.set(null);
     this.generatedPrompt.set('');
+    this.promptVersion.set('');
   }
 }

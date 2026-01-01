@@ -1,54 +1,91 @@
 import { Injectable } from '@angular/core';
 import { GoogleGenAI, Type } from '@google/genai';
 
+export interface PoemAct {
+  starter: string;
+  suggestions: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class GeminiService {
   private ai: GoogleGenAI;
   
-  // Specific model versions requested
-  private readonly TEXT_MODEL = 'gemini-3-flash-preview';
-  private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
+  // Diegetic Versioning for the Prompt Logic - Increment after every tweak!
+  public readonly PROMPT_VERSION = 'SEQ-84.4'; 
+  // Do not change model versions.
+  private readonly TEXT_MODEL = 'gemini-3-flash-preview'; 
+  private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview'; 
+
+  // Persona: Intimate, Hopeful, Open
+  private readonly SYSTEM_VOICE = `
+    **ROLE:** You are writing a postcard to someone you love who is very far away (on Mars).
+    **VOICE:** Intimate, warm, hopeful. The poetry of enduring connection.
+    **STYLE:** - **Past Tense ONLY.**
+    - **Concrete Imagery:** Anchor emotions in what's depicted in the image.
+    - **Show, Don't Tell:** Focus on the feeling of the scene.
+  `;
 
   constructor() {
     this.ai = new GoogleGenAI({ apiKey: process.env['API_KEY'] });
   }
 
+  private cleanBase64(data: string): string {
+    return data.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+  }
+
   // ---------------------------------------------------------------------------
-  // 1. GENERATE FIRST LINE (Act 1: The Observation)
+  // 1. GENERATE FULL POEM STRUCTURE (One-Shot)
   // ---------------------------------------------------------------------------
-  async generateFirstLine(imageBase64: string): Promise<{ starter: string; suggestions: string[] }> {
-    const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+  async generatePoemStructure(imageBase64: string): Promise<PoemAct[]> {
+    const cleanData = this.cleanBase64(imageBase64);
+    const randomSeed = Math.floor(Math.random() * 1000000000);
 
-    const promptText = `You're writing a postcard from Earth to a colony on Mars. You're documenting what remains.
+    // RESTORED: The exact text/examples from the original multi-step prompts
+    const promptText = `${this.SYSTEM_VOICE}
 
-**Voice:** Liminal spaces, quiet americana, the poetry of distance. Wistful but warm. Tender observation of the uncanny. Things that glow in the dark.
+**TASK:** Analyze the image and write a cohesive 3-line poem structure.
+Return a JSON array where each item represents one "Act" of the poem.
 
-**Your Task:**
-Study this image. Write one opening sentence starting with "Today I..." in past tense, ending with "____". 
+**THE NARRATIVE ARC:**
 
-**The Lens:**
-Look at the image through a dreamlike filter, turn ordinary details into strange but comforting poetry. Don't just list objects. Describe the *quality* of the scene.
-- If it's a person: Describe the light on them, or the quiet of their pose.
-- If it's nature: Describe the movement or the stillness.
-- If it's an object: Describe its texture or presence.
+**ACT 1: THE SETUP (The Observation)**
+* **GOAL:** A specific, dreamlike observation of the **moment**. This is the setting. Just observe the world as it presents itself before the mind wanders to the recipient.
+* **EXAMPLES:**
+    * "Today I watched the horizon dissolve into ____" -> ["white ink.", "gold dust.", "a soft blur."]
+    * "Today I noticed the quiet in the room felt like ____" -> ["a warm coat.", "a static hum.", "a held breath."]
+* **CONSTRAINTS:**
+    * **Starter:** MUST start with "Today I..." followed by a pithy past tense observation (under 12 words).
+    * **Suggestions:** 3 distinct, evocative phrases to fill the blank.
 
-**Constraints:**
-1. **Stem Length:** UNDER 15 WORDS (Set the scene).
-2. **Suggestion Length:** UNDER 8 WORDS.
-3. **PAST TENSE ONLY.**.
-4. **Subject + Verb.** DO NOT use fragments.
-5. **End with " ____".**
+**ACT 2: THE BODY (Specific Micro-Interaction)**
+* **GOAL:** Describe a **Specific Micro-Interaction** in the scene. Bridge the visual setup of Act 1 with the emotional pivot of Act 3 by focusing on the **tactile reality** of the moment.
+* **INSTRUCTIONS:** Identify the Interaction: What are the hands holding? What is the wind moving? What is the light touching?
+* **EXAMPLES:**
+    * "The cinnamon steam curled around ____" -> ["my frozen knuckles.", "the silence between us.", "the streetlamp's glow."]
+    * "The carousel lights painted ____" -> ["stripes of gold across our coats.", "a halo on the wet pavement.", "shadows that danced like ghosts."]
+    * "My fingers brushed against ____" -> ["the rough grain of the paper.", "the cold metal railing.", "empty air where your hand should be."]
+* **CONSTRAINTS:**
+    * **Starter:** A pithy, past tense sentence stem (under 12 words). End with " ____".
+    * **Suggestions:** Focus on the **tactile** or **specific** outcome of that interaction.
 
-**Examples:**
-"Today I watched the light settle on the floor like ____"
-→ ["dust from a previous life", "warm water", "gold spilled from a jar"]
+**ACT 3: THE RESOLUTION (The Emotional Pivot)**
+* **GOAL:** **Pivot inward.** Shift from what is seen to what is felt. Connection across distance. The feeling of driving through night toward something you can't name.
+* **EXAMPLES:**
+    * "The soft light on the stone was ____" -> ["a bridge of memory that stretched across the stars.", "a signal flare from yesterday.", "warmth that traveled light-years."]
+    * "I realized the distance between us was ____" -> ["only a trick of the light.", "thinner than a sheet of paper.", "folded like a map in my pocket."]
+* **CONSTRAINTS:**
+    * **Starter:** A past tense sentence stem (under 12 words) that can be concrete ("The light...") OR abstract ("The distance...", "It felt like...", "The silence..."). Set up a comparison between "Here" (me) and "There" (you).
+    * **Suggestions:** 3 warm, hopeful metaphors about connection and memory to bridge the distance between Earth (me) and Mars (you).
 
-"Today I found the silence in the room felt like ____"
-→ ["a heavy blanket", "holding your breath", "the space between notes"]
+**GLOBAL RULES:**
+1.  **Flow:** The lines must read naturally as a sequence.
+2.  **No Repetition:** Do not repeat nouns or adjectives between acts.
+3.  **Grammar:** Ensure every Starter + Suggestion combination forms a complete sentence ending in a period.
+4.  **Format:** Every starter must end with " ____".
 
-Return JSON: starter, suggestions`;
+Return JSON object with property "acts".`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -56,196 +93,100 @@ Return JSON: starter, suggestions`;
         contents: {
           role: 'user',
           parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
+            { inlineData: { mimeType: 'image/jpeg', data: cleanData } },
             { text: promptText }
           ]
         },
         config: {
-          temperature: 1.3, 
+          temperature: 0.8,
+          seed: randomSeed,
           responseMimeType: 'application/json',
           responseSchema: {
             type: Type.OBJECT,
             properties: {
-              starter: { type: Type.STRING },
-              suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
+              acts: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    starter: { type: Type.STRING },
+                    suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
+                  },
+                  required: ['starter', 'suggestions']
+                }
+              }
             },
-            required: ['starter', 'suggestions']
+            required: ['acts']
           }
         }
       });
 
       const result = JSON.parse(response.text || '{}');
       
-      if (result.starter) {
-        let s = result.starter.trim();
-        if (!s.toLowerCase().startsWith('today i')) {
-             s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, ''); 
-        }
-        if (!s.includes('____')) s = s.replace(/[.,;!]+$/, '') + ' ____';
-        result.starter = s;
-      }
-
-      if (result.suggestions && Array.isArray(result.suggestions)) {
-        result.suggestions = result.suggestions.map((s: string) => {
-          let clean = s.trim();
-          if (!clean.endsWith('.')) clean += '.';
-          return clean;
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('First line failed', error);
-      return {
-        starter: "Today the light hit the wall and looked like ____",
-        suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
-      };
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // 2. GENERATE NEXT LINE (Act 2: Atmosphere / Act 3: The Punchline)
-  // ---------------------------------------------------------------------------
-  async generateNextLine(
-    history: string[], 
-    imageBase64: string
-  ): Promise<{ starter: string; suggestions: string[] }> {
-    try {
-      const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-      const isFinalLine = history.length >= 2;
-      const historyText = history.join(' ');
-
-      const promptText = isFinalLine 
-        ? `You're writing the closing line of a postcard from Earth to Mars.
-        
-**Context:**
-- **Story so far:** "${historyText}"
-- **Theme:** Optimism. Connection that defies physics. "Spooky action at a distance."
-
-**Task: THE WARM CONNECTION**
-1. **The Focal Point:** Look at the image one last time. Find the *main focal point*.
-2. **The Stem:** Describe that focal point simply. e.g. "The [subject] looked...", "I realized the [subject] was...", "The way the [subject] moved..."
-3. **The Blank:** The blank is for the *feeling* that this subject evokes about distance and connection - tending toward wistful, warm, and intimate to bridge that distance.
-
-**Constraints:**
-1. **Stem Length:** UNDER 15 WORDS.
-2. **Suggestion Length:** UNDER 8 WORDS.
-3. **PAST TENSE ONLY.**
-4. **DIRECT ADDRESS:** You MUST use **"You"**, **"We"**, or **"Us"**.
-5. **NO REPETITION:** Do NOT repeat nouns/adjectives from the story so far.
-
-**Examples (Cosmic & Intimate):**
-* "The light stretching across the floor looked like ____" -> ["a bridge across the stars.", "a tether to your orbit.", "a path for your return."]
-* "I realized the distance between us was just ____" -> ["folding like a paper map.", "the space between two breaths.", "a trick of the light."]
-* "The stillness in the room felt exactly like ____" -> ["time pooling on the floorboards.", "a deep breath held across the void.", "gravity remembering your weight."]
-
-Return JSON: starter, suggestions`
-        : `You're writing line two of a postcard from Earth to Mars.
-
-**Context:**
-- **Story so far:** "${historyText}"
-- **Theme:** Deepening the atmosphere.
-
-**Task: SENSORY DETAIL**
-1. **Focus:** Find a specific sensory detail in the image (Light, Texture, Color, Sound).
-2. **Pivot:** Describe the specific quality or "vibe" of that detail.
-
-**Constraints:**
-1. **Stem Length:** STRICTLY UNDER 12 WORDS.
-2. **Suggestion Length:** STRICTLY UNDER 8 WORDS.
-3. **PAST TENSE ONLY.**
-4. **Structure:** [Subject] [Verb] [Simile/Metaphor stem] ____.
-5. **NO REPETITION:** Do NOT repeat nouns/adjectives from the story so far.
-
-**Examples:**
-* "The air in the room tasted like ____" -> ["ozone and memory.", "rain on hot asphalt.", "waiting for thunder."]
-* "The highway hummed in the distance like ____" -> ["a choir of ghosts.", "electric patience.", "ocean waves."]
-* "The texture of the wall felt like ____" -> ["a map of time.", "braille for the lonely.", "cold stone."]
-
-Return JSON: starter, suggestions`;
-
-      const response = await this.ai.models.generateContent({
-        model: this.TEXT_MODEL,
-        contents: {
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
-            { text: promptText }
-          ]
-        },
-        config: {
-          temperature: 1.2, 
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              starter: { type: Type.STRING },
-              suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
-            },
-            required: ['starter', 'suggestions']
+      if (result.acts && Array.isArray(result.acts)) {
+        return result.acts.map((act: any, index: number) => {
+          let s = act.starter.trim();
+          
+          // 1. Enforce Act 1 "Today I" convention
+          if (index === 0) {
+             if (!s.toLowerCase().startsWith('today i')) {
+                s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, ''); 
+             }
           }
-        }
-      });
-      
-      const result = JSON.parse(response.text || '{}');
-      
-      if (result.starter) {
-        let s = result.starter.trim();
-        
-        // Remove history repetition if the model ignored the instruction
-        if (historyText.length > 0 && s.startsWith(historyText.substring(0, 20))) {
-          s = s.replace(historyText, '').trim();
-          if (s.length < 5) s = "It felt like";
-        }
 
-        // Prevent "Today I" repetition in Act 2/3
-        if (s.toLowerCase().startsWith('today i ')) {
-           s = s.substring(8).trim();
-           s = s.charAt(0).toUpperCase() + s.slice(1);
-        }
+          // 2. Prevent "Today I" in Acts 2 and 3
+          if (index > 0 && s.toLowerCase().startsWith('today i')) {
+             s = s.replace(/^today i\s+/i, 'The '); 
+             s = s.charAt(0).toUpperCase() + s.slice(1);
+          }
+          
+          // 3. Formatting cleanup
+          if (!s.includes('____')) s += ' ____';
+          if (s.endsWith('.')) s = s.slice(0, -1);
+          
+          const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
+            let clean = sg.trim();
+            if (!clean.endsWith('.')) clean += '.';
+            return clean;
+          });
 
-        // Ensure starter ends cleanly
-        if (!s.includes('____')) s = s.replace(/[.,;!]+$/, '') + ' ____';
-        result.starter = s;
-      }
-
-       if (result.suggestions && Array.isArray(result.suggestions)) {
-        result.suggestions = result.suggestions.map((s: string) => {
-          let clean = s.trim();
-          if (!clean.endsWith('.')) clean += '.';
-          return clean;
+          return { starter: s, suggestions: cleanedSuggestions };
         });
       }
-
-      return result;
+      
+      throw new Error('Invalid JSON structure');
     } catch (error) {
-      console.error('Next line generation failed', error);
-      return { 
-        starter: "It felt like ____", 
-        suggestions: ["a dream waking up.", "static on the line.", "the color of time."] 
-      };
+      console.error('Poem structure generation failed', error);
+      // Fallback Structure
+      return [
+        {
+            starter: "Today I watched the light hit the wall like ____",
+            suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
+        },
+        {
+            starter: "The silence felt like ____",
+            suggestions: ["a heavy coat.", "static on the line.", "holding my breath."]
+        },
+        {
+            starter: "I realized the distance was ____",
+            suggestions: ["just a trick of the light.", "thinner than paper.", "folded like a map."]
+        }
+      ];
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 3. IDENTIFY KEY ELEMENTS
+  // 2. IDENTIFY KEY ELEMENTS
   // ---------------------------------------------------------------------------
-  private async identifyKeyElements(imageBase64: string, poem: string): Promise<string> {
-    const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
-    
-    // USES OLD PROMPT (Reads Poem)
-    const promptText = `You're analyzing a photograph to identify what must be preserved when applying artistic stylization.
+  private async identifyKeyElements(imageBase64: string): Promise<string> {
+    const randomSeed = Math.floor(Math.random() * 1000000000);
+    const cleanData = this.cleanBase64(imageBase64);
 
-**The Poem about this image:**
-"${poem.replace(/\[|\]/g, '').substring(0, 300)}"
-
-**Your Task:**
-List the 3-5 most important visual elements that must remain recognizable.
-- **IGNORE TEXT:** Do NOT list signage, street names, logos, or text.
-- **Focus on Forms:** Identify main subjects (people, animals, objects) and key spatial relationships.
-- **Atmosphere:** Note the light source if it's prominent.
-
-Be specific but concise. Format as a comma-separated list.`;
+    const promptText = `
+**TASK:** List the 3 most prominent physical subjects in this image.
+- **Rules:** Nouns only. Be specific (e.g., "a carousel", "two hands").
+- **Output:** A simple comma-separated list.
+`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -253,60 +194,52 @@ Be specific but concise. Format as a comma-separated list.`;
         contents: {
           role: 'user',
           parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
+            { inlineData: { mimeType: 'image/jpeg', data: cleanData } },
             { text: promptText }
           ]
         },
-        config: { temperature: 0.5 }
+        config: { temperature: 0.5, seed: randomSeed }
       });
       
       const text = response.text?.trim();
-      return (text && text.length > 3) ? text : "the main subject and light";
+      return (text && text.length > 3) ? text : "the main silhouette and light source";
     } catch (e) {
-      return "the main subject and light";
+      return "the main silhouette and light source";
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 4. GENERATE STYLIZED IMAGE
+  // 3. GENERATE STYLIZED IMAGE
   // ---------------------------------------------------------------------------
-  async generateStylizedImage(originalBase64: string, poem: string): Promise<{ image: string | null; prompt: string }> {
-    const keyElements = await this.identifyKeyElements(originalBase64, poem);
-    
-    // USES NEW PROMPT (Indigo/Amber Vector)
-    const fullPrompt = `Stylize this photograph of ${keyElements} into a warm, wistful postcard illustration while preserving their recognizable features and spatial relationships.
-    
-    Style Treatment:
-    - Square 1:1 format (recompose if needed but keep subjects clear)
-    - Flat vector aesthetic with soft geometric shapes
-    - Color palette: deep indigo shadows with glowing amber-gold highlights
-    - Slightly dreamlike but grounded—think quiet americana, liminal spaces, things that glow
-    - Aged postcard texture: subtle crease lines, worn edges, fine halftone grain
-    - NO text, signs, or written language anywhere
-    
-    Preserve:
-    - Pose and position of ${keyElements}
-    - Key spatial relationships
-    - Recognizable features
-    
-    Goal: A tender, nostalgic illustration that feels like a memory made tangible—warm light in darkness, concrete but slightly ethereal.`;
+  async generateStylizedImage(originalBase64: string): Promise<{ image: string | null; prompt: string; version: string }> {
+    const cleanData = this.cleanBase64(originalBase64);
+    const keyElements = await this.identifyKeyElements(cleanData);
+      
+    // Semantic Negative Prompting applied here:
+    const fullPrompt = `Transform the provided photograph of ${keyElements} into a moody, square-format vector illustration that evokes a vintage memory. Adaptively recompose the scene to fit the 1:1 square format, preserving the pose and relative identity of the subjects while simplifying them into flat, angular geometry. The composition is purely visual, defined strictly by deep indigo shadows and glowing amber highlights, completely void of written language or signs. The surface appears aged and tactile like a postcard found on Mars, marked by white crease lines, worn edges, and a coarse halftone grain that replaces all photorealistic detail.`;
 
-    const image = await this.generateImageFromPrompt(originalBase64, fullPrompt);
-    return { image, prompt: fullPrompt };
+    const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
+    return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
   }
 
-  public async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
-    const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
+  async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
+    const randomSeed = Math.floor(Math.random() * 1000000000);
+    const cleanData = this.cleanBase64(imageBase64);
+
     try {
-      const response = await this.ai.models.generateContent({
+       console.log('\n=== [Gemini] GENERATE IMAGE PROMPT ===');
+       console.log(prompt);
+       
+       const response = await this.ai.models.generateContent({
         model: this.IMAGE_MODEL,
         contents: {
           role: 'user',
-          parts: [{ inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }, { text: prompt }]
+          parts: [{ inlineData: { mimeType: 'image/jpeg', data: cleanData } }, { text: prompt }]
         },
-        config: { temperature: 1.5 }
+        config: {
+          seed: randomSeed,
+        }
       });
-
       const imagePart = response.candidates?.[0]?.content?.parts?.find(part => part.inlineData);
       return imagePart?.inlineData ? `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}` : null;
     } catch (error) {

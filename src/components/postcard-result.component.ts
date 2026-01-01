@@ -82,8 +82,10 @@ interface TextSegment {
                <p class="text-[10px] text-[#1a1a1d]/80 tracking-widest uppercase font-sans font-bold">Earth (Lost)</p>
             </div>
             <div class="flex flex-col items-end">
-              <p class="text-[8px] text-[#1a1a1d]/60 tracking-widest uppercase font-sans">Date</p>
-              <p class="text-[10px] text-[#1a1a1d]/80 tracking-widest uppercase font-sans">{{ dateDisplay }}</p>
+              <p class="text-[8px] text-[#1a1a1d]/60 tracking-widest uppercase font-sans">Archive ID</p>
+              <p class="text-[10px] text-[#1a1a1d]/80 tracking-widest uppercase font-sans">
+                {{ randomId }} <span class="opacity-50 mx-1">|</span> {{ version() }}
+              </p>
             </div>
           </div>
         </div>
@@ -176,6 +178,7 @@ export class PostcardResultComponent {
   stylizedImageSrc = input.required<string | null>();
   imagePrompt = input<string>(''); // The full prompt used
   isRegenerating = input<boolean>(false);
+  version = input<string>('SEQ-84.X'); // Diegetic Version
   
   regenerate = output<string>(); // Emits new prompt
   
@@ -499,7 +502,8 @@ export class PostcardResultComponent {
     ctx.fillText(`ORIGIN: EARTH (LOST)`, padding, footerY + 20);
     
     ctx.textAlign = 'right';
-    ctx.fillText(`ARCHIVE ID: ${this.randomId}`, width - padding, footerY + 20);
+    // Display both ID and Diegetic Version
+    ctx.fillText(`ID: ${this.randomId} // ${this.version()}`, width - padding, footerY + 20);
 
     // 6. Texture
     this.drawGrain(ctx, width, height);
