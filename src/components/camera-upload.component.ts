@@ -1,32 +1,17 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, output, signal, input, inject } from '@angular/core';
+import { GeminiService } from '../services/gemini.service';
 
 @Component({
   selector: 'app-camera-upload',
   template: `
-    <div class="flex flex-col items-center justify-center space-y-10 p-6 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto">
+    <div class="flex flex-col items-center justify-center space-y-4 p-4 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto">
       
-      <!-- Terminal Header -->
-      <div class="space-y-6 w-full border-b border-rose-900/30 pb-8">
-        <h1 class="text-2xl md:text-3xl font-mono text-rose-500 tracking-widest uppercase glow-text">
-          Postcards To Mars
-        </h1>
-        
-        <div class="flex flex-col gap-1 text-[10px] md:text-[11px] font-mono text-rose-400/80 uppercase tracking-widest">
-          <p>TERMINAL: E-99 (<span class="text-amber-500 animate-pulse">WEAK SIGNAL</span>)</p>
-          <p>STATUS: WAITING FOR INPUT</p>
-          <p>PROTOCOL: MEMORY_COMPRESSION</p>
-        </div>
-      </div>
-      
-      <p class="text-gray-300 font-mono text-xs md:text-sm leading-relaxed px-2 tracking-wide">
-        > Earth is silent. <br>
-        > The colonies need to remember.<br>
-        > Upload visual data to begin encoding.
-      </p>
-
-      <div class="w-full grid gap-4 mt-4">
+      <!-- Integrated Upload Button -->
+      <div class="w-full grid gap-4 mt-2">
         <label 
-          class="relative group cursor-pointer w-full flex items-center justify-between bg-rose-900/10 hover:bg-rose-900/20 border border-rose-500/30 p-5 transition-all duration-500"
+          class="relative group cursor-pointer w-full flex items-center justify-center gap-4 p-6 transition-all duration-500 border hover:bg-white/5 shadow-2xl"
+          [style.borderColor]="'var(--theme-primary)'"
+          [style.backgroundColor]="'var(--theme-primary-dimmer)'"
         >
           <input 
             type="file" 
@@ -35,12 +20,19 @@ import { Component, output, signal } from '@angular/core';
             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             (change)="onFileSelected($event)"
           />
-          <span class="font-mono text-rose-400 text-[11px] uppercase tracking-[0.2em] group-hover:text-rose-300 font-bold">[ Capture Image ]</span>
-          <div class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></div>
+          
+          <div class="w-2 h-2 rounded-full animate-pulse" [style.backgroundColor]="'var(--theme-primary)'"></div>
+          
+          <span 
+             class="font-mono text-sm uppercase tracking-[0.2em] font-bold" 
+             [style.color]="'var(--theme-primary)'"
+          >
+             [ {{ activeTheme().uploadButtonLabel }} ]
+          </span>
         </label>
 
         <label 
-          class="relative group cursor-pointer w-full flex items-center justify-between bg-transparent border border-gray-700 hover:border-gray-500 p-5 transition-all duration-500"
+          class="relative group cursor-pointer w-full flex items-center justify-center gap-2 bg-transparent opacity-60 hover:opacity-100 transition-all duration-300 py-2"
         >
           <input 
             type="file" 
@@ -48,8 +40,7 @@ import { Component, output, signal } from '@angular/core';
             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             (change)="onFileSelected($event)"
           />
-          <span class="font-mono text-gray-400 text-[11px] uppercase tracking-[0.2em] group-hover:text-gray-200">/ Upload_From_Archive</span>
-          <span class="text-gray-500 text-xs">></span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.2em]">/ {{ activeTheme().archiveButtonLabel }}</span>
         </label>
 
         @if (errorMessage()) {
@@ -61,9 +52,6 @@ import { Component, output, signal } from '@angular/core';
     </div>
   `,
   styles: [`
-    .glow-text {
-      text-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
-    }
     .animate-fade-in {
       animation: fadeIn 1s ease-out forwards;
     }
@@ -74,6 +62,9 @@ import { Component, output, signal } from '@angular/core';
   `]
 })
 export class CameraUploadComponent {
+  geminiService = inject(GeminiService);
+  activeTheme = this.geminiService.activeTheme;
+  
   imageSelected = output<string>();
   errorMessage = signal<string>('');
 

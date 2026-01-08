@@ -1,9 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { GoogleGenAI, Type } from '@google/genai';
+import { THEMES, ThemeConfig } from '../core/theme.config';
 
 export interface PoemAct {
   starter: string;
   suggestions: string[];
+}
+
+export interface AnalysisResult {
+  acts: PoemAct[];
+  visual_tags: string[];
+}
+
+export interface Artifact {
+  themeId: string;
+  imageUrl: string;
+  poem: string;
+  prompt: string;
+  version: string;
+  timestamp: number;
 }
 
 @Injectable({
@@ -12,23 +27,20 @@ export interface PoemAct {
 export class GeminiService {
   private ai: GoogleGenAI;
 
-  // Diegetic Versioning for the Prompt Logic - Increment after every tweak!
-  public readonly PROMPT_VERSION = 'SEQ-84.4';
-  // Do not change model versions.
+  public readonly PROMPT_VERSION = 'SEQ-85.3';
   private readonly TEXT_MODEL = 'gemini-3-flash-preview';
   private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
+  private readonly REASONING_MODEL = 'gemini-3-flash-preview';
 
-  // Persona: Intimate, Hopeful, Open
-  private readonly SYSTEM_VOICE = `
-    **ROLE:** You are writing a postcard to someone you love who is very far away (on Mars).
-    **VOICE:** Intimate, warm, hopeful. The poetry of enduring connection.
-    **STYLE:** - **Past Tense ONLY.**
-    - **Concrete Imagery:** Anchor emotions in what's depicted in the image.
-    - **Show, Don't Tell:** Focus on the feeling of the scene.
-  `;
+  // State
+  activeTheme = signal<ThemeConfig>(THEMES[0]);
+  customThemes = signal<ThemeConfig[]>([]); // Store custom themes
+
+  // Session State (Multiverse Cache)
+  // Map<themeId, Artifact>
+  private artifactCache = new Map<string, Artifact>();
 
   constructor() {
-    // The client gets the API key from the environment variable `GEMINI_API_KEY`.
     const p = (window as any).env?.apiKey;
     if (!p) {
       console.error('Gemini API Key is missing. Please check .env file or deployment config.');
@@ -36,62 +48,148 @@ export class GeminiService {
     this.ai = new GoogleGenAI({ apiKey: p });
   }
 
+  setTheme(themeId: string) {
+    let theme = THEMES.find(t => t.id === themeId);
+
+    // Check custom themes if not found in built-ins
+    if (!theme) {
+      theme = this.customThemes().find(t => t.id === themeId);
+    }
+
+    if (theme) {
+      this.activeTheme.set(theme);
+    }
+  }
+
+  getAllThemes() {
+    return [...THEMES, ...this.customThemes()];
+  }
+
+  addCustomTheme(theme: ThemeConfig) {
+    this.customThemes.update(themes => [...themes, theme]);
+  }
+
+  // Cache Management
+  cacheArtifact(themeId: string, artifact: Artifact) {
+    this.artifactCache.set(themeId, artifact);
+  }
+
+  getArtifact(themeId: string): Artifact | undefined {
+    return this.artifactCache.get(themeId);
+  }
+
+  clearCache() {
+    this.artifactCache.clear();
+  }
 
   private cleanBase64(data: string): string {
     return data.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
   }
 
-  // ---------------------------------------------------------------------------
-  // 1. GENERATE FULL POEM STRUCTURE (One-Shot)
-  // ---------------------------------------------------------------------------
-  async generatePoemStructure(imageBase64: string): Promise<PoemAct[]> {
+  // --------------------------------------------------------------------------- 
+  // CUSTOM THEME GENERATOR
+  // --------------------------------------------------------------------------- 
+  async generateCustomTheme(userPrompt: string): Promise<ThemeConfig | null> {
+    const randomId = 'custom-' + Math.random().toString(36).substr(2, 9);
+
+    const prompt = `
+      **TASK:** Create a complete "Postcards to Mars" Theme Configuration based on the user's request: "${userPrompt}".
+      
+      **OUTPUT:** A single JSON object adhering to the ThemeConfig structure.
+      
+      **REQUIREMENTS:**
+      1. **Name:** A poetic, 2-4 word title (e.g., "Neon Rain", "Velvet Void").
+      2. **Text Persona:** A detailed system prompt defining who the "Poet" is (e.g., a time traveler, a ghost, a cat).
+      3. **Visual Style:**
+         - **Prompt Template:** A highly detailed Image-to-Image prompt for Gemini Pro Vision. It must include "{visual_modifiers}" placeholder. It should describe the art style, lighting, texture, and mood.
+         - **Colors:** Pick a primary accent color, a dark background color, and a readable text color that fits the vibe.
+         - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Permanent Marker', 'Patrick Hand'.
+      4. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
+      5. **Landing UI:** Creative labels for the landing page (title, subtitle, main button, and archive button).
+      6. **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE", "JOURNAL: OPEN").
+    `;
+
+    try {
+      const response = await this.ai.models.generateContent({
+        model: this.REASONING_MODEL,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              landingTitle: { type: Type.STRING },
+              landingSubtitle: { type: Type.STRING },
+              uploadButtonLabel: { type: Type.STRING },
+              archiveButtonLabel: { type: Type.STRING },
+              headerStatus: { type: Type.STRING },
+              textPersona: { type: Type.STRING },
+              poemStructure: { type: Type.STRING },
+              visualStyle: {
+                type: Type.OBJECT,
+                properties: {
+                  promptTemplate: { type: Type.STRING },
+                  primaryColor: { type: Type.STRING },
+                  backgroundColor: { type: Type.STRING },
+                  textColor: { type: Type.STRING },
+                  fontFamilyHeader: { type: Type.STRING },
+                  fontFamilyBody: { type: Type.STRING },
+                  filterRaw: { type: Type.STRING }
+                },
+                required: ['promptTemplate', 'primaryColor', 'backgroundColor', 'textColor', 'fontFamilyHeader', 'fontFamilyBody', 'filterRaw']
+              }
+            },
+            required: ['name', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'archiveButtonLabel', 'headerStatus', 'textPersona', 'poemStructure', 'visualStyle']
+          }
+        }
+      });
+
+      const data = JSON.parse(response.text || '{}');
+
+      // Ensure the generated font families are wrapped in quotes if needed or just pass them raw if simple strings
+      // The prompt requested valid font names. We trust the model somewhat but could validate.
+
+      return {
+        id: randomId,
+        ...data
+      };
+
+    } catch (e) {
+      console.error('Theme generation failed', e);
+      return null;
+    }
+  }
+
+  // --------------------------------------------------------------------------- 
+  // 1. ANALYZE IMAGE (Poem Structure + Visual Tags)
+  // --------------------------------------------------------------------------- 
+  async analyzeImage(imageBase64: string): Promise<AnalysisResult> {
     const cleanData = this.cleanBase64(imageBase64);
     const randomSeed = Math.floor(Math.random() * 1000000000);
+    const theme = this.activeTheme();
 
-    // RESTORED: The exact text/examples from the original multi-step prompts
-    const promptText = `${this.SYSTEM_VOICE}
+    const promptText = `${theme.textPersona}
 
-**TASK:** Analyze the image and write a cohesive 3-line poem structure.
-Return a JSON array where each item represents one "Act" of the poem.
+**TASK:** Analyze the image and return a JSON object containing:
+1. "acts": A cohesive 3-line poem structure.
+2. "visual_tags": A list of 3-5 concise visual descriptors of the scene.
 
-**THE NARRATIVE ARC:**
-
-**ACT 1: THE SETUP (The Observation)**
-* **GOAL:** A specific, dreamlike observation of the **moment**. This is the setting. Just observe the world as it presents itself before the mind wanders to the recipient.
-* **EXAMPLES:**
-    * "Today I watched the horizon dissolve into ____" -> ["white ink.", "gold dust.", "a soft blur."]
-    * "Today I noticed the quiet in the room felt like ____" -> ["a warm coat.", "a static hum.", "a held breath."]
-* **CONSTRAINTS:**
-    * **Starter:** MUST start with "Today I..." followed by a pithy past tense observation (under 12 words).
-    * **Suggestions:** 3 distinct, evocative phrases to fill the blank.
-
-**ACT 2: THE BODY (Specific Micro-Interaction)**
-* **GOAL:** Describe a **Specific Micro-Interaction** in the scene. Bridge the visual setup of Act 1 with the emotional pivot of Act 3 by focusing on the **tactile reality** of the moment.
-* **INSTRUCTIONS:** Identify the Interaction: What are the hands holding? What is the wind moving? What is the light touching?
-* **EXAMPLES:**
-    * "The cinnamon steam curled around ____" -> ["my frozen knuckles.", "the silence between us.", "the streetlamp's glow."]
-    * "The carousel lights painted ____" -> ["stripes of gold across our coats.", "a halo on the wet pavement.", "shadows that danced like ghosts."]
-    * "My fingers brushed against ____" -> ["the rough grain of the paper.", "the cold metal railing.", "empty air where your hand should be."]
-* **CONSTRAINTS:**
-    * **Starter:** A pithy, past tense sentence stem (under 12 words). End with " ____".
-    * **Suggestions:** Focus on the **tactile** or **specific** outcome of that interaction.
-
-**ACT 3: THE RESOLUTION (The Emotional Pivot)**
-* **GOAL:** **Pivot inward.** Shift from what is seen to what is felt. Connection across distance. The feeling of driving through night toward something you can't name.
-* **EXAMPLES:**
-    * "The soft light on the stone was ____" -> ["a bridge of memory that stretched across the stars.", "a signal flare from yesterday.", "warmth that traveled light-years."]
-    * "I realized the distance between us was ____" -> ["only a trick of the light.", "thinner than a sheet of paper.", "folded like a map in my pocket."]
-* **CONSTRAINTS:**
-    * **Starter:** A past tense sentence stem (under 12 words) that can be concrete ("The light...") OR abstract ("The distance...", "It felt like...", "The silence..."). Set up a comparison between "Here" (me) and "There" (you).
-    * **Suggestions:** 3 warm, hopeful metaphors about connection and memory to bridge the distance between Earth (me) and Mars (you).
+**THE POEM NARRATIVE ARC:**
+${theme.poemStructure}
 
 **GLOBAL RULES:**
 1.  **Flow:** The lines must read naturally as a sequence.
-2.  **No Repetition:** Do not repeat nouns or adjectives between acts.
-3.  **Grammar:** Ensure every Starter + Suggestion combination forms a complete sentence ending in a period.
-4.  **Format:** Every starter must end with " ____".
+2.  **Grammar:** [Starter] + [Suggestion] MUST form a single, grammatically perfect sentence.
+3.  **BREVITY (CRITICAL):** 
+    - Keep it short. This is a small postcard.
+    - **Starter:** Max 6 words.
+    - **Suggestion:** Max 8 words.
+    - **TOTAL LINE LENGTH:** Must be under 15 words.
+4.  **No Placeholders:** Starters must end with " ____". Suggestions must be text only.
+5.  **Formatting:** Suggestions should NOT include leading spaces.
 
-Return JSON object with property "acts".`;
+Return JSON object.`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -100,7 +198,7 @@ Return JSON object with property "acts".`;
           role: 'user',
           parts: [
             { inlineData: { mimeType: 'image/jpeg', data: cleanData } },
-            { text: promptText }
+            { text: promptText + "\nIMPORTANT: You must provide exactly 3 distinct suggestions for each act." }
           ]
         },
         config: {
@@ -116,113 +214,80 @@ Return JSON object with property "acts".`;
                   type: Type.OBJECT,
                   properties: {
                     starter: { type: Type.STRING },
-                    suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
+                    suggestions: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING },
+                      description: "List of exactly 3 distinct suggestions"
+                    }
                   },
                   required: ['starter', 'suggestions']
                 }
+              },
+              visual_tags: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
               }
             },
-            required: ['acts']
+            required: ['acts', 'visual_tags']
           }
         }
       });
 
       const result = JSON.parse(response.text || '{}');
 
-      if (result.acts && Array.isArray(result.acts)) {
-        return result.acts.map((act: any, index: number) => {
-          let s = act.starter.trim();
+      // Post-processing acts
+      const processedActs = (result.acts || []).map((act: any, index: number) => {
+        let s = act.starter.trim();
 
-          // 1. Enforce Act 1 "Today I" convention
-          if (index === 0) {
-            if (!s.toLowerCase().startsWith('today i')) {
-              s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, '');
-            }
-          }
+        // Note: Removing strict "Today I" enforcement as themes now vary significantly
+        if (!s.includes('____')) s += ' ____';
+        if (s.endsWith('.')) s = s.slice(0, -1);
 
-          // 2. Prevent "Today I" in Acts 2 and 3
-          if (index > 0 && s.toLowerCase().startsWith('today i')) {
-            s = s.replace(/^today i\s+/i, 'The ');
-            s = s.charAt(0).toUpperCase() + s.slice(1);
-          }
-
-          // 3. Formatting cleanup
-          if (!s.includes('____')) s += ' ____';
-          if (s.endsWith('.')) s = s.slice(0, -1);
-
-          const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
-            let clean = sg.trim();
-            if (!clean.endsWith('.')) clean += '.';
-            return clean;
-          });
-
-          return { starter: s, suggestions: cleanedSuggestions };
+        const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
+          let clean = sg.trim();
+          if (!clean.endsWith('.')) clean += '.';
+          return clean;
         });
-      }
 
-      throw new Error('Invalid JSON structure');
-    } catch (error) {
-      console.error('Poem structure generation failed', error);
-      // Fallback Structure
-      return [
-        {
-          starter: "Today I watched the light hit the wall like ____",
-          suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
-        },
-        {
-          starter: "The silence felt like ____",
-          suggestions: ["a heavy coat.", "static on the line.", "holding my breath."]
-        },
-        {
-          starter: "I realized the distance was ____",
-          suggestions: ["just a trick of the light.", "thinner than paper.", "folded like a map."]
-        }
-      ];
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // 2. IDENTIFY KEY ELEMENTS
-  // ---------------------------------------------------------------------------
-  private async identifyKeyElements(imageBase64: string): Promise<string> {
-    const randomSeed = Math.floor(Math.random() * 1000000000);
-    const cleanData = this.cleanBase64(imageBase64);
-
-    const promptText = `
-**TASK:** List the 3 most prominent physical subjects in this image.
-- **Rules:** Nouns only. Be specific (e.g., "a carousel", "two hands").
-- **Output:** A simple comma-separated list.
-`;
-
-    try {
-      const response = await this.ai.models.generateContent({
-        model: this.TEXT_MODEL,
-        contents: {
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: cleanData } },
-            { text: promptText }
-          ]
-        },
-        config: { temperature: 0.5, seed: randomSeed }
+        return { starter: s, suggestions: cleanedSuggestions };
       });
 
-      const text = response.text?.trim();
-      return (text && text.length > 3) ? text : "the main silhouette and light source";
-    } catch (e) {
-      return "the main silhouette and light source";
+      return {
+        acts: processedActs.length === 3 ? processedActs : this.getFallbackActs(),
+        visual_tags: result.visual_tags || ["a memory from earth"]
+      };
+
+    } catch (error) {
+      console.error('Analysis failed', error);
+      return {
+        acts: this.getFallbackActs(),
+        visual_tags: ["a memory from earth"]
+      };
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // 3. GENERATE STYLIZED IMAGE
-  // ---------------------------------------------------------------------------
-  async generateStylizedImage(originalBase64: string): Promise<{ image: string | null; prompt: string; version: string }> {
+  // --------------------------------------------------------------------------- 
+  // 2. GENERATE STYLIZED IMAGE (Img2Img)
+  // --------------------------------------------------------------------------- 
+  async generateStylizedImage(originalBase64: string, visualModifiers: string): Promise<{ image: string | null; prompt: string; version: string }> {
     const cleanData = this.cleanBase64(originalBase64);
-    const keyElements = await this.identifyKeyElements(cleanData);
+    const theme = this.activeTheme();
 
-    // Semantic Negative Prompting applied here:
-    const fullPrompt = `Transform the provided photograph of ${keyElements} into a moody, square-format vector illustration that evokes a vintage memory. Adaptively recompose the scene to fit the 1:1 square format, preserving the pose and relative identity of the subjects while simplifying them into flat, angular geometry. The composition is purely visual, defined strictly by deep indigo shadows and glowing amber highlights, completely void of written language or signs. The surface appears aged and tactile like a postcard found on Mars, marked by white crease lines, worn edges, and a coarse halftone grain that replaces all photorealistic detail.`;
+    // Check Cache First
+    const cached = this.getArtifact(theme.id);
+    if (cached) {
+      console.log(`[Cache Hit] Returning artifact for ${theme.id}`);
+      return { image: cached.imageUrl, prompt: cached.prompt, version: cached.version };
+    }
+
+    const BASE_PROMPT_CONSTRAINTS = `
+    
+    GLOBAL CONSTRAINTS:
+    1. FORMAT: Adaptively recompose the scene to fit the 1:1 square format.
+    2. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs.
+    `;
+
+    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
 
     const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
     return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
@@ -252,5 +317,22 @@ Return JSON object with property "acts".`;
       console.error('Generation from prompt failed', error);
       return null;
     }
+  }
+
+  private getFallbackActs(): PoemAct[] {
+    return [
+      {
+        starter: "Today I watched the light hit the wall like ____",
+        suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
+      },
+      {
+        starter: "The silence felt like ____",
+        suggestions: ["a heavy coat.", "static on the line.", "holding my breath."]
+      },
+      {
+        starter: "I realized the distance was ____",
+        suggestions: ["just a trick of the light.", "thinner than paper.", "folded like a map."]
+      }
+    ];
   }
 }

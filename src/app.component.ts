@@ -4,14 +4,24 @@ import { CameraUploadComponent } from './components/camera-upload.component';
 import { DialogueComponent, PoemLine } from './components/dialogue.component';
 import { PostcardResultComponent } from './components/postcard-result.component';
 import { GeminiService, PoemAct } from './services/gemini.service';
+import { FilmStripComponent } from './components/film-strip.component';
+import { DestinationGalleryComponent } from './components/destination-gallery.component';
 
-type AppState = 'upload' | 'analyzing' | 'dialogue' | 'generating' | 'result';
+type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, CameraUploadComponent, DialogueComponent, PostcardResultComponent],
+  imports: [
+    CommonModule, 
+    CameraUploadComponent, 
+    DialogueComponent, 
+    PostcardResultComponent, 
+    FilmStripComponent,
+    DestinationGalleryComponent
+  ],
   templateUrl: './app.component.html',
-  styles: [`
+  styles: [
+    `
     .animate-progress {
       animation: progress 2s ease-in-out infinite;
     }
@@ -32,7 +42,7 @@ type AppState = 'upload' | 'analyzing' | 'dialogue' | 'generating' | 'result';
 export class AppComponent implements OnDestroy {
   geminiService = inject(GeminiService);
 
-  state = signal<AppState>('upload');
+  state = signal<AppState>('landing'); // Start at landing
   loadingNextLine = signal(false);
   isRegenerating = signal(false);
   
@@ -42,6 +52,7 @@ export class AppComponent implements OnDestroy {
   
   // Data State
   originalImage = signal<string | null>(null);
+  visualTags = signal<string[]>([]);
   imageGenerationPromise: Promise<{ image: string | null; prompt: string; version: string }> | null = null;
   promptVersion = signal<string>('');
   
@@ -104,22 +115,29 @@ export class AppComponent implements OnDestroy {
 
   async onImageSelected(base64: string) {
     this.originalImage.set(base64);
+    
+    // Skip calibration, go straight to analyzing
     this.state.set('analyzing');
+    this.startLoadingCycle();
+
+    // 1. Analyze Image (Poem Structure + Visual Tags)
+    const analysis = await this.geminiService.analyzeImage(base64);
     
-    // Start parallel image generation
-    this.imageGenerationPromise = this.geminiService.generateStylizedImage(base64);
-    
-    // Generate the full poem structure (3 acts) at once
-    const acts = await this.geminiService.generatePoemStructure(base64);
-    
-    this.poemActs.set(acts);
+    this.poemActs.set(analysis.acts);
+    this.visualTags.set(analysis.visual_tags);
     this.currentActIndex.set(0);
     this.poemHistory.set([]); 
     
+    // 2. Start parallel image generation using the visual tags
+    const modifiers = analysis.visual_tags.join(', ');
+    this.imageGenerationPromise = this.geminiService.generateStylizedImage(base64, modifiers);
+    
+    this.stopLoadingCycle();
+    
     // Load first act
-    if (acts.length > 0) {
-      this.currentStarter.set(acts[0].starter);
-      this.currentSuggestions.set(acts[0].suggestions);
+    if (analysis.acts.length > 0) {
+      this.currentStarter.set(analysis.acts[0].starter);
+      this.currentSuggestions.set(analysis.acts[0].suggestions);
     }
     
     this.state.set('dialogue');
@@ -131,12 +149,8 @@ export class AppComponent implements OnDestroy {
     const nextIndex = this.currentActIndex() + 1;
     const allActs = this.poemActs();
 
-    // Check if we have more acts to display
     if (nextIndex < allActs.length) {
-      // Simulate "thinking" delay for the UX rhythm
       this.loadingNextLine.set(true);
-      
-      // Random delay between 1s (1000ms) and 3s (3000ms)
       const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
 
       setTimeout(() => {
@@ -147,7 +161,6 @@ export class AppComponent implements OnDestroy {
       }, delay); 
       
     } else {
-      // Finished all acts
       this.finishCreation();
     }
   }
@@ -164,12 +177,11 @@ export class AppComponent implements OnDestroy {
 
     const finalPoemStr = historyLines
       .map(line => {
-        // Smart spacing for final construction
-        const sep = /^[\.,;:\?!]/.test(line.suffix) ? '' : ' ';
-        let fullLine = `${line.prefix} [${line.userInput}]${sep}${line.suffix}`.trim();
+        const cleanPrefix = line.prefix.replace(/_{2,}/g, '').trim();
+        const sep = new RegExp('^[\\.,;:\\?!]').test(line.suffix) ? '' : ' ';
+        let fullLine = `${cleanPrefix} [${line.userInput}]${sep}${line.suffix}`.trim();
         
         // Ensure line ends with punctuation, checking both the very end AND inside the bracket
-        // Matches: "sentence." or "sentence [word.]" or "sentence [word!]"
         const hasPunctuation = /[.!?]$/.test(fullLine) || /[.!?]\]$/.test(fullLine);
 
         if (!hasPunctuation) {
@@ -181,22 +193,21 @@ export class AppComponent implements OnDestroy {
       
     this.finalPoem.set(finalPoemStr);
     
-    // Generate AI Art (Nano Banana) - Image to Image
-    // Ensure minimum random delay between 2s and 4s for UX pacing
     const randomDelayMs = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
     const minDelay = new Promise(resolve => setTimeout(resolve, randomDelayMs));
     
     let imageResult: { image: string | null; prompt: string; version: string };
     const original = this.originalImage();
+    const modifiers = this.visualTags().join(', ');
+    const activeThemeId = this.geminiService.activeTheme().id;
     
     try {
       if (this.imageGenerationPromise) {
-        // Wait for the parallel request to complete + the min delay
         const [result] = await Promise.all([this.imageGenerationPromise, minDelay]);
         imageResult = result;
       } else if (original) {
-        // Fallback if promise missing
-        const [result] = await Promise.all([this.geminiService.generateStylizedImage(original), minDelay]);
+        // Fallback
+        const [result] = await Promise.all([this.geminiService.generateStylizedImage(original, modifiers), minDelay]);
         imageResult = result;
       } else {
          await minDelay;
@@ -207,12 +218,88 @@ export class AppComponent implements OnDestroy {
       imageResult = { image: null, prompt: '', version: 'ERR-0.0' };
     }
     
-    this.stylizedImage.set(imageResult.image || original); // Fallback to original
+    // Save to Cache
+    if (imageResult.image) {
+      this.geminiService.cacheArtifact(activeThemeId, {
+        themeId: activeThemeId,
+        imageUrl: imageResult.image,
+        poem: finalPoemStr,
+        prompt: imageResult.prompt,
+        version: imageResult.version,
+        timestamp: Date.now()
+      });
+    }
+    
+    this.stylizedImage.set(imageResult.image || original); 
     this.generatedPrompt.set(imageResult.prompt);
     this.promptVersion.set(imageResult.version || 'SEQ-84.X');
     
     this.stopLoadingCycle();
     this.state.set('result');
+    this.imageGenerationPromise = null; // Clear promise after consumption
+  }
+  
+  // SWITCH THEME HANDLER
+  async onThemeSwitched(newThemeId: string) {
+      if (this.state() !== 'result') return;
+
+      this.geminiService.setTheme(newThemeId);
+      this.startLoadingCycle();
+      this.loadingMessage.set("Re-calibrating destination frequency...");
+      
+      const cached = this.geminiService.getArtifact(newThemeId);
+      
+      if (cached) {
+          // 1. FAST PATH: We have everything cached
+          setTimeout(() => {
+              this.finalPoem.set(cached.poem);
+              this.stylizedImage.set(cached.imageUrl);
+              this.generatedPrompt.set(cached.prompt);
+              this.promptVersion.set(cached.version);
+              this.stopLoadingCycle();
+          }, 800); // Small artificial delay for "Tuning" feel
+      } else {
+          // 2. SLOW PATH: We need to generate a new poem (Cheap) + Generate Image (Expensive)
+          
+          // Reset UI to loading state immediately
+          this.stylizedImage.set(null);
+          this.finalPoem.set('Aligning narrative sensors...');
+
+          const base64 = this.originalImage();
+          if (!base64) return;
+          
+          const analysis = await this.geminiService.analyzeImage(base64);
+          
+          const autoPoem = analysis.acts.map(act => {
+             const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
+             const suggestion = act.suggestions[0]; // Pick first
+             const sep = new RegExp('^[\.,;:\?!]').test(suggestion) ? '' : ' ';
+             return `${cleanStarter} [${suggestion}]`; 
+          }).join('\n');
+
+          this.finalPoem.set(autoPoem); // Show poem immediately while image generates
+          
+          // B. Generate Image
+          const modifiers = this.visualTags().join(', '); // Reuse tags
+          const imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+          
+           // Save to Cache
+           if (imageRes.image) {
+              this.geminiService.cacheArtifact(newThemeId, {
+                themeId: newThemeId,
+                imageUrl: imageRes.image,
+                poem: autoPoem,
+                prompt: imageRes.prompt,
+                version: imageRes.version,
+                timestamp: Date.now()
+              });
+            }
+
+          this.stylizedImage.set(imageRes.image);
+          this.generatedPrompt.set(imageRes.prompt);
+          this.promptVersion.set(imageRes.version);
+          this.stopLoadingCycle();
+      }
   }
 
   async onRegenerateImage(newPrompt: string) {
@@ -220,12 +307,20 @@ export class AppComponent implements OnDestroy {
     if (!original) return;
 
     this.isRegenerating.set(true);
-    this.generatedPrompt.set(newPrompt); // Update prompt state
+    this.generatedPrompt.set(newPrompt); 
 
     const newImage = await this.geminiService.generateImageFromPrompt(original, newPrompt);
     
     if (newImage) {
       this.stylizedImage.set(newImage);
+      // Update cache
+      const themeId = this.geminiService.activeTheme().id;
+      const cached = this.geminiService.getArtifact(themeId);
+      if (cached) {
+          cached.imageUrl = newImage;
+          cached.prompt = newPrompt;
+          this.geminiService.cacheArtifact(themeId, cached);
+      }
     }
     
     this.isRegenerating.set(false);
@@ -233,7 +328,7 @@ export class AppComponent implements OnDestroy {
 
   reset() {
     this.stopLoadingCycle();
-    this.state.set('upload');
+    this.state.set('landing'); // Return to landing
     this.originalImage.set(null);
     this.imageGenerationPromise = null;
     this.poemHistory.set([]);
@@ -243,5 +338,7 @@ export class AppComponent implements OnDestroy {
     this.stylizedImage.set(null);
     this.generatedPrompt.set('');
     this.promptVersion.set('');
+    this.visualTags.set([]);
+    this.geminiService.clearCache(); // New session = Clear cache
   }
 }

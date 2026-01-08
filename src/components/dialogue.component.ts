@@ -21,8 +21,8 @@ export interface PoemLine {
         <!-- Main Image: visible, slightly blurred, keeping colors for atmosphere -->
         <img [src]="imageSrc()" class="w-full h-full object-cover blur-[2px] opacity-40">
         
-        <!-- Gradient overlay to ensure text readability -->
-        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/80"></div>
+        <!-- Dark overlay for readability -->
+        <div class="absolute inset-0 bg-neutral-950/80"></div>
       </div>
 
       <!-- Dialogue Interface -->
@@ -31,29 +31,29 @@ export interface PoemLine {
         <!-- History -->
         <div class="w-full flex flex-col gap-4 mb-12">
            @for (line of history(); track $index) {
-              <p class="font-serif italic text-lg text-gray-400 text-center drop-shadow-md">
-                {{ line.prefix }} <span class="text-rose-400 font-bold">{{ line.userInput }}</span>{{ needsSpace(line.suffix) ? ' ' : '' }}{{ line.suffix }}
+              <p class="italic text-lg text-neutral-400 text-center drop-shadow-md font-[family-name:var(--font-body)]">
+                {{ line.prefix }} <span class="font-bold text-[var(--theme-primary)]">{{ line.userInput }}</span>{{ needsSpace(line.suffix) ? ' ' : '' }}{{ line.suffix }}
               </p>
            }
         </div>
 
         <!-- Active Line -->
         @if (loading()) {
-           <div class="flex flex-col items-center gap-2 py-8 animate-pulse">
-             <span class="text-[10px] font-mono tracking-widest text-rose-500 uppercase">Awaiting Response...</span>
+           <div class="flex flex-col items-center gap-2 py-8 animate-pulse font-[family-name:var(--font-header)]">
+             <span class="text-[10px] tracking-widest uppercase text-[var(--theme-primary)]">Awaiting Response...</span>
            </div>
         } @else {
-           <div class="text-center w-full mb-8">
-              <p class="font-serif text-2xl md:text-3xl text-gray-100 leading-tight mb-6 italic drop-shadow-lg">
-                "{{ starterParts().prefix }}..."
-              </p>
+            <div class="text-center w-full mb-8">
+               <p class="text-2xl md:text-3xl text-white leading-tight mb-6 italic drop-shadow-lg font-[family-name:var(--font-body)]">
+                 "{{ starterParts().prefix }} ..."
+               </p>
               
               <input 
                 type="text" 
                 [(ngModel)]="userInput" 
                 (keydown.enter)="onSubmit()"
                 placeholder="_"
-                class="w-full bg-transparent border-b border-rose-900/50 text-center text-xl text-rose-300 placeholder-rose-800/30 focus:outline-none focus:border-rose-500 pb-2 transition-colors font-serif italic drop-shadow-md"
+                class="w-full bg-transparent border-b text-center text-xl placeholder-white/20 focus:outline-none pb-2 transition-colors italic drop-shadow-md font-[family-name:var(--font-body)] border-[var(--theme-primary)]/30 focus:border-[var(--theme-primary)] text-[var(--theme-primary)]"
                 autofocus
                 autocomplete="off"
               />
@@ -65,7 +65,7 @@ export interface PoemLine {
                @for (opt of suggestions(); track $index) {
                  <button 
                    (click)="selectOption(opt)"
-                   class="px-3 py-1 bg-black/40 border border-gray-600 backdrop-blur-sm text-xs text-gray-300 hover:border-rose-500 hover:text-rose-400 transition-all font-mono"
+                   class="px-3 py-1 bg-white/5 border border-white/10 backdrop-blur-sm text-xs text-neutral-300 transition-all font-mono hover:border-[var(--theme-primary)] hover:text-[var(--theme-primary)] hover:bg-[var(--theme-primary)]/10"
                  >
                    {{ opt }}
                  </button>
@@ -81,7 +81,7 @@ export interface PoemLine {
             <button 
               (click)="onSubmit()"
               [disabled]="!userInput() || userInput().length < 2"
-              class="w-full py-4 bg-black/20 hover:bg-rose-900/20 backdrop-blur-md disabled:opacity-30 disabled:cursor-not-allowed text-rose-500 uppercase tracking-[0.2em] text-[10px] font-bold border border-rose-800/60 hover:border-rose-500/80 transition-all shadow-lg"
+              class="w-full py-4 bg-[var(--theme-primary)]/10 hover:bg-[var(--theme-primary)]/20 backdrop-blur-md disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-[10px] font-bold border transition-all shadow-lg text-[var(--theme-primary)] border-[var(--theme-primary)]/60 hover:border-[var(--theme-primary)]/80"
             >
               {{ isLastLine() ? 'Finalize Transmission' : 'Confirm Input' }}
             </button>
@@ -90,10 +90,10 @@ export interface PoemLine {
          <!-- Only show the early exit button if it's NOT the last line -->
          @if (!isLastLine() && (history().length > 0 || userInput().length > 1) && !loading()) {
            <button 
-             (click)="onFinish()"
-             class="w-full text-gray-500 hover:text-gray-300 uppercase tracking-widest text-[10px] font-mono transition-colors drop-shadow-md"
-           >
-             [ Finalize & Upload ]
+              (click)="onFinish()"
+              class="w-full text-neutral-500 hover:text-white uppercase tracking-widest text-[10px] font-mono transition-colors drop-shadow-md"
+            >
+              [ Finalize & Upload ]
            </button>
          }
       </div>
@@ -106,20 +106,20 @@ export interface PoemLine {
 })
 export class DialogueComponent {
   imageSrc = input.required<string>();
-  starterText = input.required<string>(); 
-  history = input.required<PoemLine[]>();   
-  suggestions = input<string[]>([]);      
+  starterText = input.required<string>();
+  history = input.required<PoemLine[]>();
+  suggestions = input<string[]>([]);
   loading = input<boolean>(false);
   isLastLine = input<boolean>(false);
-  
-  lineCompleted = output<PoemLine>(); 
+
+  lineCompleted = output<PoemLine>();
   finished = output<PoemLine | undefined>();
 
   userInput = signal('');
 
   constructor() {
     effect(() => {
-      this.starterText(); 
+      this.starterText();
       this.userInput.set('');
     });
   }
@@ -147,7 +147,7 @@ export class DialogueComponent {
     const inputVal = this.userInput().trim();
     const sep = this.needsSpace(parts.suffix) ? ' ' : '';
     const full = `${parts.prefix} ${inputVal}${sep}${parts.suffix}`;
-    
+
     return {
       prefix: parts.prefix,
       userInput: inputVal,
@@ -164,9 +164,9 @@ export class DialogueComponent {
 
   onFinish() {
     if (this.userInput().length > 1) {
-       this.finished.emit(this.constructCurrentLine());
+      this.finished.emit(this.constructCurrentLine());
     } else {
-       this.finished.emit(undefined);
+      this.finished.emit(undefined);
     }
   }
 }
