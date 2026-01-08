@@ -1,17 +1,30 @@
+# Postcards to Mars
+
+> "Ideally, a postcard is a bridge. It says 'I am here, you are there, and I am thinking of you.'"
+
+**Postcards to Mars** is a sci-fi themed application that translates visual memories into tangible words. Set in a future where Martian colonies are drifting apart from Earth, this terminal-styled interface allows users to upload an image and receive a poetic "memory artifact" in return.
+
+The system uses AI to analyze your image, generate a three-act poem/dialogue, and create a stylized "postcard" visual, bridging the gap across the cosmos.
+
+## Features
+
+- **Visual Memory Analysis**: Upload an image to be analyzed by the system.
+- **Poetry Generation**: Generates a 3-act poem or dialogue based on the visual input.
+- **Memory Artifact Creation**: Produces a stylized, low-fidelity "transmission" version of your image.
+- **Immersive Sci-Fi Terminal**: A fully themed UI with scanlines, CRT effects, and lore-appropriate interactions.
+
+## Examples
+
+Here are some example transmissions:
+
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+    <img src="examples/IMG_3945.JPG" width="45%" alt="Example 1">
+    <img src="examples/IMG_3946.JPG" width="45%" alt="Example 2">
 </div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1Zfr2jGs5anql0EGjUwi0dOk8UvOgrnuM
 
 ## Run Locally
 
 **Prerequisites:**  Node.js
-
 
 1. Install dependencies:
    `npm install`

@@ -11,12 +11,12 @@ export interface PoemAct {
 })
 export class GeminiService {
   private ai: GoogleGenAI;
-  
+
   // Diegetic Versioning for the Prompt Logic - Increment after every tweak!
-  public readonly PROMPT_VERSION = 'SEQ-84.4'; 
+  public readonly PROMPT_VERSION = 'SEQ-84.4';
   // Do not change model versions.
-  private readonly TEXT_MODEL = 'gemini-3-flash-preview'; 
-  private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview'; 
+  private readonly TEXT_MODEL = 'gemini-3-flash-preview';
+  private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
 
   // Persona: Intimate, Hopeful, Open
   private readonly SYSTEM_VOICE = `
@@ -28,8 +28,14 @@ export class GeminiService {
   `;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env['API_KEY'] });
+    // The client gets the API key from the environment variable `GEMINI_API_KEY`.
+    const p = (window as any).env?.apiKey;
+    if (!p) {
+      console.error('Gemini API Key is missing. Please check .env file or deployment config.');
+    }
+    this.ai = new GoogleGenAI({ apiKey: p });
   }
+
 
   private cleanBase64(data: string): string {
     return data.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
@@ -122,28 +128,28 @@ Return JSON object with property "acts".`;
       });
 
       const result = JSON.parse(response.text || '{}');
-      
+
       if (result.acts && Array.isArray(result.acts)) {
         return result.acts.map((act: any, index: number) => {
           let s = act.starter.trim();
-          
+
           // 1. Enforce Act 1 "Today I" convention
           if (index === 0) {
-             if (!s.toLowerCase().startsWith('today i')) {
-                s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, ''); 
-             }
+            if (!s.toLowerCase().startsWith('today i')) {
+              s = 'Today I ' + s.replace(/^(today\s?|i\s?)+/i, '');
+            }
           }
 
           // 2. Prevent "Today I" in Acts 2 and 3
           if (index > 0 && s.toLowerCase().startsWith('today i')) {
-             s = s.replace(/^today i\s+/i, 'The '); 
-             s = s.charAt(0).toUpperCase() + s.slice(1);
+            s = s.replace(/^today i\s+/i, 'The ');
+            s = s.charAt(0).toUpperCase() + s.slice(1);
           }
-          
+
           // 3. Formatting cleanup
           if (!s.includes('____')) s += ' ____';
           if (s.endsWith('.')) s = s.slice(0, -1);
-          
+
           const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
             let clean = sg.trim();
             if (!clean.endsWith('.')) clean += '.';
@@ -153,23 +159,23 @@ Return JSON object with property "acts".`;
           return { starter: s, suggestions: cleanedSuggestions };
         });
       }
-      
+
       throw new Error('Invalid JSON structure');
     } catch (error) {
       console.error('Poem structure generation failed', error);
       // Fallback Structure
       return [
         {
-            starter: "Today I watched the light hit the wall like ____",
-            suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
+          starter: "Today I watched the light hit the wall like ____",
+          suggestions: ["a forgotten code.", "liquid glass.", "a memory of rain."]
         },
         {
-            starter: "The silence felt like ____",
-            suggestions: ["a heavy coat.", "static on the line.", "holding my breath."]
+          starter: "The silence felt like ____",
+          suggestions: ["a heavy coat.", "static on the line.", "holding my breath."]
         },
         {
-            starter: "I realized the distance was ____",
-            suggestions: ["just a trick of the light.", "thinner than paper.", "folded like a map."]
+          starter: "I realized the distance was ____",
+          suggestions: ["just a trick of the light.", "thinner than paper.", "folded like a map."]
         }
       ];
     }
@@ -200,7 +206,7 @@ Return JSON object with property "acts".`;
         },
         config: { temperature: 0.5, seed: randomSeed }
       });
-      
+
       const text = response.text?.trim();
       return (text && text.length > 3) ? text : "the main silhouette and light source";
     } catch (e) {
@@ -214,7 +220,7 @@ Return JSON object with property "acts".`;
   async generateStylizedImage(originalBase64: string): Promise<{ image: string | null; prompt: string; version: string }> {
     const cleanData = this.cleanBase64(originalBase64);
     const keyElements = await this.identifyKeyElements(cleanData);
-      
+
     // Semantic Negative Prompting applied here:
     const fullPrompt = `Transform the provided photograph of ${keyElements} into a moody, square-format vector illustration that evokes a vintage memory. Adaptively recompose the scene to fit the 1:1 square format, preserving the pose and relative identity of the subjects while simplifying them into flat, angular geometry. The composition is purely visual, defined strictly by deep indigo shadows and glowing amber highlights, completely void of written language or signs. The surface appears aged and tactile like a postcard found on Mars, marked by white crease lines, worn edges, and a coarse halftone grain that replaces all photorealistic detail.`;
 
@@ -227,10 +233,10 @@ Return JSON object with property "acts".`;
     const cleanData = this.cleanBase64(imageBase64);
 
     try {
-       console.log('\n=== [Gemini] GENERATE IMAGE PROMPT ===');
-       console.log(prompt);
-       
-       const response = await this.ai.models.generateContent({
+      console.log('\n=== [Gemini] GENERATE IMAGE PROMPT ===');
+      console.log(prompt);
+
+      const response = await this.ai.models.generateContent({
         model: this.IMAGE_MODEL,
         contents: {
           role: 'user',
