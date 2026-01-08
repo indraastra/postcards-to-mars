@@ -27,8 +27,9 @@ The application uses standard Cloud Run environment variables. The `Dockerfile` 
     gcloud run deploy postcards-to-mars \
       --source . \
       --platform managed \
-      --region us-central1 \
-      --allow-unauthenticated
+      --region europe-west2 \
+      --allow-unauthenticated \
+      --build-service-account projects/gen-lang-client-0453745132/serviceAccounts/309747105296-compute@developer.gserviceaccount.com
     ```
 
     *Note: Replace `us-central1` with your preferred region.*
