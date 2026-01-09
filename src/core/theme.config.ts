@@ -331,7 +331,7 @@ export const THEMES: ThemeConfig[] = [
     postcardOrigin: 'Owl Post',
     idLabel: 'Owl Id',
     landingTitle: 'Owl Post Service',
-    landingSubtitle: 'Awaiting delivery via flu network...',
+    landingSubtitle: 'Awaiting delivery via Owl Post...',
     uploadButtonLabel: 'Send Owl',
     archiveButtonLabel: 'Read Scroll',
     headerStatus: 'OWL STATUS: EN ROUTE',
