@@ -91,59 +91,62 @@ export const THEMES: ThemeConfig[] = [
     id: 'tokyo',
     name: 'Trains to Tokyo',
     shortName: 'Tokyo',
-    originLabel: 'Train No.',
-    postcardOrigin: 'TR-774',
-    idLabel: 'Ticket Id',
-    landingTitle: 'Night Train Express',
-    landingSubtitle: 'The city lights are blurring...',
+    originLabel: 'Carriage',
+    postcardOrigin: 'No. 6',
+    idLabel: 'Ticket',
+    landingTitle: 'One-Way Ticket',
+    landingSubtitle: 'The sea tracks stretch forever...',
     uploadButtonLabel: 'Board Train',
-    archiveButtonLabel: 'Review Logs',
-    headerStatus: 'TRAIN STATUS: ON TIME',
-    loadingText: 'Boarding Night Train...',
+    archiveButtonLabel: 'Travel Log',
+    headerStatus: 'NEXT STOP: TOKYO',
+    loadingText: 'Steam rising...',
     loadingMessages: [
-      'Checking train schedule...',
-      'Wiping rain from glass...',
-      'Validating ticket...',
-      'Finding seat...',
-      'Watching city lights...'
+      'Collecting soot sprites...',
+      'Checking boiler pressure...',
+      'Serving herbal tea...',
+      'Watching clouds pass...',
+      'Crossing the endless ocean...'
     ],
-    regenLabel: 'Reroute Track',
-    editPoemLabel: 'Rewrite Journal',
+    regenLabel: 'New Journey',
+    editPoemLabel: 'Rewrite Travel Log',
     textPersona: `
-**ROLE:** You are a weary traveler on a night train to Tokyo, writing in a travel journal.
-**VOICE:** Melancholic, observant, cinematic. The feeling of watching city lights blur through rain-streaked glass.
-**STYLE:** Present continuous or Past. Focus on light, reflection, and the transient nature of the city.
+**ROLE:** You are a traveler on a magical train running over a shallow ocean, like in Spirited Away.
+**VOICE:** Gentle, nostalgic, wondrous. The feeling of a long, quiet journey with strange companions.
+**STYLE:** STRICT HAIKU FORMAT (5-7-5 syllables). Focus on nature, clouds, and quiet magic.
     `,
     poemStructure: `
-**ACT 1: THE DEPARTURE**
-* **GOAL:** Describe the city moving past the window.
+**ACT 1: THE VIEW (5 Syllables)**
+* **GOAL:** A concrete image of the passing world (Clouds, Sea, Islands).
 * **CONSTRAINTS:**
-    * **Starter Prompt:** An observation of motion, light, or the city blurring by. Ends with " ____".
-    * **Suggestions:** 3 evocative phrases about speed, neon, or rain.
-    * **Example:** "The world outside became ____" -> "a river of liquid light."
+    * **Starter Prompt:** 5 syllables exactly. Focus on the sky or water.
+    * **Suggestions:** "White clouds drift along", "Ocean waves roll by".
+    * **Example:** "Blue sea climbs the sky"
+    * **NOTE:** Total line must be 5 syllables.
 
-**ACT 2: THE REFLECTION**
-* **GOAL:** Describe the reflection in the glass or a detail inside the train carriage.
+**ACT 2: THE COMPANION (7 Syllables)**
+* **GOAL:** A shadow, spirit, or feeling of presence.
 * **CONSTRAINTS:**
-    * **Starter Prompt:** A sentence stem focusing on the glass, the quiet, or a reflection. Ends with " ____".
-    * **Suggestions:** Focus on the ghost-like quality of reflections.
-    * **Example:** "In the glass, I saw ____" -> "a ghost of who I used to be."
+    * **Starter Prompt:** 7 syllables exactly.
+    * **Suggestions:** "Shadows sit beside me now", "Silent spirits watching us".
+    * **Example:** "Shadows sit silently here"
+    * **NOTE:** Total line must be 7 syllables.
 
-**ACT 3: THE LONGING**
-* **GOAL:** Express a feeling of missing someone.
+**ACT 3: THE MEMORY (5 Syllables)**
+* **GOAL:** A gentle closing thought.
 * **CONSTRAINTS:**
-    * **Starter Prompt:** A thought about arrival, distance, or the person waiting. Ends with " ____".
-    * **Suggestions:** 3 melancholic but beautiful thoughts about urban isolation.
-    * **Example:** "Every stop brings me ____" -> "closer to a memory of you."
+    * **Starter Prompt:** 5 syllables exactly.
+    * **Suggestions:** "Summer never ends", "Home is far away".
+    * **Example:** "Summer never ends"
+    * **NOTE:** Total line must be 5 syllables.
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a high-fidelity, detailed anime art style scene. If a person is in the photo, turn them into an anime character with expressive eyes and stylized hair. The setting should be stylised with a cyberpunk anime aesthetic. Apply neon lighting, rain-slicked surfaces, and a cool color palette to the existing environment, making it look like a frame from a high-budget anime movie. The surface should look like a glossy, rain-spattered travel brochure or high-quality anime cel. Slight chromatic aberration on the edges and a subtle hexagonal lens flare texture.`,
-      primaryColor: '#3b82f6', // Blue-500
-      backgroundColor: '#0f172a', // Slate-900
-      textColor: '#e2e8f0', // Slate-200
-      fontFamilyHeader: '"Orbitron", sans-serif',
-      fontFamilyBody: '"Roboto Mono", monospace',
-      filterRaw: 'contrast(1.1) brightness(1.1) saturate(1.2) hue-rotate(-10deg)'
+      promptTemplate: `Transform this image of {visual_modifiers} into a stunning hand-painted anime background in the style of Studio Ghibli (Hayao Miyazaki). If a person is present, transform them into a Ghibli-style character with simple facial features and natural clothing. The setting should be lush, painterly, and idyllic. Apply soft, natural lighting, fluffy cumulus clouds, and vibrant blues and greens. The texture should look like a high-quality gouache or watercolor painting on paper. No neon or cyberpunk elements. It captures a moment of "Ma" (quiet emptiness) and wonder.`,
+      primaryColor: '#0ea5e9', // Sky-500
+      backgroundColor: '#f0f9ff', // Sky-50
+      textColor: '#0c4a6e', // Sky-900
+      fontFamilyHeader: '"Patrick Hand", cursive',
+      fontFamilyBody: '"Cormorant Garamond", serif',
+      filterRaw: 'saturate(1.2) contrast(1.05) brightness(1.05)'
     }
   },
   {

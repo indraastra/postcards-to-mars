@@ -8,11 +8,11 @@ import { THEMES } from '../core/theme.config';
   selector: 'app-destination-gallery',
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="w-full max-w-2xl mx-auto flex flex-col gap-6 animate-fade-in relative z-20">
+    <div class="w-full max-w-2xl mx-auto flex flex-col gap-2 animate-fade-in relative z-20">
       
       <!-- Theme Carousel -->
       <div 
-        class="flex gap-4 overflow-x-auto px-8 py-4 md:p-6 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
+        class="flex gap-4 overflow-x-auto px-8 py-2 md:p-4 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
         id="theme-carousel"
         (mousedown)="startDrag($event)"
         (mouseleave)="stopDrag()"
@@ -84,7 +84,7 @@ import { THEMES } from '../core/theme.config';
 
       <!-- Helper Text -->
       <div class="text-center font-mono text-[10px] uppercase tracking-widest opacity-50 animate-pulse">
-        <<< Swipe to Calibrate Frequency >>>
+        <<< Swipe to Change Film >>>
       </div>
 
       <!-- Custom Theme Modal -->

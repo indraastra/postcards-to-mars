@@ -14,7 +14,7 @@ interface TextSegment {
   imports: [CommonModule, FormsModule],
   template: `
     <div 
-      class="flex flex-col items-center justify-center min-h-[80vh] p-4 pt-24 animate-fade-in pb-48"
+      class="flex flex-col items-center justify-center w-full animate-fade-in"
       [style.--theme-primary]="theme().visualStyle.primaryColor"
       [style.--theme-bg]="theme().visualStyle.backgroundColor"
       [style.--theme-text]="theme().visualStyle.textColor"
@@ -112,7 +112,7 @@ interface TextSegment {
         </div>
 
       <!-- Controls -->
-      <div class="mt-8 w-full max-w-sm flex flex-col items-center gap-4 z-10">
+      <div class="mt-8 mb-20 w-full max-w-sm flex flex-col items-center gap-4 z-10">
         <button 
           (click)="share()"
           class="w-full flex items-center justify-center gap-3 text-white px-6 py-4 rounded-sm shadow-lg transition-all font-mono uppercase tracking-widest text-xs group bg-[var(--theme-primary)] hover:opacity-90 shadow-[var(--theme-primary)]/40"

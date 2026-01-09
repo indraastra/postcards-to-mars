@@ -1,4 +1,4 @@
-<div class="min-h-screen relative overflow-hidden font-sans selection:bg-white/20 selection:text-white"
+<div class="h-[100dvh] w-full relative overflow-hidden font-sans selection:bg-white/20 selection:text-white"
   [style.background-color]="geminiService.activeTheme().visualStyle.backgroundColor === '#f4f1ea' ? '#050505' : geminiService.activeTheme().visualStyle.backgroundColor"
   [style.--theme-bg]="geminiService.activeTheme().visualStyle.backgroundColor === '#f4f1ea' ? '#050505' : geminiService.activeTheme().visualStyle.backgroundColor"
   [style.--theme-primary]="geminiService.activeTheme().visualStyle.primaryColor"
@@ -100,65 +100,66 @@
   </div>
   }
 
-  <!-- Main Content Area -->
-  <main class="relative z-10 flex flex-col items-center justify-center min-h-screen w-full max-w-2xl mx-auto px-4">
+  <main class="relative z-10 h-full w-full overflow-y-auto">
+    <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
 
-    @switch (state()) {
+      @switch (state()) {
 
-    @case ('landing') {
-    <div class="flex flex-col gap-2 md:gap-8 w-full max-w-2xl">
-      <app-destination-gallery></app-destination-gallery>
-      <app-camera-upload (imageSelected)="onImageSelected($event)"></app-camera-upload>
+      @case ('landing') {
+      <div class="flex flex-col gap-2 md:gap-4 w-full max-w-2xl">
+        <app-destination-gallery></app-destination-gallery>
+        <app-camera-upload (imageSelected)="onImageSelected($event)"></app-camera-upload>
+      </div>
+      }
+
+      @case ('analyzing') {
+      <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
+        <!-- Linear Loader -->
+        <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
+          style="opacity: 0.2">
+          <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
+        </div>
+
+        <div class="font-mono space-y-2">
+          <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">{{
+            geminiService.activeTheme().loadingText }}</h3>
+          <p class="text-[10px] text-[var(--theme-text)] uppercase tracking-wider min-h-[1rem] opacity-90">{{
+            loadingMessage() }}</p>
+        </div>
+      </div>
+      }
+
+      @case ('dialogue') {
+      <app-dialogue [imageSrc]="originalImage()!" [starterText]="currentStarter()" [history]="poemHistory()"
+        [suggestions]="currentSuggestions()" [loading]="loadingNextLine()" [isLastLine]="poemHistory().length === 2"
+        (lineCompleted)="onLineCompleted($event)" (finished)="finishCreation($event)"></app-dialogue>
+      }
+
+      @case ('generating') {
+      <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
+        <!-- Linear Loader -->
+        <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
+          style="opacity: 0.2">
+          <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
+        </div>
+
+        <div class="font-mono space-y-2">
+          <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">Transmission in Progress</h3>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider min-h-[1rem]">{{ loadingMessage() }}</p>
+        </div>
+      </div>
+      }
+
+      @case ('result') {
+      <app-postcard-result [poem]="finalPoem()" [stylizedImageSrc]="stylizedImage()" [imagePrompt]="generatedPrompt()"
+        [isRegenerating]="isRegenerating()" [version]="promptVersion()" (regenerate)="onRegenerateImage($event)"
+        (poemChange)="onPoemChanged($event)"></app-postcard-result>
+
+      <app-film-strip (themeSwitch)="onThemeSwitched($event)"></app-film-strip>
+      }
+
+      }
+
     </div>
-    }
-
-    @case ('analyzing') {
-    <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
-      <!-- Linear Loader -->
-      <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
-        style="opacity: 0.2">
-        <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
-      </div>
-
-      <div class="font-mono space-y-2">
-        <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">{{
-          geminiService.activeTheme().loadingText }}</h3>
-        <p class="text-[10px] text-[var(--theme-text)] uppercase tracking-wider min-h-[1rem] opacity-90">{{
-          loadingMessage() }}</p>
-      </div>
-    </div>
-    }
-
-    @case ('dialogue') {
-    <app-dialogue [imageSrc]="originalImage()!" [starterText]="currentStarter()" [history]="poemHistory()"
-      [suggestions]="currentSuggestions()" [loading]="loadingNextLine()" [isLastLine]="poemHistory().length === 2"
-      (lineCompleted)="onLineCompleted($event)" (finished)="finishCreation($event)"></app-dialogue>
-    }
-
-    @case ('generating') {
-    <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
-      <!-- Linear Loader -->
-      <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
-        style="opacity: 0.2">
-        <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
-      </div>
-
-      <div class="font-mono space-y-2">
-        <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">Transmission in Progress</h3>
-        <p class="text-[10px] text-gray-400 uppercase tracking-wider min-h-[1rem]">{{ loadingMessage() }}</p>
-      </div>
-    </div>
-    }
-
-    @case ('result') {
-    <app-postcard-result [poem]="finalPoem()" [stylizedImageSrc]="stylizedImage()" [imagePrompt]="generatedPrompt()"
-      [isRegenerating]="isRegenerating()" [version]="promptVersion()" (regenerate)="onRegenerateImage($event)"
-      (poemChange)="onPoemChanged($event)"></app-postcard-result>
-
-    <app-film-strip (themeSwitch)="onThemeSwitched($event)"></app-film-strip>
-    }
-
-    }
-
   </main>
 </div>

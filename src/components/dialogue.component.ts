@@ -13,7 +13,7 @@ export interface PoemLine {
   selector: 'app-dialogue',
   imports: [FormsModule, CommonModule],
   template: `
-    <div class="w-full max-w-lg mx-auto animate-fade-in relative pt-12">
+    <div class="w-full max-w-lg mx-auto animate-fade-in relative pt-4">
       
       <!-- Background Context (Image) -->
       <!-- Use fixed positioning to cover the entire screen behind the UI -->
@@ -29,7 +29,7 @@ export interface PoemLine {
       <div class="relative z-10 flex flex-col items-center justify-center p-4">
         
         <!-- History -->
-        <div class="w-full flex flex-col gap-4 mb-12">
+        <div class="w-full flex flex-col gap-2 mb-6">
            @for (line of history(); track $index) {
               <p class="italic text-lg text-neutral-400 text-center drop-shadow-md font-[family-name:var(--font-body)]">
                 {{ line.prefix }} <span class="font-bold text-[var(--theme-primary)]">{{ line.userInput }}</span>{{ needsSpace(line.suffix) ? ' ' : '' }}{{ line.suffix }}
@@ -43,7 +43,7 @@ export interface PoemLine {
              <span class="text-[10px] tracking-widest uppercase text-[var(--theme-primary)]">Awaiting Response...</span>
            </div>
         } @else {
-            <div class="text-center w-full mb-8">
+            <div class="text-center w-full mb-4">
                <p class="text-2xl md:text-3xl text-white leading-tight mb-6 italic drop-shadow-lg font-[family-name:var(--font-body)]">
                  "{{ starterParts().prefix }} ..."
                </p>

@@ -202,8 +202,12 @@ ${theme.poemStructure}
     - **Starter:** Max 6 words.
     - **Suggestion:** Max 8 words.
     - **TOTAL LINE LENGTH:** Must be under 15 words.
-4.  **No Placeholders:** Starters must end with " ____". Suggestions must be text only.
-5.  **Formatting:** Suggestions should NOT include leading spaces.
+4.  **RELEVANCE:**
+    - The poem MUST be explicitly grounded in the specific visual details of the image.
+    - If you see a person, pet, or object, weave them into the narrative arc.
+    - Do not write generic text; look at what is actually there.
+5.  **No Placeholders:** Starters must end with " ____". Suggestions must be text only.
+6.  **Formatting:** Suggestions should NOT include leading spaces.
 
 Return JSON object.`;
 

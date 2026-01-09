@@ -7,55 +7,76 @@ import { THEMES } from '../core/theme.config';
   selector: 'app-film-strip',
   imports: [CommonModule],
   template: `
-    <div class="fixed bottom-0 left-0 w-full z-40 p-4 pb-6 bg-[var(--theme-bg)] border-t border-[var(--theme-primary)]/20 shadow-2xl">
+    <div 
+      class="fixed bottom-0 left-0 w-full z-40 bg-[var(--theme-bg)] border-t border-[var(--theme-primary)]/20 shadow-2xl transition-transform duration-500 ease-in-out"
+      [style.transform]="isCollapsed() ? 'translateY(calc(100% - 2.25rem))' : 'translateY(0)'"
+    >
       
-      <div class="max-w-md mx-auto">
-        <div class="flex items-center gap-2 mb-2 px-1">
+      <!-- Collapsible Header / Handle -->
+      <button 
+        (click)="toggleCollapse()"
+        class="w-full h-9 flex items-center justify-between px-6 cursor-pointer hover:bg-white/5 transition-colors group"
+      >
+        <div class="flex items-center gap-2">
           <div class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></div>
-          <span class="text-[9px] uppercase tracking-[0.2em] font-mono text-[var(--theme-text)] opacity-60">Memory Reel</span>
+          <span class="text-[9px] uppercase tracking-[0.2em] font-mono text-[var(--theme-primary)] opacity-90 group-hover:opacity-100 transition-opacity">
+            Photo Reel
+          </span>
         </div>
 
-        <div 
-          class="flex gap-3 overflow-x-auto pb-2 px-6 pt-1 custom-scrollbar snap-x cursor-grab active:cursor-grabbing"
-          (mousedown)="startDrag($event)"
-          (mouseleave)="stopDrag()"
-          (mouseup)="stopDrag()"
-          (mousemove)="moveDrag($event)"
+        <!-- Chevron Icon -->
+        <span 
+          class="text-[var(--theme-primary)] opacity-90 group-hover:opacity-100 transition-all font-mono text-xs"
+          [class.rotate-180]="!isCollapsed()"
         >
-          
-          @for (theme of geminiService.getAllThemes(); track theme.id) {
-            <button 
-              (click)="switchTheme(theme.id)"
-              class="relative flex-shrink-0 w-16 h-20 border rounded-sm overflow-hidden transition-all duration-300 group snap-start"
-              [class.border-rose-500]="activeTheme().id === theme.id"
-              [class.border-gray-800]="activeTheme().id !== theme.id"
-              [class.opacity-50]="activeTheme().id !== theme.id"
-              [class.hover:opacity-100]="activeTheme().id !== theme.id"
-              [style.background-color]="theme.visualStyle.backgroundColor"
-            >
-              <!-- Theme Preview Color/Style -->
-              <div class="absolute inset-0 opacity-80" [style.background-color]="theme.visualStyle.primaryColor"></div>
-              
-              <!-- Active Indicator -->
-               @if (activeTheme().id === theme.id) {
-                  <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full shadow-sm z-10"></div>
-               }
-               
-               <!-- Label -->
-               <div class="absolute bottom-0 w-full bg-black/80 py-1 text-center">
-                 <span class="text-[8px] font-mono text-white uppercase tracking-wider block truncate px-1">
-                   {{ theme.shortName }}
-                 </span>
-               </div>
-               
-               <!-- Developed Marker -->
-               @if (isDeveloped(theme.id)) {
-                 <div class="absolute top-1 left-1 w-2 h-2 bg-white rounded-[1px] shadow-md z-10 border border-black/20"></div>
-               }
+          ▲
+        </span>
+      </button>
 
-            </button>
-          }
-        </div>
+      <!-- Scrollable Reel -->
+      <div 
+        class="flex gap-3 overflow-x-auto px-6 pb-4 pt-1 custom-scrollbar snap-x cursor-grab active:cursor-grabbing"
+        (mousedown)="startDrag($event)"
+        (mouseleave)="stopDrag()"
+        (mouseup)="stopDrag()"
+        (mousemove)="moveDrag($event)"
+      >
+        
+        @for (theme of geminiService.getAllThemes(); track theme.id) {
+          <button 
+            (click)="switchTheme(theme.id)"
+            class="relative flex-shrink-0 w-16 h-20 border rounded-sm overflow-hidden transition-all duration-300 group snap-start bg-black"
+            [class.border-rose-500]="activeTheme().id === theme.id"
+            [class.border-gray-800]="activeTheme().id !== theme.id"
+            [class.opacity-100]="activeTheme().id === theme.id"
+            [class.opacity-60]="activeTheme().id !== theme.id"
+            [class.hover:opacity-100]="activeTheme().id !== theme.id"
+          >
+
+            <!-- Thumbnail Logic -->
+            @if (getArtifact(theme.id); as artifact) {
+               <!-- Show Generated Image -->
+               <img [src]="artifact.imageUrl" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+            } @else {
+               <!-- Show Theme Color Placeholder -->
+               <div class="absolute inset-0 opacity-80" [style.background-color]="theme.visualStyle.backgroundColor"></div>
+               <div class="absolute inset-0 opacity-40 mix-blend-overlay" [style.background-color]="theme.visualStyle.primaryColor"></div>
+            }
+            
+            <!-- Active Indicator -->
+             @if (activeTheme().id === theme.id) {
+                <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full shadow-sm z-20"></div>
+             }
+             
+             <!-- Label -->
+             <div class="absolute bottom-0 w-full bg-black/80 py-1 text-center z-10">
+               <span class="text-[8px] font-mono text-white uppercase tracking-wider block truncate px-1">
+                 {{ theme.shortName }}
+               </span>
+             </div>
+
+          </button>
+        }
       </div>
     </div>
   `,
@@ -77,12 +98,21 @@ export class FilmStripComponent {
   themeSwitch = output<string>(); // Emits themeId
 
   activeTheme = this.geminiService.activeTheme;
+  isCollapsed = signal(false);
 
   // Drag State
   isDragging = false;
   startX = 0;
   scrollLeft = 0;
   wasDragging = false;
+
+  toggleCollapse() {
+    this.isCollapsed.update(v => !v);
+  }
+
+  getArtifact(themeId: string) {
+    return this.geminiService.getArtifact(themeId);
+  }
 
   startDrag(e: MouseEvent) {
     const slider = e.currentTarget as HTMLElement;
@@ -114,9 +144,5 @@ export class FilmStripComponent {
     if (!this.wasDragging && this.activeTheme().id !== id) {
       this.themeSwitch.emit(id);
     }
-  }
-
-  isDeveloped(themeId: string): boolean {
-    return !!this.geminiService.getArtifact(themeId);
   }
 }
