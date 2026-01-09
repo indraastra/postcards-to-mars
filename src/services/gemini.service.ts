@@ -173,7 +173,7 @@ export class GeminiService {
 
 **TASK:** Analyze the image and return a JSON object containing:
 1. "acts": A cohesive 3-line poem structure.
-2. "visual_tags": A list of 3-5 concise visual descriptors of the scene.
+2. "visual_tags": A list of 3-5 concise visual descriptors of key elements in the scene.
 
 **THE POEM NARRATIVE ARC:**
 ${theme.poemStructure}
@@ -283,11 +283,12 @@ Return JSON object.`;
     const BASE_PROMPT_CONSTRAINTS = `
     
     GLOBAL CONSTRAINTS:
-    1. FORMAT: Adaptively recompose the scene to fit the 1:1 square format.
-    2. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs.
+    1. FRAMING: Adaptively recompose the scene to fit the 1:1 square format.
+    2. PRESERVATION: Retain the key elements, poses, features, and recognisability of these: {visual_modifiers}. Allow flexibility in the exact framing.
+    3. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs, except for what was present in the original image.
     `;
 
-    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
+    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS.replace('{visual_modifiers}', visualModifiers);
 
     const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
     return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };

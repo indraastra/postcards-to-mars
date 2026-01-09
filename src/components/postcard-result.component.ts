@@ -22,10 +22,7 @@ interface TextSegment {
       [style.--font-body]="theme().visualStyle.fontFamilyBody"
     >
       
-      <div class="mb-8 text-center space-y-2 opacity-90">
-        <h2 class="text-xl font-mono tracking-widest uppercase text-[var(--theme-primary)]">Transmission Complete</h2>
-        <p class="text-[10px] text-gray-400 font-mono">ARTIFACT_ID: {{ randomId }}</p>
-      </div>
+
 
       <!-- The Card Container (Preview) -->
       <div 
@@ -42,7 +39,7 @@ interface TextSegment {
         </div>
 
         <!-- Main Art Image Area -->
-        <div class="w-full relative shadow-lg mb-6">
+        <div class="w-full relative shadow-lg mb-6 min-h-[20rem]">
            <div class="aspect-square w-full bg-zinc-100 overflow-hidden relative grayscale-[0.1] contrast-105 sepia-[0.15]">
             @if (stylizedImageSrc()) {
               <img [src]="stylizedImageSrc()" class="w-full h-full object-cover transition-opacity duration-500" [class.opacity-50]="isRegenerating()" alt="AI Art" (load)="onImageLoad()">
@@ -52,8 +49,11 @@ interface TextSegment {
                  <div class="w-12 h-px bg-zinc-300 relative overflow-hidden">
                     <div class="absolute h-full bg-zinc-500 animate-progress"></div>
                  </div>
-                 <span class="text-[10px] uppercase tracking-widest">Developing...</span>
-              </div>
+                  <div class="flex flex-col items-center gap-1">
+                     <span class="text-[10px] uppercase tracking-widest font-bold">{{ theme().loadingText }}</span>
+                     <span class="text-[10px] uppercase tracking-widest opacity-90 font-medium">{{ loadingMessage() }}</span>
+                  </div>
+               </div>
             }
 
             @if (isRegenerating()) {
@@ -72,7 +72,7 @@ interface TextSegment {
           
           <!-- Tune Signal Button -->
           <button 
-             (click)="openEditor()"
+             (click)="openEditor('stylisation')"
              [disabled]="isRegenerating()"
              class="absolute -bottom-3 right-2 bg-black/80 text-gray-400 hover:text-white text-[9px] font-mono uppercase tracking-widest px-2 py-1 border border-gray-700 transition-colors z-20 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:border-[var(--theme-primary)]"
           >
@@ -82,10 +82,18 @@ interface TextSegment {
 
         <!-- The Poem Preview -->
         <div class="px-1 text-left">
-          <div 
-             class="text-lg leading-relaxed italic whitespace-pre-wrap pl-4 border-l-2 mb-8 font-[family-name:var(--font-body)] text-[var(--theme-text)] border-[var(--theme-primary)]/40"
-             [innerHTML]="safePoemHtml()">
-          </div>
+           <div 
+              class="text-lg leading-relaxed italic whitespace-pre-wrap pl-4 border-l-2 mb-8 font-[family-name:var(--font-body)] text-[var(--theme-text)] border-[var(--theme-primary)]/40 relative group/poem"
+              [innerHTML]="safePoemHtml()">
+           </div>
+           
+           <!-- Poem Editor Button (Moved here) -->
+           <button 
+              (click)="openEditor('poem')"
+              class="absolute bottom-24 right-6 bg-[var(--theme-bg)]/80 backdrop-blur-sm text-[var(--theme-text)] hover:text-[var(--theme-primary)] text-[9px] font-mono uppercase tracking-widest px-2 py-1 border border-[var(--theme-text)]/20 transition-colors z-20 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:border-[var(--theme-primary)]"
+           >
+             [ {{ theme().editPoemLabel }} ]
+           </button>
           
           <!-- Footer Metadata -->
           <div class="flex justify-between items-end border-t pt-3 border-[var(--theme-text)]/20">
@@ -101,7 +109,7 @@ interface TextSegment {
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
       <!-- Controls -->
       <div class="mt-8 w-full max-w-sm flex flex-col items-center gap-4 z-10">
@@ -126,17 +134,27 @@ interface TextSegment {
            <div class="w-full max-w-lg bg-[#0f0f11] border p-1 shadow-2xl border-[var(--theme-primary)]/40">
               <div class="bg-[#1a1a1d] p-4 flex flex-col gap-4">
                  <div class="flex justify-between items-center border-b pb-2 border-[var(--theme-primary)]/30">
-                    <h3 class="font-mono text-xs tracking-widest uppercase text-[var(--theme-primary)]">/// VISUAL_DATA_OVERRIDE ///</h3>
+                    <h3 class="font-mono text-xs tracking-widest uppercase text-[var(--theme-primary)]">
+                      /// {{ editorMode() === 'stylisation' ? 'VISUAL_DATA_OVERRIDE' : 'MESSAGE_LOG_OVERRIDE' }} ///
+                    </h3>
                     <button (click)="closeEditor()" class="text-gray-500 hover:text-white font-mono text-xs">[X]</button>
                  </div>
-                 
-                 <div class="relative">
-                    <textarea 
-                      [(ngModel)]="editablePrompt" 
-                      class="w-full h-64 bg-black border border-gray-800 p-3 font-mono text-[11px] text-gray-300 focus:outline-none leading-relaxed resize-none custom-scrollbar focus:border-[var(--theme-primary)]/50"
-                      spellcheck="false"
-                    ></textarea>
-                    <div class="absolute bottom-2 right-2 text-[9px] text-gray-600 font-mono pointer-events-none">RAW_DATA_INPUT</div>
+                                 <div class="relative">
+                    @if (editorMode() === 'stylisation') {
+                      <textarea 
+                        [(ngModel)]="editablePrompt" 
+                        class="w-full h-64 bg-black border border-gray-800 p-3 font-mono text-[11px] text-gray-300 focus:outline-none leading-relaxed resize-none custom-scrollbar focus:border-[var(--theme-primary)]/50"
+                        spellcheck="false"
+                      ></textarea>
+                      <div class="absolute bottom-2 right-2 text-[9px] text-gray-600 font-mono pointer-events-none">RAW_DATA_INPUT</div>
+                    } @else {
+                      <textarea 
+                        [(ngModel)]="editablePoem" 
+                        class="w-full h-64 bg-black border border-gray-800 p-3 font-serif italic text-lg text-gray-300 focus:outline-none leading-relaxed resize-none custom-scrollbar focus:border-[var(--theme-primary)]/50"
+                        spellcheck="false"
+                      ></textarea>
+                      <div class="absolute bottom-2 right-2 text-[9px] text-gray-600 font-mono pointer-events-none">LOG_ENTRY_INPUT</div>
+                    }
                  </div>
 
                  <div class="flex gap-2 pt-2">
@@ -197,6 +215,7 @@ export class PostcardResultComponent {
   version = input<string>('SEQ-84.X');
 
   regenerate = output<string>();
+  poemChange = output<string>();
 
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -206,7 +225,13 @@ export class PostcardResultComponent {
 
   // Editor State
   showEditor = signal(false);
+  editorMode = signal<'stylisation' | 'poem'>('stylisation');
   editablePrompt = signal('');
+  editablePoem = signal('');
+
+  // Loading State
+  loadingMessage = signal('Developing...');
+  loadingInterval: any;
 
   safePoemHtml = computed(() => {
     const color = this.theme().visualStyle.primaryColor;
@@ -220,10 +245,45 @@ export class PostcardResultComponent {
         this.editablePrompt.set(this.imagePrompt());
       }
     });
+
+    // Start loading cycle
+    this.startLoadingCycle();
   }
 
-  openEditor() {
-    this.editablePrompt.set(this.imagePrompt());
+  ngOnDestroy() {
+    if (this.loadingInterval) {
+      clearInterval(this.loadingInterval);
+    }
+  }
+
+  startLoadingCycle() {
+    let index = 0;
+    const messages = this.theme().loadingMessages || ['Developing...'];
+
+    // Initial set
+    this.loadingMessage.set(messages[0]);
+
+    this.loadingInterval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      this.loadingMessage.set(messages[index]);
+    }, 1200);
+  }
+
+  openEditor(mode: 'stylisation' | 'poem') {
+    this.editorMode.set(mode);
+    if (mode === 'stylisation') {
+      const currentPrompt = this.imagePrompt();
+      const poemContext = `\n\nMatch the image to this poem:\n${this.poem()}`;
+
+      // Only append if not already there to avoid duplication on repeated opens
+      if (!currentPrompt.includes('Match the image to this poem:')) {
+        this.editablePrompt.set(currentPrompt + poemContext);
+      } else {
+        this.editablePrompt.set(currentPrompt);
+      }
+    } else {
+      this.editablePoem.set(this.poem());
+    }
     this.showEditor.set(true);
   }
 
@@ -233,7 +293,12 @@ export class PostcardResultComponent {
 
   submitRegeneration() {
     this.showEditor.set(false);
-    this.regenerate.emit(this.editablePrompt());
+
+    if (this.editorMode() === 'stylisation') {
+      this.regenerate.emit(this.editablePrompt());
+    } else {
+      this.poemChange.emit(this.editablePoem());
+    }
   }
 
   onImageLoad() {

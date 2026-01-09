@@ -12,7 +12,7 @@ import { THEMES } from '../core/theme.config';
       
       <!-- Theme Carousel -->
       <div 
-        class="flex gap-4 overflow-x-auto p-6 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
+        class="flex gap-4 overflow-x-auto p-0 py-4 md:p-6 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
         id="theme-carousel"
         (mousedown)="startDrag($event)"
         (mouseleave)="stopDrag()"
@@ -22,7 +22,7 @@ import { THEMES } from '../core/theme.config';
         @for (theme of geminiService.getAllThemes(); track theme.id) {
           <button 
             (click)="selectTheme(theme.id)"
-            class="relative flex-shrink-0 w-64 h-80 rounded-lg overflow-hidden transition-all duration-500 group snap-start border-2"
+            class="relative flex-shrink-0 w-56 h-64 md:w-64 md:h-80 rounded-lg overflow-hidden transition-all duration-500 group snap-start border-2"
             [class.border-white]="activeTheme().id === theme.id"
             [class.border-transparent]="activeTheme().id !== theme.id"
             [class.scale-105]="activeTheme().id === theme.id"
@@ -35,7 +35,7 @@ import { THEMES } from '../core/theme.config';
             <div class="absolute inset-0 opacity-20" [style.background-color]="theme.visualStyle.primaryColor"></div>
             
             <!-- Content -->
-            <div class="absolute inset-0 p-6 flex flex-col justify-between text-left">
+            <div class="absolute inset-0 p-4 md:p-6 flex flex-col justify-between text-left">
               <div>
                 <p class="text-[10px] uppercase tracking-[0.2em] opacity-60 mb-2 font-mono" [style.color]="theme.visualStyle.textColor">
                   Destination {{ $index + 1 }}
@@ -73,7 +73,7 @@ import { THEMES } from '../core/theme.config';
         <!-- Custom Theme Card -->
         <button 
           (click)="openCustomModal()"
-          class="relative flex-shrink-0 w-64 h-80 rounded-lg overflow-hidden transition-all duration-300 group snap-center border-2 border-dashed border-white/20 hover:border-white/50 bg-black/40 hover:bg-black/60"
+          class="relative flex-shrink-0 w-56 h-64 md:w-64 md:h-80 rounded-lg overflow-hidden transition-all duration-300 group snap-center border-2 border-dashed border-white/20 hover:border-white/50 bg-black/40 hover:bg-black/60"
         >
            <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-400 group-hover:text-white transition-colors">
               <span class="text-4xl font-mono font-light">+</span>

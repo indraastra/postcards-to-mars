@@ -4,12 +4,12 @@ import { GeminiService } from '../services/gemini.service';
 @Component({
   selector: 'app-camera-upload',
   template: `
-    <div class="flex flex-col items-center justify-center space-y-4 p-4 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto">
+    <div class="flex flex-col items-center justify-center space-y-2 md:space-y-4 p-4 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto">
       
       <!-- Integrated Upload Button -->
-      <div class="w-full grid gap-4 mt-2">
+      <div class="w-full grid gap-4">
         <label 
-          class="relative group cursor-pointer w-full flex items-center justify-center gap-4 p-6 transition-all duration-500 border hover:bg-white/5 shadow-2xl"
+          class="relative group cursor-pointer w-full flex items-center justify-center gap-4 p-4 md:p-6 transition-all duration-500 border hover:bg-white/5 shadow-2xl"
           [style.borderColor]="'var(--theme-primary)'"
           [style.backgroundColor]="'var(--theme-primary-dimmer)'"
         >
@@ -64,7 +64,7 @@ import { GeminiService } from '../services/gemini.service';
 export class CameraUploadComponent {
   geminiService = inject(GeminiService);
   activeTheme = this.geminiService.activeTheme;
-  
+
   imageSelected = output<string>();
   errorMessage = signal<string>('');
 
@@ -74,24 +74,24 @@ export class CameraUploadComponent {
 
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      
+
       if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
         this.errorMessage.set('INVALID_FORMAT');
-        input.value = ''; 
+        input.value = '';
         return;
       }
 
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         const result = e.target?.result as string;
         this.resizeImage(result);
       };
-      
+
       reader.onerror = () => {
         this.errorMessage.set('READ_FAILURE');
       };
-      
+
       reader.readAsDataURL(file);
     }
   }

@@ -17,7 +17,7 @@
   </div>
 
   <!-- Header -->
-  <header class="absolute top-0 left-0 w-full p-6 z-30 flex justify-between items-start">
+  <header class="absolute top-0 left-0 w-full p-4 pt-6 md:p-6 z-30 flex justify-between items-start">
     <div class="flex flex-col">
       <span class="text-[10px] font-bold tracking-[0.2em] uppercase leading-none transition-colors"
         [style.color]="'var(--theme-primary)'" [style.font-family]="'var(--font-header)'">
@@ -29,14 +29,14 @@
       </span>
     </div>
 
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-4 md:gap-6 shrink-0">
       <button (click)="toggleAbout()"
         class="text-[10px] font-mono opacity-50 hover:opacity-100 uppercase tracking-widest transition-colors">
         [ INFO ]
       </button>
       <button (click)="reset()"
         class="text-[10px] font-mono opacity-50 hover:opacity-100 uppercase tracking-widest transition-colors hover:text-[var(--theme-primary)]">
-        [ RESET UPLINK ]
+        [ RESET ]
       </button>
     </div>
   </header>
@@ -106,21 +106,26 @@
     @switch (state()) {
 
     @case ('landing') {
-    <div class="flex flex-col gap-8 w-full max-w-2xl">
+    <div class="flex flex-col gap-2 md:gap-8 w-full max-w-2xl">
       <app-destination-gallery></app-destination-gallery>
       <app-camera-upload (imageSelected)="onImageSelected($event)"></app-camera-upload>
     </div>
     }
 
     @case ('analyzing') {
-    <div class="flex flex-col items-center gap-4 animate-pulse font-mono">
-      <div class="w-16 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
+    <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
+      <!-- Linear Loader -->
+      <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
         style="opacity: 0.2">
-        <!-- Use the explicit class 'animate-progress' defined in AppComponent styles -->
         <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
       </div>
-      <p class="text-[10px] tracking-[0.3em] uppercase text-[var(--theme-primary)]">{{
-        geminiService.activeTheme().loadingText }}</p>
+
+      <div class="font-mono space-y-2">
+        <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">{{
+          geminiService.activeTheme().loadingText }}</h3>
+        <p class="text-[10px] text-[var(--theme-text)] uppercase tracking-wider min-h-[1rem] opacity-90">{{
+          loadingMessage() }}</p>
+      </div>
     </div>
     }
 
@@ -147,8 +152,8 @@
 
     @case ('result') {
     <app-postcard-result [poem]="finalPoem()" [stylizedImageSrc]="stylizedImage()" [imagePrompt]="generatedPrompt()"
-      [isRegenerating]="isRegenerating()" [version]="promptVersion()"
-      (regenerate)="onRegenerateImage($event)"></app-postcard-result>
+      [isRegenerating]="isRegenerating()" [version]="promptVersion()" (regenerate)="onRegenerateImage($event)"
+      (poemChange)="onPoemChanged($event)"></app-postcard-result>
 
     <app-film-strip (themeSwitch)="onThemeSwitched($event)"></app-film-strip>
     }

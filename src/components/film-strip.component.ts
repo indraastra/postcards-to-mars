@@ -50,7 +50,7 @@ import { THEMES } from '../core/theme.config';
                
                <!-- Developed Marker -->
                @if (isDeveloped(theme.id)) {
-                 <div class="absolute top-1 left-1 text-[8px] text-green-400 font-bold z-10">●</div>
+                 <div class="absolute top-1 left-1 w-2 h-2 bg-white rounded-[1px] shadow-md z-10 border border-black/20"></div>
                }
 
             </button>

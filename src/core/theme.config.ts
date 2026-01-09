@@ -11,7 +11,9 @@ export interface ThemeConfig {
   archiveButtonLabel: string;
   headerStatus: string;
   loadingText: string;
+  loadingMessages: string[];
   regenLabel: string;
+  editPoemLabel: string;
   textPersona: string;
   poemStructure: string;
   visualStyle: {
@@ -39,7 +41,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Consult Archive',
     headerStatus: 'LIFE SUPPORT: NOMINAL',
     loadingText: 'Processing Signal...',
+    loadingMessages: [
+      'Aligning satellites...',
+      'Calculating trajectory...',
+      'Boosting signal gain...',
+      'Filtering cosmic noise...',
+      'Triangulating coordinates...'
+    ],
     regenLabel: 'Adjust Signal',
+    editPoemLabel: 'Edit Log',
     textPersona: `
 **ROLE:** You are writing a postcard to someone you love who is very far away (on Mars).
 **VOICE:** Intimate, warm, hopeful. The poetry of enduring connection.
@@ -68,7 +78,7 @@ export const THEMES: ThemeConfig[] = [
     * **Example:** "Distance is just ____" -> "a number we haven't solved yet."
     `,
     visualStyle: {
-      promptTemplate: `Transform the provided photograph of {visual_modifiers} into a moody, nostalgic vector illustration. The style should be warm, wistful, and tactile, like a fading memory or a yellowed photograph. Deep amber highlights, soft shadows, and organic textures. Start with the "Postcards from Earth" aesthetic: tactile, personal, and grounded in nature or human warmth. The surface appears aged and tactile like a postcard found on Mars, marked by white crease lines, worn edges, and a coarse halftone grain that replaces all photorealistic detail.`,
+      promptTemplate: `Transform the provided photograph of {visual_modifiers} into a moody, square-format vector illustration that evokes a vintage memory. Adaptively recompose the scene to fit the 1:1 square format, preserving the pose and relative identity of the subjects while simplifying them into flat, angular geometry. The composition is purely visual, defined strictly by deep indigo shadows and glowing amber highlights, completely void of written language or signs. The surface appears aged and tactile like a postcard found on Mars, marked by white crease lines, worn edges, and a coarse halftone grain that replaces all photorealistic detail.`,
       primaryColor: '#be123c', // Rose-700
       backgroundColor: '#f4f1ea',
       textColor: '#1a1a1d',
@@ -90,7 +100,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Review Logs',
     headerStatus: 'TRAIN STATUS: ON TIME',
     loadingText: 'Boarding Night Train...',
+    loadingMessages: [
+      'Checking train schedule...',
+      'Wiping rain from glass...',
+      'Validating ticket...',
+      'Finding seat...',
+      'Watching city lights...'
+    ],
     regenLabel: 'Reroute Track',
+    editPoemLabel: 'Rewrite Journal',
     textPersona: `
 **ROLE:** You are a weary traveler on a night train to Tokyo, writing in a travel journal.
 **VOICE:** Melancholic, observant, cinematic. The feeling of watching city lights blur through rain-streaked glass.
@@ -141,7 +159,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Open Files',
     headerStatus: 'CASE STATUS: ACTIVE',
     loadingText: 'Developing Evidence...',
+    loadingMessages: [
+      'Loading film...',
+      'Lighting cigarette...',
+      'Checking contacts...',
+      'Typing report...',
+      'Reviewing case notes...'
+    ],
     regenLabel: 'Review Evidence',
+    editPoemLabel: 'Revise Statement',
     textPersona: `
 **ROLE:** You are a private investigator in a 1940s noir film, dictating a case file.
 **VOICE:** Cynical, clipped, hard-boiled. Focus on shadows, secrets, and the gritty reality.
@@ -192,7 +218,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Recall Memory',
     headerStatus: 'NATURE STATUS: BLOOMING',
     loadingText: 'Scouting Terrain...',
+    loadingMessages: [
+      'Sketching flora...',
+      'Pressing flowers...',
+      'Observing wildlife...',
+      'Consulting field guide...',
+      'Checking compass...'
+    ],
     regenLabel: 'Retrace Steps',
+    editPoemLabel: 'Edit Field Note',
     textPersona: `
 **ROLE:** You are a druid or field botanist cataloging a newly discovered magical realm.
 **VOICE:** Wonder-filled, soft, ancient. Connected to nature and the hidden spirits of things.
@@ -243,7 +277,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Rewind Tape',
     headerStatus: 'TAPE STATUS: REWOUND',
     loadingText: 'Developing Film...',
+    loadingMessages: [
+      'Shaking photo...',
+      'Waiting for development...',
+      'Checking exposure...',
+      'Recharging flash...',
+      'Advancing film...'
+    ],
     regenLabel: 'Retake Photo',
+    editPoemLabel: 'Edit Note',
     textPersona: `
 **ROLE:** You are writing on the back of a Polaroid in 1998.
 **VOICE:** Nostalgic, casual, fleeting. The feeling of youth and "you had to be there."
@@ -294,7 +336,15 @@ export const THEMES: ThemeConfig[] = [
     archiveButtonLabel: 'Read Scroll',
     headerStatus: 'OWL STATUS: EN ROUTE',
     loadingText: 'Casting Revelio...',
+    loadingMessages: [
+      'Mixing ink...',
+      'Sharpening quill...',
+      'Feeding owls...',
+      'Polishing wand...',
+      'Consulting grimoire...'
+    ],
     regenLabel: 'Recast Spell',
+    editPoemLabel: 'Rewrite Scroll',
     textPersona: `
 **ROLE:** You are a wizard or witch writing with a quill on parchment.
 **VOICE:** Whimsical, slightly archaic, magical.
@@ -323,7 +373,7 @@ export const THEMES: ThemeConfig[] = [
     * **Example:** "I solemnly swear that ____" -> "this magic will never fade."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a magical oil painting of a wizarding world scene. If a person is present, transform them into a witch or wizard wearing robes and holding a wand. If a pet is present, transform them into a magical familiar (owl, cat, toad) with mystical features. The setting should be stylised into a classical fantasy art style. Keep the original background but render it as if it were a location in a wizarding world (e.g. magical lighting, subtle floating candles), preserving the key features of the input. The surface should look like ancient, enchanted vellum. Cracks, candle wax drips, gold leaf flecks, and the texture of old magic.`,
+      promptTemplate: `Transform this image of {visual_modifiers} into a magical oil painting of a wizarding world scene. Transform any people into witches or wizards wearing robes and holding wands. Pets must become magical familiars. The setting should be stylised into a classical fantasy art style, rendered as if it were a location in a wizarding world (e.g. magical lighting, subtle floating candles), preserving the key features of the input. The surface should look like ancient, enchanted vellum. Cracks, candle wax drips, gold leaf flecks, and the texture of old magic.`,
       primaryColor: '#581c87', // Purple-900
       backgroundColor: '#fefce8', // Parchment
       textColor: '#3b0764', // Purple-950
