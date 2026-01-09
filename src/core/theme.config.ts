@@ -432,7 +432,14 @@ export const THEMES: ThemeConfig[] = [
     * **Example:** "We're all mad here, except the teapots."
     `,
     visualStyle: {
-      promptTemplate: `Create a black-and-white wood engraving in the specific style of Sir John Tenniel's illustrations for Alice in Wonderland. The image must be strictly monochrome pen-and-ink line art with intricate cross-hatching and texture. Transform the subject "{visual_modifiers}" into a Victorian fantasy character (e.g. wearing a waistcoat, holding a pocket watch, or interacting with impossible objects). The composition should be flat and theatrical. No color. No text. The background should be detailed with fine ink lines, evoking a 19th-century book illustration.`,
+      promptTemplate: `A high-contrast wood engraving in the distinct style of Sir John Tenniel's Alice in Wonderland. The image must feature "{visual_modifiers}" reimagined as a whimsical Victorian character (e.g. anthropomorphic features, period clothing, waistcoat, oversize pocket watch).
+
+Technical specifications:
+- Medium: Simulation of 19th-century woodblock print.
+- Line Work: Sharp, deliberate black lines with heavy cross-hatching to define volume and shadow.
+- Composition: Theatrical staging with a vignette style (fading to white edges), avoiding wall-to-wall background noise.
+- Mood: Grotesque realism, surreal, and strictly monochrome (1-bit color depth).
+- No text, no greyscale gradients, only pure black lines on white.`,
       primaryColor: '#d946ef', // Fuchsia-500
       backgroundColor: '#2e1065', // Violet-950
       textColor: '#e9d5ff', // Purple-200
