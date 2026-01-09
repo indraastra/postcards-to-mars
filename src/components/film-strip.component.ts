@@ -23,7 +23,7 @@ import { THEMES } from '../core/theme.config';
           (mousemove)="moveDrag($event)"
         >
           
-          @for (theme of themes; track theme.id) {
+          @for (theme of geminiService.getAllThemes(); track theme.id) {
             <button 
               (click)="switchTheme(theme.id)"
               class="relative flex-shrink-0 w-16 h-20 border rounded-sm overflow-hidden transition-all duration-300 group snap-start"
@@ -76,7 +76,6 @@ export class FilmStripComponent {
   geminiService = inject(GeminiService);
   themeSwitch = output<string>(); // Emits themeId
 
-  themes = THEMES;
   activeTheme = this.geminiService.activeTheme;
 
   // Drag State

@@ -39,7 +39,7 @@ interface TextSegment {
         </div>
 
         <!-- Main Art Image Area -->
-        <div class="w-full relative shadow-lg mb-6 min-h-[20rem]">
+        <div class="w-full relative shadow-lg mb-6">
            <div class="aspect-square w-full bg-zinc-100 overflow-hidden relative grayscale-[0.1] contrast-105 sepia-[0.15]">
             @if (stylizedImageSrc()) {
               <img [src]="stylizedImageSrc()" class="w-full h-full object-cover transition-opacity duration-500" [class.opacity-50]="isRegenerating()" alt="AI Art" (load)="onImageLoad()">

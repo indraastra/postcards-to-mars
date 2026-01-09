@@ -12,7 +12,7 @@ import { THEMES } from '../core/theme.config';
       
       <!-- Theme Carousel -->
       <div 
-        class="flex gap-4 overflow-x-auto p-0 py-4 md:p-6 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
+        class="flex gap-4 overflow-x-auto px-8 py-4 md:p-6 custom-scrollbar snap-x scroll-smooth cursor-grab active:cursor-grabbing" 
         id="theme-carousel"
         (mousedown)="startDrag($event)"
         (mouseleave)="stopDrag()"

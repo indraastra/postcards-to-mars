@@ -99,14 +99,22 @@ export class GeminiService {
       
       **REQUIREMENTS:**
       1. **Name:** A poetic, 2-4 word title (e.g., "Neon Rain", "Velvet Void").
-      2. **Text Persona:** A detailed system prompt defining who the "Poet" is (e.g., a time traveler, a ghost, a cat).
-      3. **Visual Style:**
+      2. **Short Name:** A 1-word punchy version for small UI chips (e.g. "Neon", "Void").
+      3. **Text Persona:** A detailed system prompt defining who the "Poet" is (e.g., a time traveler, a ghost, a cat).
+      4. **Visual Style:**
          - **Prompt Template:** A highly detailed Image-to-Image prompt for Gemini Pro Vision. It must include "{visual_modifiers}" placeholder. It should describe the art style, lighting, texture, and mood.
          - **Colors:** Pick a primary accent color, a dark background color, and a readable text color that fits the vibe.
          - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Permanent Marker', 'Patrick Hand'.
-      4. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
-      5. **Landing UI:** Creative labels for the landing page (title, subtitle, main button, and archive button).
-      6. **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE", "JOURNAL: OPEN").
+      5. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
+      6. **UI Labels & Text:** 
+         - **Landing Title/Subtitle:** Creative welcome text.
+         - **Buttons:** Label for Upload (e.g. "Open Channel") and Archive (e.g. "View Log").
+         - **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE").
+         - **Loading Text:** Main loading state (e.g. "PROCESSING...").
+         - **Loading Messages:** An array of 5 thematic strings for the loading cycle (e.g. "Aligning...", "Tuning...").
+         - **Labels:** 
+            - originLabel (e.g. "Sector"), postcardOrigin (e.g. "Earth"), idLabel (e.g. "Ref No").
+            - regenLabel (e.g. "Retune"), editPoemLabel (e.g. "Rewrite").
     `;
 
     try {
@@ -119,11 +127,19 @@ export class GeminiService {
             type: Type.OBJECT,
             properties: {
               name: { type: Type.STRING },
+              shortName: { type: Type.STRING },
               landingTitle: { type: Type.STRING },
               landingSubtitle: { type: Type.STRING },
               uploadButtonLabel: { type: Type.STRING },
               archiveButtonLabel: { type: Type.STRING },
               headerStatus: { type: Type.STRING },
+              loadingText: { type: Type.STRING },
+              loadingMessages: { type: Type.ARRAY, items: { type: Type.STRING } },
+              originLabel: { type: Type.STRING },
+              postcardOrigin: { type: Type.STRING },
+              idLabel: { type: Type.STRING },
+              regenLabel: { type: Type.STRING },
+              editPoemLabel: { type: Type.STRING },
               textPersona: { type: Type.STRING },
               poemStructure: { type: Type.STRING },
               visualStyle: {
@@ -140,7 +156,7 @@ export class GeminiService {
                 required: ['promptTemplate', 'primaryColor', 'backgroundColor', 'textColor', 'fontFamilyHeader', 'fontFamilyBody', 'filterRaw']
               }
             },
-            required: ['name', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'archiveButtonLabel', 'headerStatus', 'textPersona', 'poemStructure', 'visualStyle']
+            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'archiveButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'textPersona', 'poemStructure', 'visualStyle']
           }
         }
       });
@@ -173,7 +189,7 @@ export class GeminiService {
 
 **TASK:** Analyze the image and return a JSON object containing:
 1. "acts": A cohesive 3-line poem structure.
-2. "visual_tags": A list of 3-5 concise visual descriptors of key elements in the scene.
+2. "visual_tags": A list of 3-5 concise descriptors identifying the MAIN SUBJECTS (e.g. "a woman standing", "a cat sleeping"). Focus on physical presence.
 
 **THE POEM NARRATIVE ARC:**
 ${theme.poemStructure}
@@ -284,11 +300,11 @@ Return JSON object.`;
     
     GLOBAL CONSTRAINTS:
     1. FRAMING: Adaptively recompose the scene to fit the 1:1 square format.
-    2. PRESERVATION: Retain the key elements, poses, features, and recognisability of these: {visual_modifiers}. Allow flexibility in the exact framing.
+    2. PRESERVATION: Retain the main recognized subjects, their poses, and the overall composition. Ensure the result is recognizable as the original scene, but allow flexibility in framing and details to fit the style.
     3. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs, except for what was present in the original image.
     `;
 
-    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS.replace('{visual_modifiers}', visualModifiers);
+    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
 
     const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
     return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
