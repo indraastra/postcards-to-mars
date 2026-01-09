@@ -1,12 +1,53 @@
 import { Component, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
 import { THEMES } from '../core/theme.config';
 
 @Component({
   selector: 'app-film-strip',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
+    <!-- Custom Theme Modal -->
+    @if (showCustomModal()) {
+      <div class="fixed inset-0 z-50 flex items-start justify-center pt-20 pb-20 overflow-y-auto bg-black/90 p-6 animate-fade-in backdrop-blur-md">
+         <div class="w-full max-w-lg bg-[#0f0f11] border border-white/10 p-1 shadow-2xl">
+            <div class="bg-[#1a1a1d] p-6 flex flex-col gap-6">
+               
+               <div class="flex justify-between items-start border-b border-white/10 pb-4">
+                  <div>
+                    <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Manual Calibration</h3>
+                    <p class="text-gray-500 text-[10px] font-mono">Describe the world you wish to visit.</p>
+                  </div>
+                  <button (click)="closeCustomModal()" class="text-gray-500 hover:text-white font-mono text-xs p-2">[X]</button>
+               </div>
+               
+               <div class="relative">
+                  <textarea 
+                    [(ngModel)]="customPrompt" 
+                    class="w-full h-32 bg-black/50 border border-white/10 p-4 font-mono text-xs text-gray-300 focus:outline-none focus:border-rose-500/50 leading-relaxed resize-none transition-colors"
+                    placeholder="e.g. A solarpunk utopia with floating gardens..."
+                    [disabled]="isGenerating()"
+                  ></textarea>
+               </div>
+
+               <button 
+                  (click)="generateCustomTheme()"
+                  [disabled]="!customPrompt() || isGenerating()"
+                  class="w-full py-4 bg-rose-900/20 hover:bg-rose-900/40 border border-rose-800/30 hover:border-rose-500/50 text-rose-400 font-mono text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                  @if (isGenerating()) {
+                    <div class="w-2 h-2 bg-rose-500 rounded-full animate-bounce"></div>
+                    <span>Calculating Trajectory...</span>
+                  } @else {
+                    <span>Initialize Jump</span>
+                  }
+               </button>
+            </div>
+         </div>
+      </div>
+    }
+
     <div 
       class="fixed bottom-0 left-0 w-full z-40 bg-[var(--theme-bg)] border-t border-[var(--theme-primary)]/20 shadow-2xl transition-transform duration-500 ease-in-out"
       [style.transform]="isCollapsed() ? 'translateY(calc(100% - 2.25rem))' : 'translateY(0)'"
@@ -77,6 +118,15 @@ import { THEMES } from '../core/theme.config';
 
           </button>
         }
+        
+        <!-- Add Custom Theme Button -->
+        <button 
+          (click)="openCustomModal()"
+          class="relative flex-shrink-0 w-16 h-20 border border-dashed border-gray-600 rounded-sm overflow-hidden transition-all duration-300 group snap-start bg-black/20 hover:bg-white/5 hover:border-white/50 flex flex-col items-center justify-center gap-1"
+        >
+          <span class="text-xl text-gray-500 group-hover:text-white font-light">+</span>
+          <span class="text-[6px] uppercase tracking-widest text-gray-500 group-hover:text-white font-mono">Add</span>
+        </button>
       </div>
     </div>
   `,
@@ -91,6 +141,13 @@ import { THEMES } from '../core/theme.config';
       background: rgba(255, 255, 255, 0.2);
       border-radius: 2px;
     }
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+       from { opacity: 0; transform: scale(0.95); }
+       to { opacity: 1; transform: scale(1); }
+    }
   `]
 })
 export class FilmStripComponent {
@@ -100,11 +157,40 @@ export class FilmStripComponent {
   activeTheme = this.geminiService.activeTheme;
   isCollapsed = signal(false);
 
+  // Custom Theme State
+  showCustomModal = signal(false);
+  customPrompt = signal('');
+  isGenerating = signal(false);
+
   // Drag State
   isDragging = false;
   startX = 0;
   scrollLeft = 0;
   wasDragging = false;
+
+  openCustomModal() {
+    this.showCustomModal.set(true);
+  }
+
+  closeCustomModal() {
+    this.showCustomModal.set(false);
+    this.customPrompt.set('');
+  }
+
+  async generateCustomTheme() {
+    if (!this.customPrompt()) return;
+
+    this.isGenerating.set(true);
+    const theme = await this.geminiService.generateCustomTheme(this.customPrompt());
+    this.isGenerating.set(false);
+
+    if (theme) {
+      this.geminiService.addCustomTheme(theme);
+      this.geminiService.setTheme(theme.id);
+      this.closeCustomModal();
+      this.themeSwitch.emit(theme.id); // Trigger auto-generation on result page
+    }
+  }
 
   toggleCollapse() {
     this.isCollapsed.update(v => !v);

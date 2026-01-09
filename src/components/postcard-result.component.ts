@@ -112,19 +112,19 @@ interface TextSegment {
         </div>
 
       <!-- Controls -->
-      <div class="mt-8 mb-20 w-full max-w-sm flex flex-col items-center gap-4 z-10">
+      <div class="mt-8 mb-20 w-full max-w-sm flex flex-col items-center gap-3 z-10">
         <button 
           (click)="share()"
-          class="w-full flex items-center justify-center gap-3 text-white px-6 py-4 rounded-sm shadow-lg transition-all font-mono uppercase tracking-widest text-xs group bg-[var(--theme-primary)] hover:opacity-90 shadow-[var(--theme-primary)]/40"
+          class="w-full flex items-center justify-center gap-3 text-white px-6 py-3 rounded-sm shadow-lg transition-all font-mono uppercase tracking-widest text-[10px] group bg-[var(--theme-primary)] hover:opacity-90 shadow-[var(--theme-primary)]/40"
         >
           <span class="group-hover:animate-pulse">●</span> Upload to Uplink
         </button>
         
         <button 
           (click)="download()"
-          class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
+          class="w-full border border-gray-700 hover:border-[var(--theme-primary)] text-gray-400 hover:text-[var(--theme-primary)] px-6 py-3 rounded-sm font-mono uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2"
         >
-          [ Save to Local Drive ]
+          Save to Local Drive
         </button>
       </div>
 
