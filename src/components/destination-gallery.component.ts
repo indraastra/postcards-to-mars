@@ -8,7 +8,7 @@ import { THEMES } from '../core/theme.config';
   selector: 'app-destination-gallery',
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="w-full h-full flex flex-col gap-2 animate-fade-in relative z-20 overflow-x-hidden overflow-y-visible">
+    <div class="w-full h-full flex flex-col gap-2 animate-fade-in relative z-20 overflow-visible">
       
       <!-- Theme Carousel -->
       <!-- 
@@ -120,7 +120,7 @@ import { THEMES } from '../core/theme.config';
       </div>
 
       <!-- Helper Text -->
-      <div class="text-center font-mono text-[10px] uppercase tracking-widest opacity-50 animate-pulse mt-2">
+      <div class="text-center font-mono text-[10px] uppercase tracking-widest text-white/50 animate-pulse mt-2">
         <<< Swipe to Explore Destinations >>>
       </div>
 
