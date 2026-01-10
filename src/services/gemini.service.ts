@@ -65,6 +65,10 @@ export class GeminiService {
     return [...THEMES, ...this.customThemes()];
   }
 
+  getAppBackground(theme: ThemeConfig): string {
+    return '#000000';
+  }
+
   addCustomTheme(theme: ThemeConfig) {
     this.customThemes.update(themes => [...themes, theme]);
   }

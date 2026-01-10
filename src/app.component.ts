@@ -100,7 +100,7 @@ export class AppComponent implements OnDestroy {
     this.loadingInterval = setInterval(() => {
       index = (index + 1) % messages.length;
       this.loadingMessage.set(messages[index]);
-    }, 1200);
+    }, 600);
   }
 
   stopLoadingCycle() {
@@ -148,7 +148,7 @@ export class AppComponent implements OnDestroy {
 
     if (nextIndex < allActs.length) {
       this.loadingNextLine.set(true);
-      const delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+      const delay = Math.floor(Math.random() * (800 - 400 + 1)) + 400;
 
       setTimeout(() => {
         this.currentActIndex.set(nextIndex);
@@ -190,7 +190,7 @@ export class AppComponent implements OnDestroy {
 
     this.finalPoem.set(finalPoemStr);
 
-    const randomDelayMs = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
+    const randomDelayMs = Math.floor(Math.random() * (900 - 600 + 1)) + 600;
     const minDelay = new Promise(resolve => setTimeout(resolve, randomDelayMs));
 
     let imageResult: { image: string | null; prompt: string; version: string };
@@ -254,7 +254,7 @@ export class AppComponent implements OnDestroy {
         this.generatedPrompt.set(cached.prompt);
         this.promptVersion.set(cached.version);
         this.stopLoadingCycle();
-      }, 800); // Small artificial delay for "Tuning" feel
+      }, 400); // Small artificial delay for "Tuning" feel
     } else {
       // 2. SLOW PATH: We need to generate a new poem (Cheap) + Generate Image (Expensive)
 

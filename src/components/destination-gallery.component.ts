@@ -8,16 +8,16 @@ import { THEMES } from '../core/theme.config';
   selector: 'app-destination-gallery',
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="w-full h-full flex flex-col gap-2 animate-fade-in relative z-20 overflow-x-hidden">
+    <div class="w-full h-full flex flex-col gap-2 animate-fade-in relative z-20 overflow-x-hidden overflow-y-visible">
       
       <!-- Theme Carousel -->
       <!-- 
         Padding Logic:
-        Mobile: Card w-56 (14rem). Center = 7rem. Padding = 50vw - 7rem.
-        Desktop: Card w-80 (20rem). Center = 10rem. Padding = 50vw - 10rem.
+        Mobile: Card w-72 (18rem). Center = 9rem. Padding = 50vw - 9rem.
+        Desktop: Card w-96 (24rem). Center = 12rem. Padding = 50vw - 12rem.
       -->
       <div 
-        class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-7rem)] md:px-[calc(50vw-10rem)] py-12 -my-10 custom-scrollbar snap-x snap-mandatory scroll-smooth cursor-grab active:cursor-grabbing" 
+        class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-9rem)] md:px-[calc(50vw-12rem)] py-12 -my-10 custom-scrollbar snap-x snap-mandatory scroll-smooth cursor-grab active:cursor-grabbing" 
         id="theme-carousel"
         (mousedown)="startDrag($event)"
         (mouseleave)="stopDrag()"
@@ -28,7 +28,7 @@ import { THEMES } from '../core/theme.config';
           <button 
             id="theme-{{theme.id}}"
             (click)="selectTheme(theme.id)"
-            class="relative flex-shrink-0 w-56 h-64 md:w-80 md:h-56 rounded-sm overflow-hidden transition-all duration-500 group snap-center bg-[#f4f1ea] shadow-lg hover:shadow-xl hover:-translate-y-1"
+            class="relative flex-shrink-0 w-72 h-52 md:w-96 md:h-64 rounded-sm overflow-hidden transition-all duration-500 group snap-center bg-[#f4f1ea] shadow-lg hover:shadow-xl hover:-translate-y-1 border border-white/10 hover:border-white/20"
             [class.scale-105]="activeTheme().id === theme.id"
             [class.opacity-60]="activeTheme().id !== theme.id"
             [class.hover:opacity-100]="activeTheme().id !== theme.id"
@@ -110,7 +110,7 @@ import { THEMES } from '../core/theme.config';
         <!-- Custom Theme Card -->
         <button 
           (click)="openCustomModal()"
-          class="relative flex-shrink-0 w-56 h-64 md:w-80 md:h-56 rounded-lg overflow-hidden transition-all duration-300 group snap-center border-2 border-dashed border-white/20 hover:border-white/50 bg-black/40 hover:bg-black/60"
+          class="relative flex-shrink-0 w-72 h-52 md:w-96 md:h-64 rounded-lg overflow-hidden transition-all duration-300 group snap-center border-2 border-dashed border-white/20 hover:border-white/50 bg-black/40 hover:bg-black/60"
         >
            <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-400 group-hover:text-white transition-colors">
               <span class="text-4xl font-mono font-light">+</span>
@@ -125,7 +125,7 @@ import { THEMES } from '../core/theme.config';
       </div>
 
       <!-- Action Area -->
-      <div class="flex flex-col items-center gap-3 w-56 md:w-80 mx-auto mt-4 z-30 relative">
+      <div class="flex flex-col items-stretch gap-3 min-w-[14rem] md:min-w-[20rem] max-w-[90vw] mx-auto mt-4 z-30 relative">
         
         <!-- Primary: CAPTURE -->
         <label 

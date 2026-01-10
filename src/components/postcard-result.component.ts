@@ -266,7 +266,7 @@ export class PostcardResultComponent {
     this.loadingInterval = setInterval(() => {
       index = (index + 1) % messages.length;
       this.loadingMessage.set(messages[index]);
-    }, 1200);
+    }, 600);
   }
 
   openEditor(mode: 'stylisation' | 'poem') {

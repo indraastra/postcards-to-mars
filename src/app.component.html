@@ -1,6 +1,6 @@
 <div class="h-[100dvh] w-full relative overflow-hidden font-sans selection:bg-white/20 selection:text-white"
-  [style.background-color]="geminiService.activeTheme().visualStyle.backgroundColor === '#f4f1ea' ? '#050505' : geminiService.activeTheme().visualStyle.backgroundColor"
-  [style.--theme-bg]="geminiService.activeTheme().visualStyle.backgroundColor === '#f4f1ea' ? '#050505' : geminiService.activeTheme().visualStyle.backgroundColor"
+  [style.background-color]="geminiService.getAppBackground(geminiService.activeTheme())"
+  [style.--theme-bg]="geminiService.getAppBackground(geminiService.activeTheme())"
   [style.--theme-primary]="geminiService.activeTheme().visualStyle.primaryColor"
   [style.--theme-text]="geminiService.activeTheme().visualStyle.textColor"
   [style.--font-header]="geminiService.activeTheme().visualStyle.fontFamilyHeader"
