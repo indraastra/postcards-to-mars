@@ -131,7 +131,7 @@ export class GeminiService {
               landingTitle: { type: Type.STRING },
               landingSubtitle: { type: Type.STRING },
               uploadButtonLabel: { type: Type.STRING },
-              archiveButtonLabel: { type: Type.STRING },
+              captureButtonLabel: { type: Type.STRING },
               headerStatus: { type: Type.STRING },
               loadingText: { type: Type.STRING },
               loadingMessages: { type: Type.ARRAY, items: { type: Type.STRING } },

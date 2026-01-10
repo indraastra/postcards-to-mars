@@ -40,7 +40,7 @@ import { GeminiService } from '../services/gemini.service';
             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             (change)="onFileSelected($event)"
           />
-          <span class="font-mono text-[10px] uppercase tracking-[0.2em]">/ {{ activeTheme().archiveButtonLabel }}</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.2em]">/ {{ activeTheme().captureButtonLabel }}</span>
         </label>
 
         @if (errorMessage()) {

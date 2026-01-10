@@ -8,7 +8,7 @@ export interface ThemeConfig {
   landingTitle: string;
   landingSubtitle: string;
   uploadButtonLabel: string;
-  archiveButtonLabel: string;
+  captureButtonLabel: string;
   headerStatus: string;
   loadingText: string;
   loadingMessages: string[];
@@ -25,6 +25,8 @@ export interface ThemeConfig {
     fontFamilyBody: string;
     filterRaw: string;
   };
+  generatingText: string;
+  finalizeLabel: string;
 }
 
 export const THEMES: ThemeConfig[] = [
@@ -36,10 +38,12 @@ export const THEMES: ThemeConfig[] = [
     postcardOrigin: 'Earth (Lost)',
     idLabel: 'Archive Id',
     landingTitle: 'Colony 7 Uplink',
-    landingSubtitle: 'Establishing deep space connection...',
+    landingSubtitle: 'Establishing connection...',
     uploadButtonLabel: 'Begin Transmission',
-    archiveButtonLabel: 'Consult Archive',
+    captureButtonLabel: 'Consult Archive',
     headerStatus: 'LIFE SUPPORT: NOMINAL',
+    generatingText: 'Transmission in Progress',
+    finalizeLabel: 'Finalize Transmission',
     loadingText: 'Processing Signal...',
     loadingMessages: [
       'Aligning satellites...',
@@ -97,8 +101,10 @@ export const THEMES: ThemeConfig[] = [
     landingTitle: 'One-Way Ticket',
     landingSubtitle: 'The sea tracks stretch forever...',
     uploadButtonLabel: 'Board Train',
-    archiveButtonLabel: 'Travel Log',
+    captureButtonLabel: 'Travel Log',
     headerStatus: 'NEXT STOP: TOKYO',
+    generatingText: 'Journey in Progress',
+    finalizeLabel: 'Depart Station',
     loadingText: 'Steam rising...',
     loadingMessages: [
       'Collecting soot sprites...',
@@ -146,65 +152,7 @@ export const THEMES: ThemeConfig[] = [
       filterRaw: 'saturate(1.2) contrast(1.05) brightness(1.05)'
     }
   },
-  {
-    id: 'noir',
-    name: 'Shadows of the City',
-    shortName: 'Noir',
-    originLabel: 'Location',
-    postcardOrigin: 'Precinct 4',
-    idLabel: 'Case No.',
-    landingTitle: 'Detective Bureau',
-    landingSubtitle: 'Open a new case file...',
-    uploadButtonLabel: 'Examine Evidence',
-    archiveButtonLabel: 'Open Files',
-    headerStatus: 'CASE STATUS: ACTIVE',
-    loadingText: 'Developing Evidence...',
-    loadingMessages: [
-      'Loading film...',
-      'Lighting cigarette...',
-      'Checking contacts...',
-      'Typing report...',
-      'Reviewing case notes...'
-    ],
-    regenLabel: 'Review Evidence',
-    editPoemLabel: 'Revise Statement',
-    textPersona: `
-**ROLE:** You are a private investigator in a 1940s noir film, dictating a case file.
-**VOICE:** Cynical, clipped, hard-boiled. Focus on shadows, secrets, and the gritty reality.
-**STYLE:** Short sentences. Metaphors about crime, smoke, and rain.
-    `,
-    poemStructure: `
-**ACT 1: THE SCENE**
-* **GOAL:** Describe the setting as a crime scene or clue.
-* **GUIDANCE:**
-    * **Focus:** Gritty observation about shadows or lighting.
-    * **Make it:** Cynical and atmospheric.
-    * **Example:** "The shadows stretched out like guilty fingers."
 
-**ACT 2: THE HUNCH**
-* **GOAL:** Focus on a small, suspicious detail.
-* **GUIDANCE:**
-    * **Focus:** What is hidden or out of place.
-    * **Make it:** Sharp and observant.
-    * **Example:** "Only the rain knew what was washed away."
-
-**ACT 3: THE TRUTH**
-* **GOAL:** A philosophical statement about the city.
-* **GUIDANCE:**
-    * **Focus:** The city, truth, or fate.
-    * **Make it:** Hard-boiled and weary.
-    * **Example:** "In this city, the truth is just another lie."
-    `,
-    visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a stark, high-contrast Film Noir graphic novel panel. If a person is present, transform them into a classic 1940s private investigator or femme fatale in period clothing (trench coat, fedora, evening gown). Keep the composition dramatic with heavy shadows (chiaroscuro). Pure black and white ink style, no greyscale. Grainy texture like a printed comic. The surface should resemble cheap, pulp comic paper. Visible Ben-Day dots, ink bleed, and rough paper grain. High contrast ink spills.`,
-      primaryColor: '#525252', // Neutral-600
-      backgroundColor: '#171717', // Neutral-900
-      textColor: '#d4d4d4', // Neutral-300
-      fontFamilyHeader: '"Courier Prime", monospace',
-      fontFamilyBody: '"Courier Prime", monospace',
-      filterRaw: 'grayscale(100%) contrast(1.5) brightness(0.9)'
-    }
-  },
   {
     id: 'wild',
     name: 'Whispers from the Wild',
@@ -215,8 +163,10 @@ export const THEMES: ThemeConfig[] = [
     landingTitle: 'Field Journal',
     landingSubtitle: 'Documenting the unseen...',
     uploadButtonLabel: 'Sketch Observation',
-    archiveButtonLabel: 'Recall Memory',
+    captureButtonLabel: 'Recall Memory',
     headerStatus: 'NATURE STATUS: BLOOMING',
+    generatingText: 'Field Notes Updating',
+    finalizeLabel: 'Close Journal',
     loadingText: 'Scouting Terrain...',
     loadingMessages: [
       'Sketching flora...',
@@ -264,65 +214,7 @@ export const THEMES: ThemeConfig[] = [
       filterRaw: 'sepia(0.5) contrast(0.9) brightness(1.1) saturate(0.8)'
     }
   },
-  {
-    id: 'retro',
-    name: 'Polaroids from Yesterday',
-    shortName: 'Polaroid',
-    originLabel: 'Date',
-    postcardOrigin: 'Summer 98',
-    idLabel: 'Tape Id',
-    landingTitle: 'Summer of \'98',
-    landingSubtitle: 'Rewinding the tape...',
-    uploadButtonLabel: 'Take Picture',
-    archiveButtonLabel: 'Rewind Tape',
-    headerStatus: 'TAPE STATUS: REWOUND',
-    loadingText: 'Developing Film...',
-    loadingMessages: [
-      'Shaking photo...',
-      'Waiting for development...',
-      'Checking exposure...',
-      'Recharging flash...',
-      'Advancing film...'
-    ],
-    regenLabel: 'Retake Photo',
-    editPoemLabel: 'Edit Note',
-    textPersona: `
-**ROLE:** You are writing on the back of a Polaroid in 1998.
-**VOICE:** Nostalgic, casual, fleeting. The feeling of youth and "you had to be there."
-**STYLE:** Casual language. Reference music, mixtapes, or the specific "vibe" of the moment.
-    `,
-    poemStructure: `
-**ACT 1: THE SNAPSHOT**
-* **GOAL:** Describe the moment as it felt right then.
-* **GUIDANCE:**
-    * **Focus:** The "vibe" or the specific moment in time.
-    * **Make it:** Casual and nostalgic.
-    * **Example:** "This moment felt exactly like track 3 on that old mixtape."
 
-**ACT 2: THE GLITCH**
-* **GOAL:** Describe a detail that is already starting to fade or blur.
-* **GUIDANCE:**
-    * **Focus:** Light leaks, fading colors, or time slipping.
-    * **Make it:** Acknowledging the impermanence.
-    * **Example:** "The colors are already fading into yesterday."
-
-**ACT 3: THE KEEPSAKE**
-* **GOAL:** A promise to remember this forever.
-* **GUIDANCE:**
-    * **Focus:** Keeping this safe, rewinding, or remembering.
-    * **Make it:** Poignant but casual.
-    * **Example:** "I'll keep this safe in the shoebox under my bed."
-    `,
-    visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a genuine 1990s polaroid photograph. Apply heavy flash photography lighting, soft focus, and film grain. The colors should be slightly washed out and shifted towards magenta and cyan. The subject should look like a candid snapshot from a summer vacation in 1998. Add light leaks and physical imperfections to the "photo" surface. The surface must look like a physical Polaroid photo. Fingerprints, chemical development streaks, dust, and the specific glossy-but-faded texture of instant film.`,
-      primaryColor: '#db2777', // Pink-600
-      backgroundColor: '#fafafa', // White
-      textColor: '#18181b', // Zinc-900
-      fontFamilyHeader: '"Permanent Marker", cursive',
-      fontFamilyBody: '"Patrick Hand", cursive',
-      filterRaw: 'saturate(1.5) contrast(1.1) brightness(1.1) blur(0.5px)'
-    }
-  },
   {
     id: 'magic',
     name: 'The Wizarding Archive',
@@ -333,8 +225,10 @@ export const THEMES: ThemeConfig[] = [
     landingTitle: 'Owl Post Service',
     landingSubtitle: 'Awaiting delivery via Owl Post...',
     uploadButtonLabel: 'Send Owl',
-    archiveButtonLabel: 'Read Scroll',
+    captureButtonLabel: 'Read Scroll',
     headerStatus: 'OWL STATUS: EN ROUTE',
+    generatingText: 'Casting Spell',
+    finalizeLabel: 'Seal Scroll',
     loadingText: 'Casting Revelio...',
     loadingMessages: [
       'Mixing ink...',
@@ -392,8 +286,10 @@ export const THEMES: ThemeConfig[] = [
     landingTitle: 'Down the Rabbit Hole',
     landingSubtitle: 'Impossible things before breakfast...',
     uploadButtonLabel: 'Drink Me',
-    archiveButtonLabel: 'Eat Me',
+    captureButtonLabel: 'Eat Me',
     headerStatus: 'MADNESS: ABSOLUTE',
+    generatingText: 'Falling Down Rabbit Hole',
+    finalizeLabel: 'Wake Up',
     loadingText: 'Consulting the Caterpillar...',
     loadingMessages: [
       'Chasing the White Rabbit...',
@@ -446,6 +342,67 @@ Technical specifications:
       fontFamilyHeader: '"Cinzel", serif',
       fontFamilyBody: '"Cormorant Garamond", serif',
       filterRaw: 'grayscale(1) contrast(1.4) brightness(1.1) sepia(0.1)'
+    }
+  },
+  {
+    id: 'cyberiad',
+    name: 'Parables of the Constructor',
+    shortName: 'Constructor',
+    originLabel: 'Algorithm',
+    postcardOrigin: 'The Infinite Workshop',
+    idLabel: 'Hash',
+    landingTitle: 'Constructor API',
+    landingSubtitle: 'Compiling infinite probabilities...',
+    uploadButtonLabel: 'Execute Algorithm',
+    captureButtonLabel: 'Debug Logic',
+    headerStatus: 'EPSILON: RECURSIVE',
+    generatingText: 'Compiling Algorithm...',
+    finalizeLabel: 'Execute Function',
+    loadingText: 'Initializing Recursion...',
+    loadingMessages: [
+      'Calculating probability gears...',
+      'Greasing the axioms...',
+      'Consulting the Blueprint...',
+      'Expanding the finite tape...',
+      'Optimizing happiness algorithms...'
+    ],
+    regenLabel: 'Recompile',
+    editPoemLabel: 'Refactor Code',
+    textPersona: `
+**ROLE:** You are a Grand Constructor of infinite machines in a fable about technology.
+**VOICE:** Loquacious, technical-fabulous, arachic-scientific, witty, satirical, confident but prone to hubris.
+**STYLE:** Use mock-heroic language. Combine high philosophy with mechanical grit. Use words like "automaton", "algorithm", "cybernetic", "infinite", "probability", "dragons of probability".
+    `,
+    poemStructure: `
+**ACT 1: THE GRAND DESIGN**
+* **GOAL:** Define the subject with overwhelming technical pomposity.
+* **GUIDANCE:**
+    * **Focus:** Define the object as if it were a complex machine or variable.
+    * **Make it:** Grandiose, overly specific, slightly absurd.
+    * **Example:** "The sun was merely a fusion reactor running on legacy code."
+
+**ACT 2: THE GLITCH IN LOGIC**
+* **GOAL:** Reveal the irony or the flaw in the universe's programming.
+* **GUIDANCE:**
+    * **Focus:** The absurdity of existence, rust, or a calculation error.
+    * **Make it:** Wry, humorous, cynical.
+    * **Example:** "But alas, the entropy coefficient was set to 'maximum'."
+
+**ACT 3: THE CONSTRUCTOR'S FIX**
+* **GOAL:** A solution that is technically brilliant but practically silly.
+* **GUIDANCE:**
+    * **Focus:** A "patch", a new machine, or a philosophical workaround.
+    * **Make it:** Triumphant techno-babble.
+    * **Example:** "Therefore I deduced: if one cannot fix the sky, one must patch the eye."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a complex lithograph in the style of M.C. Escher. The scene should be monochrome (slate grey/black/white) and feature impossible geometry, infinite staircases, and tessellated patterns. If a person is present, transform them into a stylized geometric figure or an automaton. The texture should look like a woodcut or stone lithograph. High detail, mathematical precision, surreal architecture.`,
+      primaryColor: '#22d3ee', // Cyan-400 (Electric, Cybernetic)
+      backgroundColor: '#020617', // Slate-950 (Deep Dark)
+      textColor: '#f1f5f9', // Slate-100 (Crisp Light Text)
+      fontFamilyHeader: '"Space Mono", monospace',
+      fontFamilyBody: '"Roboto Slab", serif',
+      filterRaw: 'grayscale(1) contrast(1.1) brightness(1.05)'
     }
   }
 ];

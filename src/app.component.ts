@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CameraUploadComponent } from './components/camera-upload.component';
+
 import { DialogueComponent, PoemLine } from './components/dialogue.component';
 import { PostcardResultComponent } from './components/postcard-result.component';
 import { GeminiService, PoemAct } from './services/gemini.service';
@@ -13,7 +13,6 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result';
   selector: 'app-root',
   imports: [
     CommonModule,
-    CameraUploadComponent,
     DialogueComponent,
     PostcardResultComponent,
     FilmStripComponent,

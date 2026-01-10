@@ -17,7 +17,8 @@
   </div>
 
   <!-- Header -->
-  <header class="absolute top-0 left-0 w-full p-4 pt-6 md:p-6 z-30 flex justify-between items-start">
+  <header
+    class="absolute top-0 left-0 w-full p-4 pt-6 md:p-6 z-30 flex justify-between items-start backdrop-blur-[2px]">
     <div class="flex flex-col">
       <span class="text-[10px] font-bold tracking-[0.2em] uppercase leading-none transition-colors"
         [style.color]="'var(--theme-primary)'" [style.font-family]="'var(--font-header)'">
@@ -29,14 +30,14 @@
       </span>
     </div>
 
-    <div class="flex items-center gap-4 md:gap-6 shrink-0">
+    <div class="flex items-center gap-3 shrink-0">
       <button (click)="toggleAbout()"
-        class="text-[10px] font-mono opacity-50 hover:opacity-100 uppercase tracking-widest transition-colors">
-        [ INFO ]
+        class="px-3 py-1.5 rounded border border-white/10 bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/60 hover:text-white hover:border-white/30 uppercase tracking-widest transition-all">
+        INFO
       </button>
       <button (click)="reset()"
-        class="text-[10px] font-mono opacity-50 hover:opacity-100 uppercase tracking-widest transition-colors hover:text-[var(--theme-primary)]">
-        [ RESET ]
+        class="px-3 py-1.5 rounded border border-white/10 bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/60 hover:text-[var(--theme-primary)] hover:border-[var(--theme-primary)] uppercase tracking-widest transition-all">
+        RESET
       </button>
     </div>
   </header>
@@ -100,19 +101,18 @@
   </div>
   }
 
-  <main class="relative z-10 h-full w-full overflow-y-auto">
+  <main class="relative z-10 w-full h-full overflow-y-auto overflow-x-hidden">
+
+    @switch (state()) {
+
+    @case ('landing') {
+    <div class="w-full min-h-full flex flex-col justify-center py-20">
+      <app-destination-gallery (imageSelected)="onImageSelected($event)"></app-destination-gallery>
+    </div>
+    }
+
+    @case ('analyzing') {
     <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
-
-      @switch (state()) {
-
-      @case ('landing') {
-      <div class="flex flex-col gap-2 md:gap-4 w-full max-w-2xl">
-        <app-destination-gallery></app-destination-gallery>
-        <app-camera-upload (imageSelected)="onImageSelected($event)"></app-camera-upload>
-      </div>
-      }
-
-      @case ('analyzing') {
       <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
         <!-- Linear Loader -->
         <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
@@ -127,15 +127,20 @@
             loadingMessage() }}</p>
         </div>
       </div>
-      }
+    </div>
+    }
 
-      @case ('dialogue') {
+    @case ('dialogue') {
+    <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
       <app-dialogue [imageSrc]="originalImage()!" [starterText]="currentStarter()" [history]="poemHistory()"
         [suggestions]="currentSuggestions()" [loading]="loadingNextLine()" [isLastLine]="poemHistory().length === 2"
-        (lineCompleted)="onLineCompleted($event)" (finished)="finishCreation($event)"></app-dialogue>
-      }
+        [finalizeLabel]="geminiService.activeTheme().finalizeLabel" (lineCompleted)="onLineCompleted($event)"
+        (finished)="finishCreation($event)"></app-dialogue>
+    </div>
+    }
 
-      @case ('generating') {
+    @case ('generating') {
+    <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
       <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
         <!-- Linear Loader -->
         <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'"
@@ -144,22 +149,24 @@
         </div>
 
         <div class="font-mono space-y-2">
-          <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">Transmission in Progress</h3>
+          <h3 class="text-xs tracking-widest uppercase text-[var(--theme-primary)]">{{
+            geminiService.activeTheme().generatingText }}</h3>
           <p class="text-[10px] text-gray-400 uppercase tracking-wider min-h-[1rem]">{{ loadingMessage() }}</p>
         </div>
       </div>
-      }
+    </div>
+    }
 
-      @case ('result') {
+    @case ('result') {
+    <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
       <app-postcard-result [poem]="finalPoem()" [stylizedImageSrc]="stylizedImage()" [imagePrompt]="generatedPrompt()"
         [isRegenerating]="isRegenerating()" [version]="promptVersion()" (regenerate)="onRegenerateImage($event)"
         (poemChange)="onPoemChanged($event)"></app-postcard-result>
 
       <app-film-strip (themeSwitch)="onThemeSwitched($event)"></app-film-strip>
-      }
-
-      }
-
     </div>
+    }
+
+    }
   </main>
 </div>

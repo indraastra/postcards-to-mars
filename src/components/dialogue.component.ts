@@ -83,7 +83,7 @@ export interface PoemLine {
               [disabled]="!userInput() || userInput().length < 2"
               class="w-full py-4 bg-[var(--theme-primary)]/10 hover:bg-[var(--theme-primary)]/20 backdrop-blur-md disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-[10px] font-bold border transition-all shadow-lg text-[var(--theme-primary)] border-[var(--theme-primary)]/60 hover:border-[var(--theme-primary)]/80"
             >
-              {{ isLastLine() ? 'Finalize Transmission' : 'Confirm Input' }}
+              {{ isLastLine() ? finalizeLabel() : 'Confirm Input' }}
             </button>
          }
 
@@ -111,6 +111,7 @@ export class DialogueComponent {
   suggestions = input<string[]>([]);
   loading = input<boolean>(false);
   isLastLine = input<boolean>(false);
+  finalizeLabel = input<string>('Finalize Transmission');
 
   lineCompleted = output<PoemLine>();
   finished = output<PoemLine | undefined>();

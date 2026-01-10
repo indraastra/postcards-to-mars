@@ -50,7 +50,7 @@ interface TextSegment {
                     <div class="absolute h-full bg-zinc-500 animate-progress"></div>
                  </div>
                   <div class="flex flex-col items-center gap-1">
-                     <span class="text-[10px] uppercase tracking-widest font-bold">{{ theme().loadingText }}</span>
+                     <span class="text-[10px] uppercase tracking-widest font-bold">{{ theme().generatingText }}</span>
                      <span class="text-[10px] uppercase tracking-widest opacity-90 font-medium">{{ loadingMessage() }}</span>
                   </div>
                </div>
@@ -61,7 +61,7 @@ interface TextSegment {
                  <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'" style="opacity: 0.2">
                     <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
                  </div>
-                 <p class="text-[10px] tracking-[0.3em] uppercase text-[var(--theme-primary)] animate-pulse">{{ theme().loadingText }}</p>
+                 <p class="text-[10px] tracking-[0.3em] uppercase text-[var(--theme-primary)] animate-pulse">{{ theme().generatingText }}</p>
               </div>
             }
 
