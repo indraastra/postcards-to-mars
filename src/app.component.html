@@ -134,8 +134,7 @@
     <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
       <app-dialogue [imageSrc]="originalImage()!" [starterText]="currentStarter()" [history]="poemHistory()"
         [suggestions]="currentSuggestions()" [loading]="loadingNextLine()" [isLastLine]="poemHistory().length === 2"
-        [finalizeLabel]="geminiService.activeTheme().finalizeLabel" (lineCompleted)="onLineCompleted($event)"
-        (finished)="finishCreation($event)"></app-dialogue>
+        (lineCompleted)="onLineCompleted($event)"></app-dialogue>
     </div>
     }
 

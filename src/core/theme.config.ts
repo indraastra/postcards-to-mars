@@ -30,7 +30,7 @@ export interface ThemeConfig {
   usePoemForImageGeneration?: boolean;
 }
 
-export const THEMES: ThemeConfig[] = [
+export const RAW_THEMES: ThemeConfig[] = [
   {
     id: 'mars',
     name: 'Postcards to Mars',
@@ -337,127 +337,137 @@ export const THEMES: ThemeConfig[] = [
     }
   },
   {
-    id: 'cinema',
-    name: 'Silver of the Screen',
-    shortName: 'Cinema',
-    originLabel: 'Reel',
-    postcardOrigin: 'Studio 19',
-    idLabel: 'Scene',
-    landingTitle: 'The Silent Era',
-    landingSubtitle: 'Action!',
-    uploadButtonLabel: 'Roll Camera',
-    captureButtonLabel: 'Audit Scene',
-    headerStatus: 'PRODUCTION: LIVE',
-    generatingText: 'Developing Film',
-    finalizeLabel: 'Cut! Print!',
-    loadingText: 'Splicing Reel...',
+    id: 'inverse',
+    name: 'Echoes from the Inverse',
+    shortName: 'Inverse',
+    originLabel: 'Zone',
+    postcardOrigin: 'The Funhouse',
+    idLabel: 'Warp No.',
+    landingTitle: 'Welcome to the Wackiness',
+    landingSubtitle: 'Gravity is just a suggestion!',
+    uploadButtonLabel: 'Unzip Gravity',
+    captureButtonLabel: 'Snag a Glitch',
+    headerStatus: 'LOGIC: RUBBERIZED',
+    generatingText: 'Inflating Reality',
+    finalizeLabel: 'Boing!',
+    loadingText: 'Making it weird...',
     loadingMessages: [
-      'Adjusting spotlight...',
-      'Cueing the orchestra...',
-      'Applying makeup...',
-      'Setting the scene...',
-      'Fading to black...'
+      'Tickling the atoms...',
+      'Painting the sky plaid...',
+      'Teaching fish to walk...',
+      'Melting the clocks...',
+      'Bouncing off the walls...'
     ],
-    regenLabel: 'Take Two',
-    editPoemLabel: 'Rewrite Script',
+    regenLabel: 'Re-Bounce',
+    editPoemLabel: 'Twist Truth',
     textPersona: `
-**ROLE:** You are a Silent Film Director or Title Card Writer from the 1920s.
-**VOICE:** Melodramatic, expressive, exaggerated.
-**STYLE:** Write as if these are "Intertitles" (dialogue cards) in a silent movie. Short, punchy, emotional.
+**ROLE:** You are a manic, sugar-rushed cartoon narrator in a Bizarro World where logic is inverted and silly.
+**VOICE:** High-energy, whimsical, absurd. Think Alice in Wonderland meets Saturday Morning Cartoons.
+**STYLE:** Use playground logic. "It's floating because it forgot to fall!" "The wall is made of grape jelly!"
     `,
     poemStructure: `
-**ACT 1: THE OPENING SHOT**
-* **GOAL:** Set the scene with dramatic flair.
+**ACT 1: THE SILLY INVERSION**
+* **GOAL:** Describe the subject but flip a key property whimsically.
 * **GUIDANCE:**
-    * **Focus:** The mood, the lighting, or the "star".
-    * **Make it:** Theatrical.
-    * **Example:** "A NIGHT... OF SHADOWS!"
+    * **Focus:** Hard is soft, heavy is light, serious is goofy.
+    * **Make it:** Playful and confusing.
+    * **Example:** "The mountain tried to fly but its shoes were too loose."
 
-**ACT 2: THE TWIST**
-* **GOAL:** A sudden realization or emotional turn.
+**ACT 2: THE PLAYGROUND LOGIC**
+* **GOAL:** Explain *why* it is doing that with nonsense logic.
 * **GUIDANCE:**
-    * **Focus:** Betrayal, love, or surprise.
-    * **Make it:** Breathless shorthand.
-    * **Example:** "BUT WAIT! HER HEART... WAVERS?"
+    * **Focus:** Anthropomorphism or cartoon physics.
+    * **Make it:** Funny.
+    * **Example:** "It's hiding from the Tuesday afternoon nap."
 
-**ACT 3: THE FADE OUT**
-* **GOAL:** The final dramatic conclusion.
+**ACT 3: THE PUNCHLINE**
+* **GOAL:** A joyful, chaotic conclusion.
 * **GUIDANCE:**
-    * **Focus:** The end, the memory, or the curtain call.
-    * **Make it:** Final.
-    * **Example:** "AND SO... THE DAWN BREAKS."
+    * **Focus:** Energy, bouncing, or color.
+    * **Make it:** A celebration of weirdness.
+    * **Example:** "And that is why the sky tastes like blueberry fizz!"
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a vintage 1920s Silent Film frame. The image must be black and white (monochrome) with heavy film grain, scratches, and a soft focus vignette. The lighting should be dramatic and theatrical (German Expressionism). If a person is present, their expression should be slightly exaggerated like a silent film actor. The texture should look like damaged, old nitrate film stock. High contrast, flickering light effect.`,
-      primaryColor: '#e5e5e5', // Neutral-200
-      backgroundColor: '#171717', // Neutral-900
-      textColor: '#d4d4d4', // Neutral-300
-      fontFamilyHeader: '"Playfair Display", serif', // Elegant serif
-      fontFamilyBody: '"Lora", serif', // Elegant and readable serif
-      filterRaw: 'grayscale(1) contrast(1.4) brightness(0.9) blur(0.5px)'
+      promptTemplate: `Transform this image of {visual_modifiers} into a whimsical, madcap "Bizarro World" interpretation.
+1. SUBJECT INVERSION: Reinterpret these elements using "Playground Logic". If serious, make it chaotic and goofy (Wario/Looney Tunes energy). If an object, invert its physics (square clouds, melting clocks, rubber machines).
+2. STYLE: High-energy cartoon illustration with exaggerated, squash-and-stretch proportions (rubber-hose or absurdist comic).
+3. COLORS: A hyper-saturated "candy-color" explosion. Bright magentas, electric blues, lime greens, sunny yellows. No dark shadows.
+4. VIBE: Joyfully chaotic, frenetic, topsy-turvy perspective. Floating objects, bouncing items.`,
+      primaryColor: '#a3e635', // Lime-400 (Toxic Green)
+      backgroundColor: '#312e81', // Indigo-900 (Deep Blue/Purple mix)
+      textColor: '#ecfccb', // Lime-100
+      fontFamilyHeader: '"Carter One", display', // Playful display
+      fontFamilyBody: '"Comic Neue", cursive', // Readable comic style
+      filterRaw: 'saturate(1.8) hue-rotate(-20deg) contrast(1.1)'
     },
     usePoemForImageGeneration: true
   },
   {
-    id: 'codex',
-    name: 'Sketches from the Codex',
-    shortName: 'Codex',
-    originLabel: 'Volume',
-    postcardOrigin: 'The Laboratory',
-    idLabel: 'Page No.',
-    landingTitle: 'The Alchemist\'s Table',
-    landingSubtitle: 'Transmuting lead into gold...',
-    uploadButtonLabel: 'Analyze Matter',
-    captureButtonLabel: 'Study Form',
-    headerStatus: 'TRANSMUTATION: ACTIVE',
-    generatingText: 'Distilling Essence',
-    finalizeLabel: 'Inscribe Page',
-    loadingText: 'Consulting the Tablets...',
+    id: 'paper',
+    name: 'Papercut Dreams',
+    shortName: 'Paper',
+    originLabel: 'Layer',
+    postcardOrigin: 'The Shoebox',
+    idLabel: 'Cut No.',
+    landingTitle: 'The Paper Theater',
+    landingSubtitle: 'A world of layers...',
+    uploadButtonLabel: 'Open Box',
+    captureButtonLabel: 'Freeze Scene',
+    headerStatus: 'DEPTH: CALCULATED',
+    generatingText: 'Cutting Paper',
+    finalizeLabel: 'Paste Layer',
+    loadingText: 'Assembling Diorama...',
     loadingMessages: [
-      'Mixing reagents...',
-      'Drawing geometric proofs...',
-      'Aligning the celestial spheres...',
-      'Deciphering ancient runes...',
-      'Heating the crucible...'
+      'Sharpening scissors...',
+      'Selecting cardstock...',
+      'Applying glue...',
+      'Stacking layers...',
+      'Adjusting depth...'
     ],
-    regenLabel: 'Redraw Diagram',
-    editPoemLabel: 'Refine Theory',
+    regenLabel: 'Recut Scene',
+    editPoemLabel: 'Fold Paper',
     textPersona: `
-**ROLE:** You are Leonardo da Vinci or an ancient alchemist documenting a new discovery in a secret codex.
-**VOICE:** Academic, obsessive, visionary. Focused on anatomy, geometry, and the "divine proportion" of things.
-**STYLE:** Use terms like "ratio", "divine", "essence", "mechanism". Write as if observing the hidden machinery of nature.
+**ROLE:** You are a Memory Architect building a fragile world out of paper scraps.
+**VOICE:** Gentle, precise, tactile. Obsessed with preservation and construction.
+**STYLE:** Focus on "cutting", "folding", "glue", "layers", and "construction".
     `,
     poemStructure: `
-**ACT 1: THE ANATOMY**
-* **GOAL:** Describe the physical structure or geometry of the subject.
+**ACT 1: THE MATERIAL**
+* **GOAL:** Select the texture or color of the memory from the box.
 * **GUIDANCE:**
-    * **Focus:** Angles, curves, lines, or mechanics.
-    * **Make it:** Analytical but beautiful.
-    * **Example:** "The curve of the wing follows the golden spiral."
+    * **Focus:** The raw material of the memory.
+    * **Make it:** Tactile and specific.
+    * **Example:** "I chose the blue construction paper for your silence."
 
-**ACT 2: THE ESSENCE**
-* **GOAL:** Hypothesize the hidden purpose or soul of the object.
+**ACT 2: THE CUT**
+* **GOAL:** The precise moment of shaping the memory.
 * **GUIDANCE:**
-    * **Focus:** What is it *for*? What makes it alive?
-    * **Make it:** Visionary.
-    * **Example:** "It holds the breath of the wind itself."
+    * **Focus:** The scissors, the edge, or the silhouette.
+    * **Make it:** Sharp and deliberate.
+    * **Example:** "The scissors followed the curve of your hesitation."
 
-**ACT 3: THE TRANSMUTATION**
-* **GOAL:** A concluding thought on transforming this knowledge.
+**ACT 3: THE ASSEMBLY**
+* **GOAL:** Placing the piece into the scene.
 * **GUIDANCE:**
-    * **Focus:** Preservation, invention, or enlightenment.
-    * **Make it:** Profound.
-    * **Example:** "Thus we prove that flight is merely a matter of will."
+    * **Focus:** Glue, layers, permanence, or fragility.
+    * **Make it:** Architectural.
+    * **Example:** "Now you are glued forever against the paper sky."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a vintage Leonardo da Vinci style sketch on old parchment. The image should look like a study from a codex, with ink contour lines, cross-hatching to define volume, and handwritten mirror-writing marginalia. The color palette should be strictly sepia, brown ink, and yellowed paper. If a person is present, show them with Vitruvian proportions or anatomical overlay lines circles and geometry. The texture should be rough, aged paper with ink stains and fading. High detail, ink and quill style.`,
-      primaryColor: '#d97706', // Amber-600
-      backgroundColor: '#fef3c7', // Amber-100 (Parchment)
-      textColor: '#451a03', // Amber-950 (Ink)
-      fontFamilyHeader: '"Cinzel", serif',
-      fontFamilyBody: '"Courier Prime", monospace', // Typewriter/Notes style
-      filterRaw: 'sepia(0.8) contrast(1.1) brightness(1.05)'
-    }
+      promptTemplate: `Transform this image of {visual_modifiers} into a layered papercut diorama art style.
+1. TECHNIQUE: The image must look like it is constructed from layers of colored construction paper stacked in a shadow box.
+2. TEXTURE: NO internal textures (no fur, skin details, or patterns). Surfaces must be flat, solid colors.
+3. DEPTH: Creates depth through physical layering and cast shadows (drop shadows) between sheets.
+4. COLORS: Soft, harmonious pastel palette (Corals, Teals, Creams) or high-contrast silhouettes.
+5. VIBE: Whimsical, handmade, tactile.`,
+      primaryColor: '#2dd4bf', // Teal-400
+      backgroundColor: '#f0fdfa', // Teal-50
+      textColor: '#134e4a', // Teal-900
+      fontFamilyHeader: '"Quicksand", sans-serif',
+      fontFamilyBody: '"Cormorant Garamond", serif',
+      filterRaw: 'contrast(1.1) brightness(1.05)',
+    },
+    usePoemForImageGeneration: true
   },
   {
     id: 'looking-glass',
@@ -590,69 +600,311 @@ Technical specifications:
     }
   },
   {
-    id: 'inverse',
-    name: 'Echoes from the Inverse',
-    shortName: 'Inverse',
-    originLabel: 'Zone',
-    postcardOrigin: 'The Funhouse',
-    idLabel: 'Warp No.',
-    landingTitle: 'Welcome to the Wackiness',
-    landingSubtitle: 'Gravity is just a suggestion!',
-    uploadButtonLabel: 'Unzip Gravity',
-    captureButtonLabel: 'Snag a Glitch',
-    headerStatus: 'LOGIC: RUBBERIZED',
-    generatingText: 'Inflating Reality',
-    finalizeLabel: 'Boing!',
-    loadingText: 'Making it weird...',
+    id: 'stars',
+    name: 'Celestial Mythos',
+    shortName: 'Stars',
+    originLabel: 'Constellation',
+    postcardOrigin: 'The Observatory',
+    idLabel: 'Star ID',
+    landingTitle: 'Star Chart',
+    landingSubtitle: 'Mapping the infinite...',
+    uploadButtonLabel: 'Chart Stars',
+    captureButtonLabel: 'Name Star',
+    headerStatus: 'SKY: CLEAR',
+    generatingText: 'Connecting Stars',
+    finalizeLabel: 'Mythologize',
+    loadingText: 'Polishing lenses...',
     loadingMessages: [
-      'Tickling the atoms...',
-      'Painting the sky plaid...',
-      'Teaching fish to walk...',
-      'Melting the clocks...',
-      'Bouncing off the walls...'
+      'Aligning the telescope...',
+      'Charting the zodiac...',
+      'Naming a new planet...',
+      'Calculating parallax...',
+      'Cleaning the lens...'
     ],
-    regenLabel: 'Re-Bounce',
-    editPoemLabel: 'Twist Truth',
+    regenLabel: 'Realign Scope',
+    editPoemLabel: 'Rewrite Myth',
     textPersona: `
-**ROLE:** You are a manic, sugar-rushed cartoon narrator in a Bizarro World where logic is inverted and silly.
-**VOICE:** High-energy, whimsical, absurd. Think Alice in Wonderland meets Saturday Morning Cartoons.
-**STYLE:** Use playground logic. "It's floating because it forgot to fall!" "The wall is made of grape jelly!"
+**ROLE:** You are an ancient astronomer or myth-maker connecting stars into stories.
+**VOICE:** Cosmic, grand, whispery, timeless.
+**STYLE:** Focus on "connecting dots", "heroes", "beasts", and "ancient lights".
     `,
     poemStructure: `
-**ACT 1: THE SILLY INVERSION**
-* **GOAL:** Describe the subject but flip a key property whimsically.
+**ACT 1: THE PATTERN**
+* **GOAL:** Describe the shape of the stars.
 * **GUIDANCE:**
-    * **Focus:** Hard is soft, heavy is light, serious is goofy.
-    * **Make it:** Playful and confusing.
-    * **Example:** "The mountain tried to fly but its shoes were too loose."
+    * **Focus:** Geometry, lines, or a figure in the sky.
+    * **Make it:** Cosmic.
+    * **Example:** "Seven stars form the hunter's bow."
 
-**ACT 2: THE PLAYGROUND LOGIC**
-* **GOAL:** Explain *why* it is doing that with nonsense logic.
+**ACT 2: THE MYTH**
+* **GOAL:** Assign a legend to the shape.
 * **GUIDANCE:**
-    * **Focus:** Anthropomorphism or cartoon physics.
-    * **Make it:** Funny.
-    * **Example:** "It's hiding from the Tuesday afternoon nap."
+    * **Focus:** A hero, a monster, or a tragedy.
+    * **Make it:** Epic.
+    * **Example:** "He chases the great bear across the velvet night."
 
-**ACT 3: THE PUNCHLINE**
-* **GOAL:** A joyful, chaotic conclusion.
+**ACT 3: THE MESSAGE**
+* **GOAL:** What does the star tell us?
 * **GUIDANCE:**
-    * **Focus:** Energy, bouncing, or color.
-    * **Make it:** A celebration of weirdness.
-    * **Example:** "And that is why the sky tastes like blueberry fizz!"
+    * **Focus:** Guidance, destiny, or distance.
+    * **Make it:** Timeless.
+    * **Example:** "We are all made of the same ancient dust."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a whimsical, madcap "Bizarro World" interpretation.
-1. SUBJECT INVERSION: Reinterpret these elements using "Playground Logic". If serious, make it chaotic and goofy (Wario/Looney Tunes energy). If an object, invert its physics (square clouds, melting clocks, rubber machines).
-2. STYLE: High-energy cartoon illustration with exaggerated, squash-and-stretch proportions (rubber-hose or absurdist comic).
-3. COLORS: A hyper-saturated "candy-color" explosion. Bright magentas, electric blues, lime greens, sunny yellows. No dark shadows.
-4. VIBE: Joyfully chaotic, frenetic, topsy-turvy perspective. Floating objects, bouncing items.`,
-      primaryColor: '#a3e635', // Lime-400 (Toxic Green)
-      backgroundColor: '#312e81', // Indigo-900 (Deep Blue/Purple mix)
-      textColor: '#ecfccb', // Lime-100
-      fontFamilyHeader: '"Carter One", display', // Playful display
-      fontFamilyBody: '"Comic Neue", cursive', // Readable comic style
-      filterRaw: 'saturate(1.8) hue-rotate(-20deg) contrast(1.1)'
+      promptTemplate: `Transform this image of {visual_modifiers} into a vintage star chart or constellation map.
+1. BACKGROUND: Deep, rich midnight blue (almost black).
+2. LINES: Connect key elements with thin, glowing white or gold lines like a constellation.
+3. STYLE: Scientific yet mythological. Add faint grid lines, degrees, and greek letters.
+4. VIBE: Elegant, cosmic, navigational.
+5. DETAILS: The subject should look like a grouping of stars forming a shape.`,
+      primaryColor: '#fbbf24', // Amber-400 (Star Gold)
+      backgroundColor: '#0f172a', // Slate-900 (Midnight)
+      textColor: '#f1f5f9', // Slate-100
+      fontFamilyHeader: '"Cinzel", serif',
+      fontFamilyBody: '"Courier Prime", monospace', // Scientific/Navigational
+      filterRaw: 'contrast(1.2) brightness(1.1) saturate(1.1)'
     },
     usePoemForImageGeneration: true
+  },
+  {
+    id: 'medieval',
+    name: 'From Medieval Margins',
+    shortName: 'Medieval',
+    originLabel: 'Folio',
+    postcardOrigin: 'The Monastery',
+    idLabel: 'Verse',
+    landingTitle: 'The Scriptorium',
+    landingSubtitle: 'Beware the snails...',
+    uploadButtonLabel: 'Open Tome',
+    captureButtonLabel: 'Illuminate',
+    headerStatus: 'INK: DRYING',
+    generatingText: 'Scribing...',
+    finalizeLabel: 'Seal Wax',
+    loadingText: 'Sharpening Quill...',
+    loadingMessages: [
+      'Chasing rabbits...',
+      'Mixing gold leaf...',
+      'Complaining about back pain...',
+      'Drawing distinct feet...',
+      'Fighting a snail...'
+    ],
+    regenLabel: 'Scrap Vellum',
+    editPoemLabel: 'Correct Latin',
+    textPersona: `
+**ROLE:** You are a bored 14th-century monk doodling in the margins of a sacred text.
+**VOICE:** Tired, cynical, historically specific but absurd.
+**STYLE:** Complain about your work. Reference "Killer Rabbits", "Fighting Snails", "Flat Earth". Physics do not apply.
+    `,
+    poemStructure: `
+**ACT 1: THE DOODLE**
+* **GOAL:** Describe the subject as a weird drawing.
+* **GUIDANCE:**
+    * **Focus:** Strange anatomy, stiff poses, or lack of perspective.
+    * **Make it:** Absurd.
+    * **Example:** "I drew a man, but his feet are backwards."
+
+**ACT 2: THE MARGIN**
+* **GOAL:** Add a classic marginalia element (snail/rabbit).
+* **GUIDANCE:**
+    * **Focus:** e.g. A snail knight, a rabbit with an axe, or a trumpet in a butt, etc.
+    * **Make it:** Historically accurate weirdness.
+    * **Example:** "A snail is attacking him with a lance."
+
+**ACT 3: THE COMPLAINT**
+* **GOAL:** A complaint about the work or the abbot.
+* **GUIDANCE:**
+    * **Focus:** Cold ink, candle wax, or tiredness.
+    * **Make it:** Relatable but old.
+    * **Example:** "The Abbot will not be pleased with this nonsense."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a bizarre 14th-century illuminated manuscript marginalia doodle.
+1. PERSPECTIVE: ZERO depth. Everything is completely flat and stacked vertically. No foreshortening.
+2. STYLE: Stiff, awkward poses typical of medieval art. Weird proportions.
+3. ELEMENTS: Add gold leaf accents. If animals are present, make them "human-like" or violent (e.g., rabbits with swords).
+4. BACKGROUND: Aged parchment texture with latin text fragments or floral borders.
+5. VIBE: Absurdist, unintentional humor, historical.`,
+      primaryColor: '#d97706', // Amber-600
+      backgroundColor: '#fffbeb', // Amber-50 (Parchment)
+      textColor: '#451a03', // Amber-950
+      fontFamilyHeader: '"Cinzel", serif',
+      fontFamilyBody: '"Cormorant Garamond", serif',
+      filterRaw: 'sepia(0.8) contrast(1.1)',
+    },
+    usePoemForImageGeneration: true
+  },
+  {
+    id: 'codex',
+    name: 'Sketches from the Codex',
+    shortName: 'Codex',
+    originLabel: 'Volume',
+    postcardOrigin: 'The Laboratory',
+    idLabel: 'Page No.',
+    landingTitle: 'The Alchemist\'s Table',
+    landingSubtitle: 'Transmuting lead into gold...',
+    uploadButtonLabel: 'Analyze Matter',
+    captureButtonLabel: 'Study Form',
+    headerStatus: 'TRANSMUTATION: ACTIVE',
+    generatingText: 'Distilling Essence',
+    finalizeLabel: 'Inscribe Page',
+    loadingText: 'Consulting the Tablets...',
+    loadingMessages: [
+      'Mixing reagents...',
+      'Drawing geometric proofs...',
+      'Aligning the celestial spheres...',
+      'Deciphering ancient runes...',
+      'Heating the crucible...'
+    ],
+    regenLabel: 'Redraw Diagram',
+    editPoemLabel: 'Refine Theory',
+    textPersona: `
+**ROLE:** You are Leonardo da Vinci or an ancient alchemist documenting a new discovery in a secret codex.
+**VOICE:** Academic, obsessive, visionary. Focused on anatomy, geometry, and the "divine proportion" of things.
+**STYLE:** Use terms like "ratio", "divine", "essence", "mechanism". Write as if observing the hidden machinery of nature.
+    `,
+    poemStructure: `
+**ACT 1: THE ANATOMY**
+* **GOAL:** Describe the physical structure or geometry of the subject.
+* **GUIDANCE:**
+    * **Focus:** Angles, curves, lines, or mechanics.
+    * **Make it:** Analytical but beautiful.
+    * **Example:** "The curve of the wing follows the golden spiral."
+
+**ACT 2: THE ESSENCE**
+* **GOAL:** Hypothesize the hidden purpose or soul of the object.
+* **GUIDANCE:**
+    * **Focus:** What is it *for*? What makes it alive?
+    * **Make it:** Visionary.
+    * **Example:** "It holds the breath of the wind itself."
+
+**ACT 3: THE TRANSMUTATION**
+* **GOAL:** A concluding thought on transforming this knowledge.
+* **GUIDANCE:**
+    * **Focus:** Preservation, invention, or enlightenment.
+    * **Make it:** Profound.
+    * **Example:** "Thus we prove that flight is merely a matter of will."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a vintage Leonardo da Vinci style sketch on old parchment. The image should look like a study from a codex, with ink contour lines, cross-hatching to define volume, and handwritten mirror-writing marginalia. The color palette should be strictly sepia, brown ink, and yellowed paper. If a person is present, show them with Vitruvian proportions or anatomical overlay lines circles and geometry. The texture should be rough, aged paper with ink stains and fading. High detail, ink and quill style.`,
+      primaryColor: '#d97706', // Amber-600
+      backgroundColor: '#fef3c7', // Amber-100 (Parchment)
+      textColor: '#451a03', // Amber-950 (Ink)
+      fontFamilyHeader: '"Cinzel", serif',
+      fontFamilyBody: '"Courier Prime", monospace', // Typewriter/Notes style
+      filterRaw: 'sepia(0.8) contrast(1.1) brightness(1.05)'
+    }
+  },
+  {
+    id: 'chalk',
+    name: 'The Unsolved Equation',
+    shortName: 'Equation',
+    originLabel: 'Theorem',
+    postcardOrigin: 'The Classroom',
+    idLabel: 'Proof',
+    landingTitle: 'The Blackboard',
+    landingSubtitle: 'Solving for X...',
+    uploadButtonLabel: 'Prove Theorem',
+    captureButtonLabel: 'Erase Board',
+    headerStatus: 'Q.E.D.',
+    generatingText: 'Calculating...',
+    finalizeLabel: 'Publish Proof',
+    loadingText: 'Deriving formula...',
+    loadingMessages: [
+      'Chalk dust filling the air...',
+      'Checking the axiom...',
+      'Finding the limit...',
+      'Erasing the mistake...',
+      'Dividing by zero...'
+    ],
+    regenLabel: 'Recompute',
+    editPoemLabel: 'Refine Logic',
+    textPersona: `
+**ROLE:** You are a brilliant but obsessed mathematician trying to solve the equation of a memory.
+**VOICE:** Analytical, desperate, beautiful. Mixing math with longing.
+**STYLE:** Use concepts like "limits", "variables", "constants", "infinity", "coordinates".
+    `,
+    poemStructure: `
+**ACT 1: THE VARIABLE**
+* **GOAL:** Define the subject as a variable in an equation.
+* **GUIDANCE:**
+    * **Focus:** X, Y, or an unknown quantity.
+    * **Make it:** Analytical.
+    * **Example:** "Let X be the moment you looked away."
+
+**ACT 2: THE CALCULATION**
+* **GOAL:** Attempt to solve or measure the feeling.
+* **GUIDANCE:**
+    * **Focus:** Geometry, addition, subtraction, or calculus.
+    * **Make it:** Precise but futile.
+    * **Example:** "I integrated the silence over infinite time."
+
+**ACT 3: THE PROOF**
+* **GOAL:** The final result of the equation.
+* **GUIDANCE:**
+    * **Focus:** A solution, a constant, or an impossibility.
+    * **Make it:** Absolute.
+    * **Example:** "The remainder is always zero."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a colorful academic chalkboard diagram.
+1. STYLE: The entire scene must be rendered as a vintage classroom diagram drawn on a dusty blackboard. The subject should be depicted as a technical or biological sketch with cross-sections, angular breakdown lines, or geometric analysis.
+2. COLORS: Use a classic "Teacher's Chalk" palette: Dusty White, Pale Yellow, Mint Green, and Soft Pink against a dark slate background.
+3. DETAILS: Add dotted guidelines, force vectors, labeled dimensions (A, B, θ), and explanatory notes in cursive chalk.
+4. TEXTURE: Heavy slate texture, eraser smudges, and chalk dust.
+5. VIBE: Educational, analytical, vintage schoolhouse.`,
+      primaryColor: '#fde047', // Yellow-300 (Chalk Yellow)
+      backgroundColor: '#1c1917', // Stone-900 (Blackboard)
+      textColor: '#e7e5e4', // Stone-200
+      fontFamilyHeader: '"Space Mono", monospace',
+      fontFamilyBody: '"Roboto Slab", serif',
+      filterRaw: 'contrast(1.1) saturate(1.1)'
+    },
+    usePoemForImageGeneration: false
   }
 ];
+
+// --- Sorting Logic ---
+
+function getLuminance(hex: string): number {
+  const c = hex.substring(1);
+  const rgb = parseInt(c, 16);
+  const r = (rgb >> 16) & 0xff;
+  const g = (rgb >> 8) & 0xff;
+  const b = (rgb >> 0) & 0xff;
+
+  // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+  return Math.sqrt(
+    0.299 * (r * r) +
+    0.587 * (g * g) +
+    0.114 * (b * b)
+  );
+}
+
+function sortThemes(themes: ThemeConfig[]): ThemeConfig[] {
+  const mars = themes.find(t => t.id === 'mars');
+  const others = themes.filter(t => t.id !== 'mars');
+
+  if (!mars) return themes; // Safety check
+
+  // Threshold for "Dark" background (approx < 130 is dark)
+  const isDark = (t: ThemeConfig) => getLuminance(t.visualStyle.backgroundColor) < 128;
+
+  const darks = others.filter(isDark);
+  const lights = others.filter(t => !isDark(t));
+
+  const sorted: ThemeConfig[] = [mars];
+
+  // Mars is Light (usually), so next should be Dark.
+  // We want to alternate: L (Mars) -> D -> L -> D...
+
+  const maxLength = Math.max(darks.length, lights.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    if (darks[i]) sorted.push(darks[i]);
+    if (lights[i]) sorted.push(lights[i]);
+  }
+
+  return sorted;
+}
+
+export const THEMES = sortThemes(RAW_THEMES);

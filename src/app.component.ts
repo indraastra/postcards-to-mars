@@ -100,7 +100,7 @@ export class AppComponent implements OnDestroy {
     this.loadingInterval = setInterval(() => {
       index = (index + 1) % messages.length;
       this.loadingMessage.set(messages[index]);
-    }, 600);
+    }, 1000);
   }
 
   stopLoadingCycle() {

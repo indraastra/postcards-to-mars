@@ -83,18 +83,8 @@ export interface PoemLine {
               [disabled]="!userInput() || userInput().length < 2"
               class="w-full py-4 bg-[var(--theme-primary)]/10 hover:bg-[var(--theme-primary)]/20 backdrop-blur-md disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-[10px] font-bold border transition-all shadow-lg text-[var(--theme-primary)] border-[var(--theme-primary)]/60 hover:border-[var(--theme-primary)]/80"
             >
-              {{ isLastLine() ? finalizeLabel() : 'Confirm Input' }}
+              Confirm Input
             </button>
-         }
-
-         <!-- Only show the early exit button if it's NOT the last line -->
-         @if (!isLastLine() && (history().length > 0 || userInput().length > 1) && !loading()) {
-           <button 
-              (click)="onFinish()"
-              class="w-full text-neutral-500 hover:text-white uppercase tracking-widest text-[10px] font-mono transition-colors drop-shadow-md"
-            >
-              [ Finalize & Upload ]
-           </button>
          }
       </div>
     </div>
@@ -111,10 +101,7 @@ export class DialogueComponent {
   suggestions = input<string[]>([]);
   loading = input<boolean>(false);
   isLastLine = input<boolean>(false);
-  finalizeLabel = input<string>('Finalize Transmission');
-
   lineCompleted = output<PoemLine>();
-  finished = output<PoemLine | undefined>();
 
   userInput = signal('');
 
@@ -160,14 +147,6 @@ export class DialogueComponent {
   onSubmit() {
     if (this.userInput().length > 1) {
       this.lineCompleted.emit(this.constructCurrentLine());
-    }
-  }
-
-  onFinish() {
-    if (this.userInput().length > 1) {
-      this.finished.emit(this.constructCurrentLine());
-    } else {
-      this.finished.emit(undefined);
     }
   }
 }

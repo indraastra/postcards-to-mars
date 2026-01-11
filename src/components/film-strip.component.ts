@@ -14,10 +14,10 @@ import { THEMES } from '../core/theme.config';
          <div class="w-full max-w-lg bg-[#0f0f11] border border-white/10 p-1 shadow-2xl">
             <div class="bg-[#1a1a1d] p-6 flex flex-col gap-6">
                
-               <div class="flex justify-between items-start border-b border-white/10 pb-4">
+                <div class="flex justify-between items-start border-b border-white/10 pb-4">
                   <div>
-                    <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Manual Calibration</h3>
-                    <p class="text-gray-500 text-[10px] font-mono">Describe the world you wish to visit.</p>
+                    <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Create Custom Theme</h3>
+                    <p class="text-gray-500 text-[10px] font-mono">Describe the visual style or mood you want to capture.</p>
                   </div>
                   <button (click)="closeCustomModal()" class="text-gray-500 hover:text-white font-mono text-xs p-2">[X]</button>
                </div>
@@ -38,9 +38,9 @@ import { THEMES } from '../core/theme.config';
                >
                   @if (isGenerating()) {
                     <div class="w-2 h-2 bg-rose-500 rounded-full animate-bounce"></div>
-                    <span>Calculating Trajectory...</span>
+                    <span>Weaving Reality...</span>
                   } @else {
-                    <span>Initialize Jump</span>
+                    <span>Create Theme</span>
                   }
                </button>
             </div>

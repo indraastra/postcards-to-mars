@@ -97,22 +97,23 @@ export class GeminiService {
     const randomId = 'custom-' + Math.random().toString(36).substr(2, 9);
 
     const prompt = `
-      **TASK:** Create a complete "Postcards to Mars" Theme Configuration based on the user's request: "${userPrompt}".
-      
-      **OUTPUT:** A single JSON object adhering to the ThemeConfig structure.
-      
-      **REQUIREMENTS:**
-      1. **Name:** A poetic, 2-4 word title (e.g., "Neon Rain", "Velvet Void").
-      2. **Short Name:** A 1-word punchy version for small UI chips (e.g. "Neon", "Void").
-      3. **Text Persona:** A detailed system prompt defining who the "Poet" is (e.g., a time traveler, a ghost, a cat).
-      4. **Visual Style:**
-         - **Prompt Template:** A highly detailed Image-to-Image prompt for Gemini Pro Vision. It must include "{visual_modifiers}" placeholder. It should describe the art style, lighting, texture, and mood.
-         - **Colors:** Pick a primary accent color, a dark background color, and a readable text color that fits the vibe.
-         - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Comic Neue', 'Carter One', 'Quicksand', 'Lora'.
-      5. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
-      6. **UI Labels & Text:** 
-         - **Landing Title/Subtitle:** Creative welcome text.
-         - **Buttons:** Label for Upload (e.g. "Open Channel") and Archive (e.g. "View Log").
+       **TASK:** Create a complete "Poetic Visual Theme" Configuration based on the user's request: "${userPrompt}".
+       **CONTEXT:** This theme will be used in an app where users upload photos to generate poetic postcards. The copy should reflect this creative act.
+       
+       **OUTPUT:** A single JSON object adhering to the ThemeConfig structure.
+       
+       **REQUIREMENTS:**
+       1. **Name:** A poetic, 2-4 word title (e.g., "Neon Rain", "Velvet Void").
+       2. **Short Name:** A 1-word punchy version for small UI chips (e.g. "Neon", "Void").
+       3. **Text Persona:** A detailed system prompt defining who the "Poet" is (e.g., a time traveler, a ghost, a cat).
+       4. **Visual Style:**
+          - **Prompt Template:** A highly detailed Image-to-Image prompt for Gemini Pro Vision. It must include "{visual_modifiers}" placeholder. It should describe the art style, lighting, texture, and mood.
+          - **Colors:** Pick a primary accent color, a dark background color, and a readable text color that fits the vibe.
+          - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Comic Neue', 'Carter One', 'Quicksand', 'Lora'.
+       5. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
+       6. **UI Labels & Text:** 
+          - **Landing Title/Subtitle:** Creative welcome text.
+          - **Buttons:** Label for Upload (e.g. "Open Channel") and Capture (e.g. "Save Artifact").
          - **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE").
          - **Loading Text:** Main loading state (e.g. "PROCESSING...").
          - **Loading Messages:** An array of 5 thematic strings for the loading cycle (e.g. "Aligning...", "Tuning...").
@@ -160,7 +161,7 @@ export class GeminiService {
                 required: ['promptTemplate', 'primaryColor', 'backgroundColor', 'textColor', 'fontFamilyHeader', 'fontFamilyBody', 'filterRaw']
               }
             },
-            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'archiveButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'textPersona', 'poemStructure', 'visualStyle']
+            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'captureButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'textPersona', 'poemStructure', 'visualStyle']
           }
         }
       });
