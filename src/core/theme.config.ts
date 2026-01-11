@@ -27,6 +27,7 @@ export interface ThemeConfig {
   };
   generatingText: string;
   finalizeLabel: string;
+  usePoemForImageGeneration?: boolean;
 }
 
 export const THEMES: ThemeConfig[] = [
@@ -208,7 +209,7 @@ export const THEMES: ThemeConfig[] = [
       primaryColor: '#0ea5e9', // Sky-500
       backgroundColor: '#f0f9ff', // Sky-50
       textColor: '#0c4a6e', // Sky-900
-      fontFamilyHeader: '"Patrick Hand", cursive',
+      fontFamilyHeader: '"Quicksand", sans-serif',
       fontFamilyBody: '"Cormorant Garamond", serif',
       filterRaw: 'saturate(1.2) contrast(1.05) brightness(1.05)'
     }
@@ -392,9 +393,10 @@ export const THEMES: ThemeConfig[] = [
       backgroundColor: '#171717', // Neutral-900
       textColor: '#d4d4d4', // Neutral-300
       fontFamilyHeader: '"Playfair Display", serif', // Elegant serif
-      fontFamilyBody: '"Limelight", cursive', // Or a silent film font if available, fallback to decorative
+      fontFamilyBody: '"Lora", serif', // Elegant and readable serif
       filterRaw: 'grayscale(1) contrast(1.4) brightness(0.9) blur(0.5px)'
-    }
+    },
+    usePoemForImageGeneration: true
   },
   {
     id: 'codex',
@@ -453,7 +455,7 @@ export const THEMES: ThemeConfig[] = [
       backgroundColor: '#fef3c7', // Amber-100 (Parchment)
       textColor: '#451a03', // Amber-950 (Ink)
       fontFamilyHeader: '"Cinzel", serif',
-      fontFamilyBody: '"Patrick Hand", cursive', // Handwriting style
+      fontFamilyBody: '"Courier Prime", monospace', // Typewriter/Notes style
       filterRaw: 'sepia(0.8) contrast(1.1) brightness(1.05)'
     }
   },
@@ -523,7 +525,8 @@ Technical specifications:
       fontFamilyHeader: '"Cinzel", serif',
       fontFamilyBody: '"Cormorant Garamond", serif',
       filterRaw: 'grayscale(1) contrast(1.4) brightness(1.1) sepia(0.1)'
-    }
+    },
+    usePoemForImageGeneration: true
   },
   {
     id: 'magic',
@@ -646,9 +649,10 @@ Technical specifications:
       primaryColor: '#a3e635', // Lime-400 (Toxic Green)
       backgroundColor: '#312e81', // Indigo-900 (Deep Blue/Purple mix)
       textColor: '#ecfccb', // Lime-100
-      fontFamilyHeader: '"Rubik Glitch", display', // Keep glitch/fun font
-      fontFamilyBody: '"Comic Neue", cursive', // Or 'Patrick Hand' if Comic Neue not avail, let's use a rounder font if possible
+      fontFamilyHeader: '"Carter One", display', // Playful display
+      fontFamilyBody: '"Comic Neue", cursive', // Readable comic style
       filterRaw: 'saturate(1.8) hue-rotate(-20deg) contrast(1.1)'
-    }
+    },
+    usePoemForImageGeneration: true
   }
 ];

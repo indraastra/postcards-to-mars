@@ -125,9 +125,16 @@ export class AppComponent implements OnDestroy {
     this.currentActIndex.set(0);
     this.poemHistory.set([]);
 
-    // 2. Start parallel image generation using the visual tags
+    // 2. Start parallel image generation using the visual tags (IF NOT Sequential)
     const modifiers = analysis.visual_tags.join(', ');
-    this.imageGenerationPromise = this.geminiService.generateStylizedImage(base64, modifiers);
+    const useSequential = this.geminiService.activeTheme().usePoemForImageGeneration;
+
+    if (!useSequential) {
+      this.imageGenerationPromise = this.geminiService.generateStylizedImage(base64, modifiers);
+    } else {
+      console.log('Sequential Mode: Waiting for poem completion before generating image...');
+      this.imageGenerationPromise = null;
+    }
 
     this.stopLoadingCycle();
 
@@ -200,11 +207,17 @@ export class AppComponent implements OnDestroy {
 
     try {
       if (this.imageGenerationPromise) {
+        // Parallel Mode: Image likely ready or generating
         const [result] = await Promise.all([this.imageGenerationPromise, minDelay]);
         imageResult = result;
       } else if (original) {
-        // Fallback
-        const [result] = await Promise.all([this.geminiService.generateStylizedImage(original, modifiers), minDelay]);
+        // Sequential Mode (or Fallback): Generate NOW using the poem context
+        console.log('Generating image with poem context:', finalPoemStr);
+        // If sequential, we pass the poem. If fallback, we might not have it but the method handles optional.
+        const [result] = await Promise.all([
+          this.geminiService.generateStylizedImage(original, modifiers, finalPoemStr),
+          minDelay
+        ]);
         imageResult = result;
       } else {
         await minDelay;

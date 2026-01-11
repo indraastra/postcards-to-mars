@@ -108,7 +108,7 @@ export class GeminiService {
       4. **Visual Style:**
          - **Prompt Template:** A highly detailed Image-to-Image prompt for Gemini Pro Vision. It must include "{visual_modifiers}" placeholder. It should describe the art style, lighting, texture, and mood.
          - **Colors:** Pick a primary accent color, a dark background color, and a readable text color that fits the vibe.
-         - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Permanent Marker', 'Patrick Hand'.
+         - **Fonts:** Choose from these available Google Fonts ONLY: 'Space Grotesk', 'Playfair Display', 'Orbitron', 'Roboto Mono', 'Courier Prime', 'Cinzel', 'Cormorant Garamond', 'Comic Neue', 'Carter One', 'Quicksand', 'Lora'.
       5. **Poem Structure:** Define a 3-Act narrative structure (Setup -> Interaction -> Resolution) with examples, similar to the provided examples.
       6. **UI Labels & Text:** 
          - **Landing Title/Subtitle:** Creative welcome text.
@@ -293,7 +293,7 @@ Return JSON object.`;
   // --------------------------------------------------------------------------- 
   // 2. GENERATE STYLIZED IMAGE (Img2Img)
   // --------------------------------------------------------------------------- 
-  async generateStylizedImage(originalBase64: string, visualModifiers: string): Promise<{ image: string | null; prompt: string; version: string }> {
+  async generateStylizedImage(originalBase64: string, visualModifiers: string, poemContext?: string): Promise<{ image: string | null; prompt: string; version: string }> {
     const cleanData = this.cleanBase64(originalBase64);
     const theme = this.activeTheme();
 
@@ -312,7 +312,11 @@ Return JSON object.`;
     3. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs, except for what was present in the original image.
     `;
 
-    const fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
+    let fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
+
+    if (poemContext) {
+      fullPrompt += `\n\nTHEMATIC CONTEXT: The following poem accompanies this image. Ensure the visual mood matches: "${poemContext}"`;
+    }
 
     const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
     return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
