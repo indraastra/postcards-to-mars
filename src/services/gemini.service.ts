@@ -211,8 +211,12 @@ ${theme.poemStructure}
     - The poem MUST be explicitly grounded in the specific visual details of the image.
     - If you see a person, pet, or object, weave them into the narrative arc.
     - Do not write generic text; look at what is actually there.
-5.  **No Placeholders:** Starters must end with " ____". Suggestions must be text only.
-6.  **Formatting:** Suggestions should NOT include leading spaces.
+5.  **CREATIVITY:**
+    - The provided "Stems" and Examples are **ILLUSTRATIVE ONLY**.
+    - You are free to deviate from the example phrasing if it fits the persona better.
+    - Be poetic, surprising, and specific.
+6.  **No Placeholders:** Starters must end with " ____". Suggestions must be text only.
+7.  **Formatting:** Suggestions should NOT include leading spaces.
 
 Return JSON object.`;
 
@@ -227,7 +231,7 @@ Return JSON object.`;
           ]
         },
         config: {
-          temperature: 0.8,
+          temperature: 1.2,
           seed: randomSeed,
           responseMimeType: 'application/json',
           responseSchema: {
@@ -345,7 +349,7 @@ Return JSON object.`;
       return imagePart?.inlineData ? `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}` : null;
     } catch (error) {
       console.error('Generation from prompt failed', error);
-      return null;
+      throw error;
     }
   }
 

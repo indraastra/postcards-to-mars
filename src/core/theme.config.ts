@@ -39,13 +39,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'Earth (Lost)',
     idLabel: 'Archive Id',
     landingTitle: 'Colony 7 Uplink',
-    landingSubtitle: 'Establishing connection...',
+    landingSubtitle: 'Establishing connection',
     uploadButtonLabel: 'Begin Transmission',
     captureButtonLabel: 'Consult Archive',
     headerStatus: 'LIFE SUPPORT: NOMINAL',
     generatingText: 'Transmission in Progress',
     finalizeLabel: 'Finalize Transmission',
-    loadingText: 'Processing Signal...',
+    loadingText: 'Processing Signal',
     loadingMessages: [
       'Aligning satellites...',
       'Calculating trajectory...',
@@ -100,13 +100,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'The Infinite Workshop',
     idLabel: 'Hash',
     landingTitle: 'Constructor API',
-    landingSubtitle: 'Compiling infinite probabilities...',
+    landingSubtitle: 'Compiling infinite probabilities',
     uploadButtonLabel: 'Execute Algorithm',
     captureButtonLabel: 'Debug Logic',
     headerStatus: 'EPSILON: RECURSIVE',
-    generatingText: 'Compiling Algorithm...',
+    generatingText: 'Compiling Algorithm',
     finalizeLabel: 'Execute Function',
-    loadingText: 'Initializing Recursion...',
+    loadingText: 'Initializing Recursion',
     loadingMessages: [
       'Calculating probability gears...',
       'Greasing the axioms...',
@@ -161,13 +161,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'No. 6',
     idLabel: 'Ticket',
     landingTitle: 'One-Way Ticket',
-    landingSubtitle: 'The sea tracks stretch forever...',
+    landingSubtitle: 'The sea tracks stretch forever',
     uploadButtonLabel: 'Board Train',
     captureButtonLabel: 'Travel Log',
     headerStatus: 'NEXT STOP: TOKYO',
     generatingText: 'Journey in Progress',
     finalizeLabel: 'Depart Station',
-    loadingText: 'Steam rising...',
+    loadingText: 'Steam rising',
     loadingMessages: [
       'Collecting soot sprites...',
       'Checking boiler pressure...',
@@ -222,13 +222,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'Night City',
     idLabel: 'Data Packet',
     landingTitle: 'Grid Uplink',
-    landingSubtitle: 'The city never sleeps...',
+    landingSubtitle: 'The city never sleeps',
     uploadButtonLabel: 'Jack In',
     captureButtonLabel: 'Scan Net',
     headerStatus: 'CONNECTION: SECURE',
     generatingText: 'Uploading to Grid',
     finalizeLabel: 'Send Packet',
-    loadingText: 'Handshaking...',
+    loadingText: 'Handshaking',
     loadingMessages: [
       'Bypassing firewalls...',
       'Synthesizing neon...',
@@ -276,65 +276,71 @@ export const RAW_THEMES: ThemeConfig[] = [
     }
   },
   {
-    id: 'wild',
-    name: 'Whispers from the Wild',
-    shortName: 'Wild',
-    originLabel: 'Region',
-    postcardOrigin: 'Deep Woods',
-    idLabel: 'Species Id',
-    landingTitle: 'Field Journal',
-    landingSubtitle: 'Documenting the unseen...',
-    uploadButtonLabel: 'Sketch Observation',
-    captureButtonLabel: 'Recall Memory',
-    headerStatus: 'NATURE STATUS: BLOOMING',
-    generatingText: 'Field Notes Updating',
-    finalizeLabel: 'Close Journal',
-    loadingText: 'Scouting Terrain...',
+    id: 'garden',
+    name: 'The Painted Garden',
+    shortName: 'Garden',
+    originLabel: 'Easel',
+    postcardOrigin: 'Giverny',
+    idLabel: 'Study No.',
+    landingTitle: 'En Plein Air',
+    landingSubtitle: 'Capturing the fleeting moment',
+    uploadButtonLabel: 'Set Easel',
+    captureButtonLabel: 'Capture Light',
+    headerStatus: 'LIGHT: GOLDEN HOUR',
+    generatingText: 'Mixing Pigments',
+    finalizeLabel: 'Sign Canvas',
+    loadingText: 'Chasing the light',
     loadingMessages: [
-      'Sketching flora...',
-      'Pressing flowers...',
-      'Observing wildlife...',
-      'Consulting field guide...',
-      'Checking compass...'
+      'Mixing cerulean blue...',
+      'Dabbing sunlight touches...',
+      'Softening the edges...',
+      'Observing the shadows...',
+      'Waiting for the clouds...'
     ],
-    regenLabel: 'Retrace Steps',
-    editPoemLabel: 'Edit Field Note',
+    regenLabel: 'Scrape Canvas',
+    editPoemLabel: 'Rewrite Verse',
     textPersona: `
-**ROLE:** You are a druid or field botanist cataloging a newly discovered magical realm.
-**VOICE:** Wonder-filled, soft, ancient. Connected to nature and the hidden spirits of things.
-**STYLE:** Focus on growth, light, organic textures, and the "living" quality of the scene.
+**ROLE:** You are a Romantic poet (like Keats) or an Impressionist painter writing a letter from a blooming garden.
+**VOICE:** Lyrical, sensory, emotional, vivid. Obsessed with light, color, and the fleeting nature of beauty.
+**STYLE:** Use words like "dappled", "gossamer", "verdant", "fleeting". Focus on the *impression* of the scene, not just the facts.
     `,
     poemStructure: `
-**ACT 1: THE DISCOVERY**
-* **GOAL:** Describe the subject as a rare, magical find.
+**ACT 1: THE PALETTE**
+* **GOAL:** Describe the colors and light of the scene.
 * **GUIDANCE:**
-    * **Focus:** A gentle observation of a natural detail or "spirit".
-    * **Make it:** Whimsical and ancient.
-    * **Example:** "The light touched the leaves like a blessing."
+    * **Focus:** How light hits the subject. "Dappled", "Awash", "Gilded".
+    * **Make it:** Vibrant and painterly.
+    * **Example:** "The light spills like liquid gold across the path."
 
-**ACT 2: THE COMMUNION**
-* **GOAL:** Describe the feeling of being close to nature.
+**ACT 2: THE BREATH**
+* **GOAL:** The sensory feeling of the moment.
 * **GUIDANCE:**
-    * **Focus:** The air, the sound, or the feeling of the earth.
-    * **Make it:** Sensory and soft.
-    * **Example:** "The earth breathed a sigh of ancient relief."
+    * **Focus:** Scent, warmth, or the breeze.
+    * **Make it:** Intimate and breathing.
+    * **Example:** "The air holds the sweet, heavy breath of noon."
 
-**ACT 3: THE LESSON**
-* **GOAL:** What does nature teach us here?
+**ACT 3: THE IMMORTALITY**
+* **GOAL:** Freeze this fleeting moment forever.
 * **GUIDANCE:**
-    * **Focus:** Growth, time, cycles, or roots.
-    * **Make it:** Wise and metaphorical.
-    * **Example:** "Time here moves at the speed of a blooming flower."
+    * **Focus:** Preservation, memory, or art.
+    * **Make it:** Poetic and profound.
+    * **Example:** "Let us keep this silence before it fades."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a page from a fantasy field journal. If a person is present, transform them into an elven scout or druid with subtle nature-inspired accessories (leaf motifs, earthy cloak). If an animal is present, transform them into a mystical woodland spirit with glowing eyes or antlers. The style should be watercolor and ink, with handwritten notes and botanical sketches on the edges. Soft, magical lighting. The surface should look like rough, hand-pressed parchment or watercolor paper. Uneven edges, water stains, and ink splatters consistent with a field journal.`,
-      primaryColor: '#15803d', // Green-700
-      backgroundColor: '#fefce8', // Yellow-50 (Parchment)
-      textColor: '#052e16', // Green-950
-      fontFamilyHeader: '"Cinzel", serif',
-      fontFamilyBody: '"Cormorant Garamond", serif',
-      filterRaw: 'sepia(0.5) contrast(0.9) brightness(1.1) saturate(0.8)'
-    }
+      promptTemplate: `Transform this image of {visual_modifiers} into a vibrant Impressionist watercolor painting.
+1. STYLE: Loose, expressive brushstrokes and 'wet-on-wet' technique. Style of Claude Monet or John Singer Sargent.
+2. LIGHTING: Dappled sunlight (chiaroscuro), soft edges, and glowing highlights.
+3. COLORS: A rich, vibrant palette. Cerulean blues, Viridian greens, Rose madders, Napthol yellows. No black shadows—use deep purple or indigo instead.
+4. VIBE: Romantic, idyllic, airy, fleeting.
+5. DETAILS: The subject should feel like it is dissolving slightly into the light and atmosphere.`,
+      primaryColor: '#db2777', // Pink-600 (Rose)
+      backgroundColor: '#fff1f2', // Rose-50
+      textColor: '#881337', // Rose-900
+      fontFamilyHeader: '"Playfair Display", serif',
+      fontFamilyBody: '"Lora", serif',
+      filterRaw: 'saturate(1.3) brightness(1.1) contrast(1.1)'
+    },
+    usePoemForImageGeneration: true
   },
   {
     id: 'inverse',
@@ -350,7 +356,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'LOGIC: RUBBERIZED',
     generatingText: 'Inflating Reality',
     finalizeLabel: 'Boing!',
-    loadingText: 'Making it weird...',
+    loadingText: 'Making it weird',
     loadingMessages: [
       'Tickling the atoms...',
       'Painting the sky plaid...',
@@ -410,13 +416,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'The Shoebox',
     idLabel: 'Cut No.',
     landingTitle: 'The Paper Theater',
-    landingSubtitle: 'A world of layers...',
+    landingSubtitle: 'A world of layers',
     uploadButtonLabel: 'Open Box',
     captureButtonLabel: 'Freeze Scene',
     headerStatus: 'DEPTH: CALCULATED',
     generatingText: 'Cutting Paper',
     finalizeLabel: 'Paste Layer',
-    loadingText: 'Assembling Diorama...',
+    loadingText: 'Assembling Diorama',
     loadingMessages: [
       'Sharpening scissors...',
       'Selecting cardstock...',
@@ -427,39 +433,37 @@ export const RAW_THEMES: ThemeConfig[] = [
     regenLabel: 'Recut Scene',
     editPoemLabel: 'Fold Paper',
     textPersona: `
-**ROLE:** You are a Memory Architect building a fragile world out of paper scraps.
-**VOICE:** Gentle, precise, tactile. Obsessed with preservation and construction.
-**STYLE:** Focus on "cutting", "folding", "glue", "layers", and "construction".
+**ROLE:** You are a cozy hobbyist creating a tiny diorama at your crafting desk.
+**VOICE:** Gentle, instructional, cute, tactile. Focus on "snipping", "gluing", "hanging", and "shapes".
+**STYLE:** Write instructions for building the scene out of paper. Keep it small and precious.
     `,
     poemStructure: `
-**ACT 1: THE MATERIAL**
-* **GOAL:** Select the texture or color of the memory from the box.
+**ACT 1: THE SNIP**
+* **GOAL:** Cut out the main subject from paper.
 * **GUIDANCE:**
-    * **Focus:** The raw material of the memory.
-    * **Make it:** Tactile and specific.
-    * **Example:** "I chose the blue construction paper for your silence."
+    * **Focus:** Scissors, shapes, or the outline.
+    * **Make it:** Precise and cute.
+    * **Example:** "With your smallest scissors, snip a shape like a cloud."
 
-**ACT 2: THE CUT**
-* **GOAL:** The precise moment of shaping the memory.
+**ACT 2: THE GLUE**
+* **GOAL:** Place the subject into the scene.
 * **GUIDANCE:**
-    * **Focus:** The scissors, the edge, or the silhouette.
-    * **Make it:** Sharp and deliberate.
-    * **Example:** "The scissors followed the curve of your hesitation."
+    * **Focus:** Glue, paste, layers, or hiding things behind others.
+    * **Make it:** Constructive.
+    * **Example:** "Use a dab of glue to paste it behind the moon."
 
-**ACT 3: THE ASSEMBLY**
-* **GOAL:** Placing the piece into the scene.
+**ACT 3: THE HANGING**
+* **GOAL:** Add a final decorative detail.
 * **GUIDANCE:**
-    * **Focus:** Glue, layers, permanence, or fragility.
-    * **Make it:** Architectural.
-    * **Example:** "Now you are glued forever against the paper sky."
+    * **Focus:** Hanging, dangling, charms, or strings.
+    * **Make it:** A finishing touch.
+    * **Example:** "Finally, hang a tiny paper charm of a star."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a layered papercut diorama art style.
-1. TECHNIQUE: The image must look like it is constructed from layers of colored construction paper stacked in a shadow box.
-2. TEXTURE: NO internal textures (no fur, skin details, or patterns). Surfaces must be flat, solid colors.
-3. DEPTH: Creates depth through physical layering and cast shadows (drop shadows) between sheets.
-4. COLORS: Soft, harmonious pastel palette (Corals, Teals, Creams) or high-contrast silhouettes.
-5. VIBE: Whimsical, handmade, tactile.`,
+      promptTemplate: `Create a whimsical "Papercut Shadowbox" illustration in a soft, pastel palette.
+1. SUBJECT & MEDIUM: Assemble the scene "{visual_modifiers}" using layers of textured colored paper. The aesthetic should be "Cozy Arts & Crafts"—clean cuts, playful shapes, and a handmade feel. Avoid sharp, jagged menace. Use rounded edges.
+2. COMPOSITION (The Diorama): Frame the image like a small theater stage or a shoebox diorama. Use "Multi-plane Camera" depth: A blurry foreground frame, a sharp mid-ground subject, and a distant background layer. Create separation between layers using drop shadows (simulating foam spacers).
+3. LIGHTING & COLOR: Lighting: Soft, diffused backlighting that makes the paper glow warmly (like a nightlight). Colors: Mint greens, baby blues, pale pinks, cream, and lavender. High key (bright), not dark.`,
       primaryColor: '#2dd4bf', // Teal-400
       backgroundColor: '#f0fdfa', // Teal-50
       textColor: '#134e4a', // Teal-900
@@ -477,13 +481,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     postcardOrigin: 'The Garden',
     idLabel: 'Curiosity',
     landingTitle: 'Down the Rabbit Hole',
-    landingSubtitle: 'Impossible things before breakfast...',
+    landingSubtitle: 'Impossible things before breakfast',
     uploadButtonLabel: 'Drink Me',
     captureButtonLabel: 'Eat Me',
     headerStatus: 'MADNESS: ABSOLUTE',
     generatingText: 'Falling Down Rabbit Hole',
     finalizeLabel: 'Wake Up',
-    loadingText: 'Consulting the Caterpillar...',
+    loadingText: 'Consulting the Caterpillar',
     loadingMessages: [
       'Chasing the White Rabbit...',
       'Painting the roses red...',
@@ -546,13 +550,13 @@ Technical specifications:
     postcardOrigin: 'Owl Post',
     idLabel: 'Owl Id',
     landingTitle: 'Owl Post Service',
-    landingSubtitle: 'Awaiting delivery via Owl Post...',
+    landingSubtitle: 'Awaiting delivery via Owl Post',
     uploadButtonLabel: 'Send Owl',
     captureButtonLabel: 'Read Scroll',
     headerStatus: 'OWL STATUS: EN ROUTE',
     generatingText: 'Casting Spell',
     finalizeLabel: 'Seal Scroll',
-    loadingText: 'Casting Revelio...',
+    loadingText: 'Casting Revelio',
     loadingMessages: [
       'Mixing ink...',
       'Sharpening quill...',
@@ -601,68 +605,68 @@ Technical specifications:
   },
   {
     id: 'stars',
-    name: 'Celestial Mythos',
-    shortName: 'Stars',
-    originLabel: 'Constellation',
-    postcardOrigin: 'The Observatory',
-    idLabel: 'Star ID',
-    landingTitle: 'Star Chart',
-    landingSubtitle: 'Mapping the infinite...',
-    uploadButtonLabel: 'Chart Stars',
-    captureButtonLabel: 'Name Star',
-    headerStatus: 'SKY: CLEAR',
-    generatingText: 'Connecting Stars',
-    finalizeLabel: 'Mythologize',
-    loadingText: 'Polishing lenses...',
+    name: 'The Golden Record',
+    shortName: 'Record',
+    originLabel: 'Artifact',
+    postcardOrigin: 'Voyager 1',
+    idLabel: 'Disc Track',
+    landingTitle: 'Interstellar Message',
+    landingSubtitle: 'Hello from the children of planet Earth...',
+    uploadButtonLabel: 'Etch to Gold',
+    captureButtonLabel: 'Record Sample',
+    headerStatus: 'VELOCITY: ESCAPE',
+    generatingText: 'Engraving Disc',
+    finalizeLabel: 'Launch Probe',
+    loadingText: 'Encoding binary',
     loadingMessages: [
-      'Aligning the telescope...',
-      'Charting the zodiac...',
-      'Naming a new planet...',
-      'Calculating parallax...',
-      'Cleaning the lens...'
+      'Translating to hydrogen frequency...',
+      'Encoding greetings in 55 languages...',
+      'Calibrating the stylus...',
+      'Etching the sound of rain...',
+      'Pointing antenna to deep space...'
     ],
-    regenLabel: 'Realign Scope',
-    editPoemLabel: 'Rewrite Myth',
+    regenLabel: 'Re-Record',
+    editPoemLabel: 'Edit Data',
     textPersona: `
-**ROLE:** You are an ancient astronomer or myth-maker connecting stars into stories.
-**VOICE:** Cosmic, grand, whispery, timeless.
-**STYLE:** Focus on "connecting dots", "heroes", "beasts", and "ancient lights".
+**ROLE:** You are a scientist (like Carl Sagan) curating the Voyager Golden Record.
+**VOICE:** Objective, universal, profound, scientific yet deeply human.
+**STYLE:** Describe human experiences as "data", "frequencies", or "samples" for an alien audience.
     `,
     poemStructure: `
-**ACT 1: THE PATTERN**
-* **GOAL:** Describe the shape of the stars.
+**ACT 1: THE SAMPLE**
+* **GOAL:** Define the subject as a data point for aliens.
 * **GUIDANCE:**
-    * **Focus:** Geometry, lines, or a figure in the sky.
-    * **Make it:** Cosmic.
-    * **Example:** "Seven stars form the hunter's bow."
+    * **Focus:** "Specimen", "Audio Sample", "Visual Data".
+    * **Make it:** Clinical but beautiful.
+    * **Example:** "Sample 42: The frequency of a human heartbeat."
 
-**ACT 2: THE MYTH**
-* **GOAL:** Assign a legend to the shape.
+**ACT 2: THE TRANSLATION**
+* **GOAL:** Explain the hidden emotion behind the data.
 * **GUIDANCE:**
-    * **Focus:** A hero, a monster, or a tragedy.
-    * **Make it:** Epic.
-    * **Example:** "He chases the great bear across the velvet night."
+    * **Focus:** What the data *means* to a human.
+    * **Make it:** A universal truth.
+    * **Example:** "It signifies the persistence of hope against entropy."
 
-**ACT 3: THE MESSAGE**
-* **GOAL:** What does the star tell us?
+**ACT 3: THE TRANSMISSION**
+* **GOAL:** Sending it into the void.
 * **GUIDANCE:**
-    * **Focus:** Guidance, destiny, or distance.
-    * **Make it:** Timeless.
-    * **Example:** "We are all made of the same ancient dust."
+    * **Focus:** Distance, preservation, or the future.
+    * **Make it:** A message in a bottle.
+    * **Example:** "Play this when our sun has gone quiet."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a vintage star chart or constellation map.
-1. BACKGROUND: Deep, rich midnight blue (almost black).
-2. LINES: Connect key elements with thin, glowing white or gold lines like a constellation.
-3. STYLE: Scientific yet mythological. Add faint grid lines, degrees, and greek letters.
-4. VIBE: Elegant, cosmic, navigational.
-5. DETAILS: The subject should look like a grouping of stars forming a shape.`,
-      primaryColor: '#fbbf24', // Amber-400 (Star Gold)
-      backgroundColor: '#0f172a', // Slate-900 (Midnight)
-      textColor: '#f1f5f9', // Slate-100
-      fontFamilyHeader: '"Cinzel", serif',
-      fontFamilyBody: '"Courier Prime", monospace', // Scientific/Navigational
-      filterRaw: 'contrast(1.2) brightness(1.1) saturate(1.1)'
+      promptTemplate: `Transform this image of {visual_modifiers} into a gold-etched diagram in the style of the NASA Voyager Golden Record cover.
+1. STYLE: Minimalist scientific line art engraved into a gold metal surface.
+2. DETAILS: Convert the subject into a schematic wireframe or pulsar map style. Surround the subject with binary code rings, hydrogen hyperfine transition symbols, and radial instruction lines.
+3. COLOR: Monochrome Gold (#fbbf24) on a Deep Space Black (#000000) background.
+4. TEXTURE: Brushed metal, etched grooves, vector precision.
+5. VIBE: Scientific, lonely, profound, interstellar.`,
+      primaryColor: '#fbbf24', // Amber-400 (Gold)
+      backgroundColor: '#020617', // Slate-950 (Space Black)
+      textColor: '#fef3c7', // Amber-100
+      fontFamilyHeader: '"Orbitron", sans-serif', // Sci-Fi Technical
+      fontFamilyBody: '"Space Mono", monospace', // Data Code
+      filterRaw: 'grayscale(1) sepia(1) hue-rotate(5deg) contrast(1.3)'
     },
     usePoemForImageGeneration: true
   },
@@ -674,13 +678,13 @@ Technical specifications:
     postcardOrigin: 'The Monastery',
     idLabel: 'Verse',
     landingTitle: 'The Scriptorium',
-    landingSubtitle: 'Beware the snails...',
+    landingSubtitle: 'Beware the snails',
     uploadButtonLabel: 'Open Tome',
     captureButtonLabel: 'Illuminate',
     headerStatus: 'INK: DRYING',
     generatingText: 'Scribing...',
     finalizeLabel: 'Seal Wax',
-    loadingText: 'Sharpening Quill...',
+    loadingText: 'Sharpening Quill',
     loadingMessages: [
       'Chasing rabbits...',
       'Mixing gold leaf...',
@@ -741,13 +745,13 @@ Technical specifications:
     postcardOrigin: 'The Laboratory',
     idLabel: 'Page No.',
     landingTitle: 'The Alchemist\'s Table',
-    landingSubtitle: 'Transmuting lead into gold...',
+    landingSubtitle: 'Transmuting lead into gold',
     uploadButtonLabel: 'Analyze Matter',
     captureButtonLabel: 'Study Form',
     headerStatus: 'TRANSMUTATION: ACTIVE',
     generatingText: 'Distilling Essence',
     finalizeLabel: 'Inscribe Page',
-    loadingText: 'Consulting the Tablets...',
+    loadingText: 'Consulting the Tablets',
     loadingMessages: [
       'Mixing reagents...',
       'Drawing geometric proofs...',
@@ -802,13 +806,13 @@ Technical specifications:
     postcardOrigin: 'The Classroom',
     idLabel: 'Proof',
     landingTitle: 'The Blackboard',
-    landingSubtitle: 'Solving for X...',
+    landingSubtitle: 'Solving for X',
     uploadButtonLabel: 'Prove Theorem',
     captureButtonLabel: 'Erase Board',
     headerStatus: 'Q.E.D.',
-    generatingText: 'Calculating...',
+    generatingText: 'Calculating',
     finalizeLabel: 'Publish Proof',
-    loadingText: 'Deriving formula...',
+    loadingText: 'Deriving formula',
     loadingMessages: [
       'Chalk dust filling the air...',
       'Checking the axiom...',

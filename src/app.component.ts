@@ -7,7 +7,7 @@ import { GeminiService, PoemAct } from './services/gemini.service';
 import { FilmStripComponent } from './components/film-strip.component';
 import { DestinationGalleryComponent } from './components/destination-gallery.component';
 
-type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result';
+type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' | 'error';
 
 @Component({
   selector: 'app-root',
@@ -72,6 +72,10 @@ export class AppComponent implements OnDestroy {
   // Loading State
   loadingMessage = signal('Processing Signal...');
   loadingInterval: any;
+
+  // Error State
+  errorMessage = signal('Something went wrong.');
+  retryAction = () => { };
 
   ngOnDestroy() {
     this.stopLoadingCycle();
@@ -225,7 +229,11 @@ export class AppComponent implements OnDestroy {
       }
     } catch (err) {
       console.error('Image generation failed', err);
-      imageResult = { image: null, prompt: '', version: 'ERR-0.0' };
+      // ERROR HANDLING
+      this.state.set('error');
+      this.errorMessage.set('Unable to connect to server.');
+      this.retryAction = () => this.finishCreation();
+      return;
     }
 
     // Save to Cache
@@ -291,7 +299,15 @@ export class AppComponent implements OnDestroy {
 
       // B. Generate Image
       const modifiers = this.visualTags().join(', '); // Reuse tags
-      const imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+      let imageRes;
+      try {
+        imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+      } catch (e) {
+        this.state.set('error');
+        this.errorMessage.set('Failed to generate image.');
+        this.retryAction = () => this.onThemeSwitched(newThemeId);
+        return;
+      }
 
       // Save to Cache
       if (imageRes.image) {
@@ -310,6 +326,13 @@ export class AppComponent implements OnDestroy {
       this.promptVersion.set(imageRes.version);
       this.stopLoadingCycle();
     }
+  }
+
+
+  // Retry Handler
+  retry() {
+    this.state.set('generating');
+    this.retryAction();
   }
 
   async onRegenerateImage(newPrompt: string) {

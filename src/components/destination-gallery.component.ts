@@ -19,6 +19,7 @@ import { THEMES } from '../core/theme.config';
       <div 
         class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-9rem)] md:px-[calc(50vw-12rem)] py-12 -my-10 custom-scrollbar snap-x snap-mandatory scroll-smooth cursor-grab active:cursor-grabbing" 
         id="theme-carousel"
+        (scroll)="onScroll($event)"
         (mousedown)="startDrag($event)"
         (mouseleave)="stopDrag()"
         (mouseup)="stopDrag()"
@@ -241,6 +242,54 @@ export class DestinationGalleryComponent {
   startX = 0;
   scrollLeft = 0;
   wasDragging = false;
+  scrollTimeout: any;
+  private lastManualSelectTime = 0;
+
+  onScroll(e: Event) {
+    if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
+
+    // Debounce check for centered card
+    this.scrollTimeout = setTimeout(() => {
+      this.checkSelection(e.target as HTMLElement);
+    }, 150);
+  }
+
+  checkSelection(container: HTMLElement) {
+    // If we are currently dragging, don't auto-select yet
+    if (this.isDragging) return;
+
+    // If a manual selection happened recently (e.g. click), ignore scroll updates 
+    // to prevent the active theme from flickering back to the previous one during smooth scroll.
+    if (Date.now() - this.lastManualSelectTime < 800) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+
+    let closestThemeId: string | null = null;
+    let minDistance = Infinity;
+
+    // Iterate over all theme cards
+    const cards = container.querySelectorAll('[id^="theme-"]');
+    cards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestThemeId = card.id.replace('theme-', '');
+      }
+    });
+
+    // Valid threshold to consider it "centered" (snap usually handles this)
+    // Mobile card width ~288px (w-72), Desktop ~384px (w-96). 
+    // Half width is 144px/192px. If distance is < 100px, it's definitely the focused one.
+    if (closestThemeId && minDistance < 150) {
+      if (this.activeTheme().id !== closestThemeId) {
+        this.geminiService.setTheme(closestThemeId);
+      }
+    }
+  }
 
   startDrag(e: MouseEvent) {
     const slider = e.currentTarget as HTMLElement;
@@ -279,6 +328,7 @@ export class DestinationGalleryComponent {
 
   selectTheme(id: string) {
     if (!this.wasDragging) {
+      this.lastManualSelectTime = Date.now();
       this.geminiService.setTheme(id);
 
       // Center the selected card
