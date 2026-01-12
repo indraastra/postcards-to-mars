@@ -327,12 +327,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     * **Example:** "Let us keep this silence before it fades."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a detailed line and wash watercolor illustration.
-1. STYLE: A "line and wash" urban sketch. This is defined by crisp, permanent black ink outlines for all subjects and major architectural details, filled with watercolor washes.
-2. TECHNIQUE: The watercolor application should be controlled. Use "wet-on-dry" techniques for main subjects to ensure sharp details and vibrant colors. Use "wet-in-wet" washes for sky and background elements to create atmosphere, keeping the overall feel illustrative and defined.
-3. PAPER: The texture of cold-press watercolor paper should be visible, adding a granular feel to the washes.
-4. COLORS: The palette is vibrant and rich, with distinct color separation aided by the ink lines. Highlights are created by leaving the white of the paper exposed.
-5. VIBE: A personal, handcrafted illustration capturing a specific moment with clarity and artistic flair.`,
+      promptTemplate: `Transform this image of {visual_modifiers} into a loose watercolor painting with soft edges.`,
       primaryColor: '#db2777', // Pink-600 (Rose)
       backgroundColor: '#fff1f2', // Rose-50
       textColor: '#881337', // Rose-900
