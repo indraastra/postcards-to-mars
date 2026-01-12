@@ -319,9 +319,7 @@ Return JSON object.`;
 
     let fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
 
-    if (poemContext) {
-      fullPrompt += `\n\nTHEMATIC CONTEXT: The following poem accompanies this image. Ensure the visual mood matches: "${poemContext}"`;
-    }
+
 
     const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
     return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
