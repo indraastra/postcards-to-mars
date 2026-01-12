@@ -273,14 +273,7 @@ export class PostcardResultComponent {
     this.editorMode.set(mode);
     if (mode === 'stylisation') {
       const currentPrompt = this.imagePrompt();
-      const poemContext = `\n\nMatch the image to this poem:\n${this.poem()}`;
-
-      // Only append if not already there to avoid duplication on repeated opens
-      if (!currentPrompt.includes('Match the image to this poem:')) {
-        this.editablePrompt.set(currentPrompt + poemContext);
-      } else {
-        this.editablePrompt.set(currentPrompt);
-      }
+      this.editablePrompt.set(currentPrompt);
     } else {
       this.editablePoem.set(this.poem());
     }

@@ -274,7 +274,7 @@ Return JSON object.`;
 
         const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
           let clean = sg.trim();
-          if (!clean.endsWith('.')) clean += '.';
+          if (!/[.!?]$/.test(clean)) clean += '.';
           return clean;
         });
 
@@ -318,11 +318,14 @@ Return JSON object.`;
     `;
 
     let fullPrompt = theme.visualStyle.promptTemplate.replace('{visual_modifiers}', visualModifiers) + BASE_PROMPT_CONSTRAINTS;
+    let actualPrompt = fullPrompt;
 
+    if (poemContext) {
+      actualPrompt += `\n\nTHEMATIC CONTEXT: The following poem accompanies this image. Ensure the visual mood matches: "${poemContext}"`;
+    }
 
-
-    const image = await this.generateImageFromPrompt(cleanData, fullPrompt);
-    return { image, prompt: fullPrompt, version: this.PROMPT_VERSION };
+    const image = await this.generateImageFromPrompt(cleanData, actualPrompt);
+    return { image, prompt: actualPrompt, version: this.PROMPT_VERSION };
   }
 
   async generateImageFromPrompt(imageBase64: string, prompt: string): Promise<string | null> {
