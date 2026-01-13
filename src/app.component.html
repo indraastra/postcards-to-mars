@@ -72,19 +72,20 @@
         <!-- Content -->
         <div class="space-y-6 text-zinc-400 text-[11px] leading-relaxed relative z-10">
           <p class="font-serif italic text-lg text-zinc-200 border-l-2 border-zinc-700/50 pl-4">
-            A postcard is a bridge between worlds.
+            Ideally, a postcard is a bridge. It says 'I am here, you are there, and I am thinking of you.'
           </p>
 
           <div class="space-y-4 pt-2">
             <p>
-              > This system is a quiet attempt to bridge the distance between alternative realities.
+              > Sometimes the distance between people feels vast — like planets drifting apart. This project is a quiet
+              attempt to close that gap.
             </p>
             <p>
-              > It uses Multimodal AI to extract the emotional resonance of your memories, translating them into
-              artifacts from other timelines.
+              > It uses AI to translate a visual memory into something tangible. You provide the image; the system helps
+              you find the words.
             </p>
             <p>
-              > Choose a destination frequency, provide a visual anchor, and find the words to send back.
+              > It's a way to slow down and send a signal to someone far away: I saw this, and I thought of you.
             </p>
           </div>
         </div>
@@ -192,6 +193,10 @@
 
       </div>
     </div>
+    }
+
+    @case ('debug') {
+    <app-image-debug class="block w-full h-full"></app-image-debug>
     }
 
     }

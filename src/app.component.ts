@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DialogueComponent, PoemLine } from './components/dialogue.component';
@@ -6,8 +6,9 @@ import { PostcardResultComponent } from './components/postcard-result.component'
 import { GeminiService, PoemAct } from './services/gemini.service';
 import { FilmStripComponent } from './components/film-strip.component';
 import { DestinationGalleryComponent } from './components/destination-gallery.component';
+import { ImageDebugComponent } from './components/image-debug.component';
 
-type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' | 'error';
+type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' | 'error' | 'debug';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' |
     DialogueComponent,
     PostcardResultComponent,
     FilmStripComponent,
-    DestinationGalleryComponent
+    DestinationGalleryComponent,
+    ImageDebugComponent
   ],
   templateUrl: './app.component.html',
   styles: [
@@ -38,7 +40,7 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' |
     }
   `]
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnDestroy, OnInit {
   geminiService = inject(GeminiService);
 
   state = signal<AppState>('landing'); // Start at landing
@@ -76,6 +78,18 @@ export class AppComponent implements OnDestroy {
   // Error State
   errorMessage = signal('Something went wrong.');
   retryAction = () => { };
+
+
+
+  ngOnInit() {
+    // Hidden Debug Route Check
+    const path = window.location.pathname;
+    const search = window.location.search;
+    if (path.includes('/debug') || search.includes('mode=debug')) {
+      console.log('Entering Debug Mode');
+      this.state.set('debug');
+    }
+  }
 
   ngOnDestroy() {
     this.stopLoadingCycle();

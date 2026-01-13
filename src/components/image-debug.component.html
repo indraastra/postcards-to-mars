@@ -1,0 +1,91 @@
+<div class="p-8 text-zinc-300 font-mono h-full overflow-y-auto bg-black/90">
+    <h1 class="text-xl mb-6 text-zinc-100 uppercase tracking-widest border-b border-zinc-700 pb-2">Image Gen Debugger
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <!-- Input Column -->
+        <div class="space-y-6">
+            <!-- Upload -->
+            <div class="border border-zinc-700 p-4 rounded bg-zinc-900/50">
+                <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Source Image</label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*"
+                    class="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-300 hover:file:bg-zinc-700" />
+
+                @if (uploadedImage()) {
+                <div class="mt-4 relative aspect-square w-32 border border-zinc-700 rounded overflow-hidden">
+                    <img [src]="uploadedImage()" class="w-full h-full object-cover">
+                </div>
+                }
+            </div>
+
+            <!-- Modifiers -->
+            <div class="border border-zinc-700 p-4 rounded bg-zinc-900/50">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-xs uppercase tracking-wider text-zinc-500">Visual Modifiers</label>
+                    @if(isAnalyzing()) { <span class="text-xs text-amber-500 animate-pulse">Analyzing...</span> }
+                </div>
+                <textarea [ngModel]="visualModifiers()" (ngModelChange)="visualModifiers.set($event)"
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                    rows="3" placeholder="Waiting for analysis..."></textarea>
+            </div>
+
+            <!-- Prompt Template -->
+            <div class="border border-zinc-700 p-4 rounded bg-zinc-900/50">
+                <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Prompt Template</label>
+                <p class="text-[10px] text-zinc-600 mb-2">Use {visual_modifiers} to insert the tags above.</p>
+                <textarea [ngModel]="promptTemplate()" (ngModelChange)="promptTemplate.set($event)"
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                    rows="6"></textarea>
+            </div>
+
+            <button (click)="generate()" [disabled]="!uploadedImage() || isGenerating()"
+                class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-200 uppercase tracking-widest text-xs font-bold transition-colors border border-zinc-600">
+                @if(isGenerating()) { Generating... } @else { Generate Debug Image }
+            </button>
+        </div>
+
+        <!-- Output Column (Latest Result or Placeholder) -->
+        <div
+            class="border border-zinc-800 rounded bg-zinc-950/50 flex items-center justify-center relative overflow-hidden h-full min-h-[400px]">
+            @if (logs().length > 0) {
+            <img [src]="logs()[0].resultImage" class="w-full h-full object-contain">
+            } @else {
+            <div class="text-zinc-700 text-sm uppercase tracking-wider">No Result Yet</div>
+            }
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="mt-12">
+        <h2 class="text-sm uppercase tracking-widest text-zinc-500 mb-4">Generation History</h2>
+        <div class="border border-zinc-800 rounded overflow-hidden">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-zinc-900 text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                    <tr>
+                        <th class="p-4 font-normal w-1/4">Visual Modifiers</th>
+                        <th class="p-4 font-normal w-1/4">Template</th>
+                        <th class="p-4 font-normal">Result</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    @for (log of logs(); track log.timestamp) {
+                    <tr class="bg-black/20 hover:bg-zinc-900/30 transition-colors">
+                        <td class="p-4 align-top text-zinc-400">{{ log.visualModifiers }}</td>
+                        <td class="p-4 align-top text-zinc-400 font-mono text-[10px] whitespace-pre-wrap">{{
+                            log.promptTemplate }}</td>
+                        <td class="p-4 align-top">
+                            @if (log.resultImage) {
+                            <div class="w-32 h-32 border border-zinc-800 rounded overflow-hidden">
+                                <img [src]="log.resultImage" class="w-full h-full object-cover">
+                            </div>
+                            } @else {
+                            <span class="text-rose-500">Failed</span>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
