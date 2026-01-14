@@ -318,7 +318,7 @@ Return JSON object.`;
     
     GLOBAL CONSTRAINTS:
     1. FRAMING: Adaptively recompose the scene to fit the 1:1 square format.
-    2. PRESERVATION: Retain the main recognized subjects, their poses, and the overall composition. Ensure the result is recognizable as the original scene, but allow flexibility in framing and details to fit the style.
+    2. PRESERVATION: Retain the main recognized subjects, their poses, skin tones, and the overall composition. Ensure the result is recognizable as the original scene, but allow flexibility in framing and details to fit the style.
     3. VISUALS ONLY: The image must be purely visual and completely void of any written language, text, numbers, or signs, except for what was present in the original image.
     `;
 

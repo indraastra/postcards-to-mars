@@ -854,7 +854,7 @@ Technical specifications:
       filterRaw: 'sepia(0.4) contrast(1.1) brightness(0.95) saturate(1.1)' // Slight aging effect
     },
     usePoemForImageGeneration: true
-  }
+  },
 ];
 
 // --- Sorting Logic ---
