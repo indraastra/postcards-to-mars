@@ -313,9 +313,16 @@ export class AppComponent implements OnDestroy, OnInit {
 
       // B. Generate Image
       const modifiers = this.visualTags().join(', '); // Reuse tags
+      const activeTheme = this.geminiService.activeTheme();
+
       let imageRes;
       try {
-        imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+        if (activeTheme.usePoemForImageGeneration) {
+          console.log('Generating image with poem context:', autoPoem);
+          imageRes = await this.geminiService.generateStylizedImage(base64, modifiers, autoPoem);
+        } else {
+          imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+        }
       } catch (e) {
         this.state.set('error');
         this.errorMessage.set('Failed to generate image.');

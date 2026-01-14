@@ -32,7 +32,8 @@
             <!-- Prompt Template -->
             <div class="border border-zinc-700 p-4 rounded bg-zinc-900/50">
                 <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Prompt Template</label>
-                <p class="text-[10px] text-zinc-600 mb-2">Use {visual_modifiers} to insert the tags above.</p>
+                <p class="text-[10px] text-zinc-600 mb-2">Use {{ '{' }}visual_modifiers&#125; to insert the tags above.
+                </p>
                 <textarea [ngModel]="promptTemplate()" (ngModelChange)="promptTemplate.set($event)"
                     class="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-sm focus:border-amber-500 focus:outline-none transition-colors"
                     rows="6"></textarea>

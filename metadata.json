@@ -1,7 +1,7 @@
-{
-  "name": "Postcards",
-  "description": "A creative tool that translates visual memories into signals for someone far away.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
+  {
+    "name": "Postcards To Mars",
+    "description": "A creative tool that translates visual memories into signals for someone far away.",
+    "requestFramePermissions": [
+      "camera"
+    ]
+  }

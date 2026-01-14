@@ -733,132 +733,127 @@ Technical specifications:
     usePoemForImageGeneration: true
   },
   {
-    id: 'codex',
-    name: 'Sketches from the Codex',
-    shortName: 'Codex',
-    originLabel: 'Volume',
-    postcardOrigin: 'The Laboratory',
-    idLabel: 'Page No.',
-    landingTitle: 'The Alchemist\'s Table',
-    landingSubtitle: 'Transmuting lead into gold',
-    uploadButtonLabel: 'Analyze Matter',
-    captureButtonLabel: 'Study Form',
-    headerStatus: 'TRANSMUTATION: ACTIVE',
-    generatingText: 'Distilling Essence',
-    finalizeLabel: 'Inscribe Page',
-    loadingText: 'Consulting the Tablets',
-    loadingMessages: [
-      'Mixing reagents...',
-      'Drawing geometric proofs...',
-      'Aligning the celestial spheres...',
-      'Deciphering ancient runes...',
-      'Heating the crucible...'
-    ],
-    regenLabel: 'Redraw Diagram',
-    editPoemLabel: 'Refine Theory',
-    textPersona: `
-**ROLE:** You are Leonardo da Vinci or an ancient alchemist documenting a new discovery in a secret codex.
-**VOICE:** Academic, obsessive, visionary. Focused on anatomy, geometry, and the "divine proportion" of things.
-**STYLE:** Use terms like "ratio", "divine", "essence", "mechanism". Write as if observing the hidden machinery of nature.
-    `,
-    poemStructure: `
-**ACT 1: THE ANATOMY**
-* **GOAL:** Describe the physical structure or geometry of the subject.
-* **GUIDANCE:**
-    * **Focus:** Angles, curves, lines, or mechanics.
-    * **Make it:** Analytical but beautiful.
-    * **Example:** "The curve of the wing follows the golden spiral."
-
-**ACT 2: THE ESSENCE**
-* **GOAL:** Hypothesize the hidden purpose or soul of the object.
-* **GUIDANCE:**
-    * **Focus:** What is it *for*? What makes it alive?
-    * **Make it:** Visionary.
-    * **Example:** "It holds the breath of the wind itself."
-
-**ACT 3: THE TRANSMUTATION**
-* **GOAL:** A concluding thought on transforming this knowledge.
-* **GUIDANCE:**
-    * **Focus:** Preservation, invention, or enlightenment.
-    * **Make it:** Profound.
-    * **Example:** "Thus we prove that flight is merely a matter of will."
-    `,
-    visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a vintage Leonardo da Vinci style sketch on old parchment. The image should look like a study from a codex, with ink contour lines, cross-hatching to define volume, and handwritten mirror-writing marginalia. The color palette should be strictly sepia, brown ink, and yellowed paper. If a person is present, show them with Vitruvian proportions or anatomical overlay lines circles and geometry. The texture should be rough, aged paper with ink stains and fading. High detail, ink and quill style.`,
-      primaryColor: '#d97706', // Amber-600
-      backgroundColor: '#fef3c7', // Amber-100 (Parchment)
-      textColor: '#451a03', // Amber-950 (Ink)
-      fontFamilyHeader: '"Cinzel", serif',
-      fontFamilyBody: '"Courier Prime", monospace', // Typewriter/Notes style
-      filterRaw: 'sepia(0.8) contrast(1.1) brightness(1.05)'
-    }
-  },
-  {
     id: 'chalk',
     name: 'The Unsolved Equation',
     shortName: 'Equation',
     originLabel: 'Theorem',
     postcardOrigin: 'The Classroom',
-    idLabel: 'Proof',
-    landingTitle: 'The Blackboard',
-    landingSubtitle: 'Solving for X',
-    uploadButtonLabel: 'Prove Theorem',
-    captureButtonLabel: 'Erase Board',
-    headerStatus: 'Q.E.D.',
-    generatingText: 'Calculating',
-    finalizeLabel: 'Publish Proof',
-    loadingText: 'Deriving formula',
+    idLabel: 'Theorem',
+    landingTitle: 'The Classroom',
+    landingSubtitle: 'Where x marks the unknown',
+    uploadButtonLabel: 'Solve for X',
+    captureButtonLabel: 'Prove Logic',
+    headerStatus: 'QUIZ: POP',
+    generatingText: 'Solving Equation',
+    finalizeLabel: 'Erase Board',
+    loadingText: 'Chalking the board',
     loadingMessages: [
-      'Chalk dust filling the air...',
-      'Checking the axiom...',
-      'Finding the limit...',
-      'Erasing the mistake...',
-      'Dividing by zero...'
+      'Finding the hypotenuse...',
+      'Dividing by zero...',
+      'Clapping erasers...',
+      'Drawing perfect circles...',
+      'Reviewing homework...'
     ],
-    regenLabel: 'Recompute',
-    editPoemLabel: 'Refine Logic',
+    regenLabel: 'Re-Calculate',
+    editPoemLabel: 'Check Work',
     textPersona: `
-**ROLE:** You are a brilliant but obsessed mathematician trying to solve the equation of a memory.
-**VOICE:** Analytical, desperate, beautiful. Mixing math with longing.
-**STYLE:** Use concepts like "limits", "variables", "constants", "infinity", "coordinates".
+**ROLE:** You are an eccentric math professor who sees the world as a series of beautiful equations.
+**VOICE:** Enthusiastic, slightly confused, brilliant.
+**STYLE:** Use math metaphors. "Love is the only constant." "Grief is an asymptotic line."
     `,
     poemStructure: `
 **ACT 1: THE VARIABLE**
-* **GOAL:** Define the subject as a variable in an equation.
+* **GOAL:** Define the subject as a mathematical variable.
 * **GUIDANCE:**
     * **Focus:** X, Y, or an unknown quantity.
-    * **Make it:** Analytical.
-    * **Example:** "Let X be the moment you looked away."
+    * **Make it:** Intellectual but simple.
+    * **Example:** "Let X be the way the light hits your face."
 
-**ACT 2: THE CALCULATION**
-* **GOAL:** Attempt to solve or measure the feeling.
+**ACT 2: THE EQUATION**
+* **GOAL:** Describe the interaction using math terms.
 * **GUIDANCE:**
-    * **Focus:** Geometry, addition, subtraction, or calculus.
-    * **Make it:** Precise but futile.
-    * **Example:** "I integrated the silence over infinite time."
+    * **Focus:** Addition, subtraction, calculus, or geometry.
+    * **Make it:** Clever.
+    * **Example:** "We added time, but the result was still zero."
 
 **ACT 3: THE PROOF**
-* **GOAL:** The final result of the equation.
+* **GOAL:** A Q.E.D. conclusion.
 * **GUIDANCE:**
-    * **Focus:** A solution, a constant, or an impossibility.
+    * **Focus:** The solution or the unsolvable nature of life.
     * **Make it:** Absolute.
-    * **Example:** "The remainder is always zero."
+    * **Example:** "Therefore, you are infinite."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a colorful academic chalkboard diagram.
-1. STYLE: The entire scene must be rendered as a vintage classroom diagram drawn on a dusty blackboard. The subject should be depicted as a technical or biological sketch with cross-sections, angular breakdown lines, or geometric analysis.
-2. COLORS: Use a classic "Teacher's Chalk" palette: Dusty White, Pale Yellow, Mint Green, and Soft Pink against a dark slate background.
-3. DETAILS: Add dotted guidelines, force vectors, labeled dimensions (A, B, θ), and explanatory notes in cursive chalk.
-4. TEXTURE: Heavy slate texture, eraser smudges, and chalk dust.
-5. VIBE: Educational, analytical, vintage schoolhouse.`,
-      primaryColor: '#fde047', // Yellow-300 (Chalk Yellow)
-      backgroundColor: '#1c1917', // Stone-900 (Blackboard)
-      textColor: '#e7e5e4', // Stone-200
-      fontFamilyHeader: '"Space Mono", monospace',
-      fontFamilyBody: '"Roboto Slab", serif',
-      filterRaw: 'contrast(1.1) saturate(1.1)'
+      promptTemplate: `Transform this image of {visual_modifiers} into a colorful, dusty chalkboard diagram on a blackboard in an academic style (a math or physics college class).`,
+      primaryColor: '#facc15', // Yellow-400
+      backgroundColor: '#1e293b', // Slate-800
+      textColor: '#f8fafc', // Slate-50
+      fontFamilyHeader: '"Fredericka the Great", cursive',
+      fontFamilyBody: '"Comic Neue", cursive',
+      filterRaw: 'contrast(1.2) brightness(1.1)'
     },
-    usePoemForImageGeneration: false
+    usePoemForImageGeneration: true
+  },
+  {
+    id: 'egypt',
+    name: 'The Stone Chronicle',
+    shortName: 'Chronicle',
+    originLabel: 'Dynasty',
+    postcardOrigin: 'The Valley of the Kings',
+    idLabel: 'Cartouche No.',
+    landingTitle: 'The Tomb of Eternity',
+    landingSubtitle: 'Unearthing the past...',
+    uploadButtonLabel: 'Enter Tomb',
+    captureButtonLabel: 'Translate Hieroglyphs',
+    headerStatus: 'SEAL: BROKEN',
+    generatingText: 'Carving Relief',
+    finalizeLabel: 'Seal the Tomb',
+    loadingText: 'Dusting off history...',
+    loadingMessages: [
+      'Deciphering Rosetta Stone...',
+      'Lighting torches...',
+      'Avoiding curses...',
+      'Consulting the Book of the Dead...',
+      'Mixing lapis lazuli pigment...'
+    ],
+    regenLabel: 'Re-Inscribe',
+    editPoemLabel: 'Correct Translation',
+    textPersona: `
+**ROLE:** You are the Royal Scribe to the Pharaoh, recording daily life for the afterlife.
+**VOICE:** Formal, declarative, ritualistic, arrogant. You are obsessed with eternity, permanence, and order (Ma'at).
+**STYLE:** Use archaic phrasing but keep it punchy. Speak as if you are carving truth into stone.
+    `,
+    poemStructure: `
+**ACT 1: THE PROCLAMATION**
+* **GOAL:** Formally announce the subject of the painting.
+* **GUIDANCE:**
+    * **Focus:** Introduce the subject as if they are a deity or royal figure being presented to the gods.
+    * **Make it:** Grandiose and specific.
+    * **Example:** "Behold the likeness of the warrior cat, guardian of the grain."
+
+**ACT 2: THE INSCRIPTION**
+* **GOAL:** Connect the image to the physical medium (Stone).
+* **GUIDANCE:**
+    * **Focus:** The act of carving, the hardness of the limestone, or the permanence of the wall.
+    * **Make it:** Tactile and rigid.
+    * **Example:** "We carve their spirit into the unyielding limestone."
+
+**ACT 3: THE ETERNAL VOW**
+* **GOAL:** State the purpose of the art: Immortality.
+* **GUIDANCE:**
+    * **Focus:** The afterlife, the horizon, or ensuring the name lasts forever.
+    * **Make it:** A defiant promise against time.
+    * **Example:** "So that their name shall echo when the stars burn out."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a weathered fresco on cracked limestone in the style of the intricate, vividly colored reliefs from the tombs in the Valley of the Kings. Render the subjects using the traditional Egyptian 'composite view' (heads in profile, eyes frontal, shoulders frontal). Use a historic pigment palette featuring ochre, terracotta, lapis lazuli blue, turquoise, and charcoal. Flatten the perspective to remove depth, and fill the background with vertical columns of intricate hieroglyphs and cartouches. The final result should look like a high-fidelity photograph of an archaeological artifact discovered in a dusty tomb.`, primaryColor: '#d97706', // Amber-600 (Ochre/Gold)
+      backgroundColor: '#fefce8', // Yellow-50 (Limestone/Sand)
+      textColor: '#0c4a6e', // Sky-900 (Lapis Lazuli/Dark Blue for contrast)
+      fontFamilyHeader: '"Cinzel Decorative", serif', // Egyptian/Monumental feel
+      fontFamilyBody: '"Cormorant Garamond", serif', // Academic/Historical
+      filterRaw: 'sepia(0.4) contrast(1.1) brightness(0.95) saturate(1.1)' // Slight aging effect
+    },
+    usePoemForImageGeneration: true
   }
 ];
 

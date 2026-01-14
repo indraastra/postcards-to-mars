@@ -194,7 +194,12 @@ export class GeminiService {
 
 **TASK:** Analyze the image and return a JSON object containing:
 1. "acts": A cohesive 3-line poem structure.
-2. "visual_tags": A list of 3-5 concise descriptors identifying the MAIN SUBJECTS (e.g. "a woman standing", "a cat sleeping"). Focus on physical presence.
+2. "visual_tags": A list of UP TO 3 distinct descriptors identifying the MAIN SUBJECTS (e.g. "a woman standing", "a cat sleeping"). 
+   - **CONSTRAINT:** No overlap or repetition (one group should not include another).
+   - **BAD:** ["a couple", "a man", "a woman"] (The couple INCLUDES the man and woman).
+   - **GOOD:** ["a couple holding hands", "a sunset background", "a park bench"].
+   - **GOOD:** ["a smiling cat", "a red ball", "a wooden floor"].
+   - Focus on distinct physical elements.
 
 **THE POEM NARRATIVE ARC:**
 ${theme.poemStructure}
