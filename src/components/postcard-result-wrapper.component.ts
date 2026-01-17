@@ -81,7 +81,7 @@ export class PostcardResultWrapperComponent {
                     const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
                     const suggestion = act.suggestions[0];
                     return `${cleanStarter} [${suggestion}]`;
-                }).join('\\n');
+                }).join('\n');
 
                 this.session.setFinalPoem(autoPoem);
 
