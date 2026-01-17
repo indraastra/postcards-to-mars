@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
 import { THEMES } from '../core/theme.config';
+import { SessionStore } from '../store/session.store';
 
 @Component({
   selector: 'app-destination-gallery',
@@ -231,7 +232,8 @@ import { THEMES } from '../core/theme.config';
 })
 export class DestinationGalleryComponent {
   geminiService = inject(GeminiService);
-  activeTheme = this.geminiService.activeTheme;
+  session = inject(SessionStore);
+  activeTheme = this.session.theme;
 
   showCustomModal = signal(false);
   customPrompt = signal('');
@@ -286,7 +288,7 @@ export class DestinationGalleryComponent {
     // Half width is 144px/192px. If distance is < 100px, it's definitely the focused one.
     if (closestThemeId && minDistance < 150) {
       if (this.activeTheme().id !== closestThemeId) {
-        this.geminiService.setTheme(closestThemeId);
+        this.session.setTheme(closestThemeId);
       }
     }
   }
@@ -329,7 +331,7 @@ export class DestinationGalleryComponent {
   selectTheme(id: string) {
     if (!this.wasDragging) {
       this.lastManualSelectTime = Date.now();
-      this.geminiService.setTheme(id);
+      this.session.setTheme(id);
 
       // Center the selected card
       setTimeout(() => {
@@ -361,7 +363,7 @@ export class DestinationGalleryComponent {
       const newTheme = await this.geminiService.generateCustomTheme(this.customPrompt());
       if (newTheme) {
         this.geminiService.addCustomTheme(newTheme);
-        this.selectTheme(newTheme.id);
+        this.session.setTheme(newTheme.id);
         this.closeCustomModal();
       }
     } catch (err) {
