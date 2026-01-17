@@ -52,6 +52,22 @@ describe('DialogueComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should clean prefix underscores when completing line', () => {
+        // Arrange
+        storeMock.poemActs.set([{ starter: 'Hello ____ world', suggestions: [] }]);
+        component.customLine.set('beautiful');
+
+        // Act
+        component.submitCustomLine();
+
+        // Assert
+        expect(storeMock.addPoemLine).toHaveBeenCalledWith(expect.objectContaining({
+            prefix: 'Hello',
+            userInput: 'beautiful',
+            suffix: 'world' // Should extract suffix
+        }));
+    });
+
     it('should complete line and advance to next act', () => {
         // Arrange
         // Current index is 0. Next is 1. Acts length is 2.

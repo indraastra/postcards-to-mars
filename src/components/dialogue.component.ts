@@ -144,11 +144,29 @@ export class DialogueComponent {
   }
 
   private completeLine(userInput: string) {
+    // Check for placeholders (____) to support "fill in the blank" style
+    // or default to appending if no placeholder exists.
+    const parts = this.starterText().split(/_{2,}/);
+
+    // Prefix is the part before the blank, trimmed
+    const prefix = parts[0].trim();
+    // Suffix is the part after the blank (trimmed), or '.' if we are just appending
+    const suffix = parts.length > 1 ? parts[1].trim() : '.';
+
+    // Reconstruct full text for storage logic if needed
+    let fullText = `${prefix} ${userInput}`;
+    if (suffix === '.') {
+      fullText += '.';
+    } else {
+      // If it's a suffix word, add space unless it's punctuation
+      fullText += (this.needsSpace(suffix) ? ' ' : '') + suffix;
+    }
+
     const line: PoemLine = {
-      prefix: this.starterText(),
-      userInput: userInput,
-      suffix: '.', // Default suffix for now
-      fullText: `${this.starterText()} ${userInput}.`
+      prefix,
+      userInput,
+      suffix,
+      fullText
     };
 
     this.session.addPoemLine(line);
