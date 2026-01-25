@@ -1,4 +1,4 @@
-import { Component, inject, signal, output } from '@angular/core';
+import { Component, inject, signal, output, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
@@ -230,7 +230,7 @@ import { SessionStore } from '../store/session.store';
     }
   `]
 })
-export class DestinationGalleryComponent {
+export class DestinationGalleryComponent implements AfterViewInit {
   geminiService = inject(GeminiService);
   session = inject(SessionStore);
   activeTheme = this.session.theme;
@@ -246,6 +246,17 @@ export class DestinationGalleryComponent {
   wasDragging = false;
   scrollTimeout: any;
   private lastManualSelectTime = 0;
+
+  ngAfterViewInit() {
+    // Scroll to the active theme immediately on load
+    setTimeout(() => {
+      const id = this.activeTheme().id;
+      const el = document.getElementById(`theme-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+      }
+    }, 0);
+  }
 
   onScroll(e: Event) {
     if (this.scrollTimeout) clearTimeout(this.scrollTimeout);

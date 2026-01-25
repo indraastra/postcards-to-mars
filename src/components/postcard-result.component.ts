@@ -112,7 +112,7 @@ interface TextSegment {
         </div>
 
       <!-- Controls -->
-      <div class="mt-8 mb-20 w-full max-w-sm flex flex-col items-center gap-3 z-10">
+      <div class="mt-8 mb-48 w-full max-w-sm flex flex-col items-center gap-3 z-10">
         <button 
           (click)="share()"
           class="w-full flex items-center justify-center gap-3 text-white px-6 py-3 rounded-sm shadow-lg transition-all font-mono uppercase tracking-widest text-[10px] group bg-[var(--theme-primary)] hover:opacity-90 shadow-[var(--theme-primary)]/40"
