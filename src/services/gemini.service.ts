@@ -40,12 +40,20 @@ export class GeminiService {
   // Map<themeId, Artifact>
   private artifactCache = new Map<string, Artifact>();
 
-  constructor() {
+  constructor() { }
+
+  private getClient(): GoogleGenAI {
+    if (this.ai) return this.ai;
+
     const p = (window as any).env?.apiKey;
+
     if (!p) {
       console.error('Gemini API Key is missing. Please check .env file or deployment config.');
+      throw new Error('Gemini API Key missing');
     }
+
     this.ai = new GoogleGenAI({ apiKey: p });
+    return this.ai;
   }
 
   setTheme(themeId: string) {
@@ -123,7 +131,7 @@ export class GeminiService {
     `;
 
     try {
-      const response = await this.ai.models.generateContent({
+      const response = await this.getClient().models.generateContent({
         model: this.REASONING_MODEL,
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
@@ -226,7 +234,7 @@ ${theme.poemStructure}
 Return JSON object.`;
 
     try {
-      const response = await this.ai.models.generateContent({
+      const response = await this.getClient().models.generateContent({
         model: this.TEXT_MODEL,
         contents: {
           role: 'user',
@@ -341,7 +349,7 @@ Return JSON object.`;
       console.log('\n=== [Gemini] GENERATE IMAGE PROMPT ===');
       console.log(prompt);
 
-      const response = await this.ai.models.generateContent({
+      const response = await this.getClient().models.generateContent({
         model: this.IMAGE_MODEL,
         contents: {
           role: 'user',

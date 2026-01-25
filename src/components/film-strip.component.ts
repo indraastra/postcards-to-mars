@@ -16,8 +16,8 @@ import { THEMES } from '../core/theme.config';
                
                 <div class="flex justify-between items-start border-b border-white/10 pb-4">
                   <div>
-                    <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Create Custom Theme</h3>
-                    <p class="text-gray-500 text-[10px] font-mono">Describe the visual style or mood you want to capture.</p>
+                    <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Design New Theme</h3>
+                    <p class="text-gray-500 text-[10px] font-mono">Describe the visual style you want to create.</p>
                   </div>
                   <button (click)="closeCustomModal()" class="text-gray-500 hover:text-white font-mono text-xs p-2">[X]</button>
                </div>
@@ -38,7 +38,7 @@ import { THEMES } from '../core/theme.config';
                >
                   @if (isGenerating()) {
                     <div class="w-2 h-2 bg-rose-500 rounded-full animate-bounce"></div>
-                    <span>Weaving Reality...</span>
+                    <span>Creating Theme...</span>
                   } @else {
                     <span>Create Theme</span>
                   }

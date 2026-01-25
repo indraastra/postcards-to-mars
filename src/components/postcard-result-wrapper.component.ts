@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PostcardResultComponent } from './postcard-result.component';
@@ -17,6 +17,7 @@ import { GeminiService } from '../services/gemini.service';
         [stylizedImageSrc]="session.stylizedImage()" 
         [imagePrompt]="session.generatedPrompt()"
         [version]="session.promptVersion()" 
+        [isRegenerating]="isRegenerating()"
         (regenerate)="onRegenerateImage($event)"
         (poemChange)="onPoemChanged($event)">
       </app-postcard-result>
@@ -30,12 +31,38 @@ export class PostcardResultWrapperComponent {
     geminiService = inject(GeminiService);
     router = inject(Router);
 
-    onRegenerateImage(newPrompt: string) {
-        // Logic to regenerate
-        // Implementation similar to original 'onRegenerateImage'
-        // We can move this to component or handle here.
-        // Let's implement here for now or update component to use store?
-        // Updating component to use store is better, but wrapper is fine for now to match structure.
+    isRegenerating = signal(false);
+
+    async onRegenerateImage(newPrompt: string) {
+        const original = this.session.originalImage();
+        if (!original) return;
+
+        this.isRegenerating.set(true);
+
+        try {
+            const newImage = await this.geminiService.generateImageFromPrompt(original, newPrompt);
+
+            if (newImage) {
+                // Update Store
+                this.session.updateArtifactImage(newImage, newPrompt);
+
+                // Update Cache
+                const theme = this.session.theme();
+                this.geminiService.cacheArtifact(theme.id, {
+                    themeId: theme.id,
+                    imageUrl: newImage,
+                    poem: this.session.finalPoem(),
+                    prompt: newPrompt,
+                    version: this.session.promptVersion(), // Keep version or update? Keeping for now.
+                    timestamp: Date.now()
+                });
+            }
+        } catch (e) {
+            console.error('Regeneration failed', e);
+            // Optional: Notify user of failure via a toast or store error
+        } finally {
+            this.isRegenerating.set(false);
+        }
     }
 
     onPoemChanged(newPoem: string) {
@@ -74,6 +101,10 @@ export class PostcardResultWrapperComponent {
             // PostcardResult component accepts [isRegenerating].
             // Maybe we can hijack that?
 
+            // NOTE: Using isRegenerating here might be misleading if we are switching whole context,
+            // but it's better than nothing.
+            this.isRegenerating.set(true);
+
             try {
                 const analysis = await this.geminiService.analyzeImage(base64);
                 // Create auto poem
@@ -108,6 +139,8 @@ export class PostcardResultWrapperComponent {
 
             } catch (e) {
                 console.error(e);
+            } finally {
+                this.isRegenerating.set(false);
             }
         }
     }

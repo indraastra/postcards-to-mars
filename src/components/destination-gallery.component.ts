@@ -116,7 +116,7 @@ import { SessionStore } from '../store/session.store';
         >
            <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-400 group-hover:text-white transition-colors">
               <span class="text-4xl font-mono font-light">+</span>
-              <span class="text-xs uppercase tracking-[0.2em] font-mono">Discover New World</span>
+              <span class="text-xs uppercase tracking-[0.2em] font-mono">Create New Theme</span>
            </div>
         </button>
       </div>
@@ -178,8 +178,8 @@ import { SessionStore } from '../store/session.store';
                  
                  <div class="flex justify-between items-start border-b border-white/10 pb-4">
                     <div>
-                      <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Manual Calibration</h3>
-                      <p class="text-gray-500 text-[10px] font-mono">Describe the world you wish to visit.</p>
+                      <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Design New Theme</h3>
+                      <p class="text-gray-500 text-[10px] font-mono">Describe the visual style you want to create.</p>
                     </div>
                     <button (click)="closeCustomModal()" class="text-gray-500 hover:text-white font-mono text-xs p-2">[X]</button>
                  </div>
@@ -200,9 +200,9 @@ import { SessionStore } from '../store/session.store';
                  >
                     @if (isGenerating()) {
                       <div class="w-2 h-2 bg-rose-500 rounded-full animate-bounce"></div>
-                      <span>Calculating Trajectory...</span>
+                      <span>Creating Theme...</span>
                     } @else {
-                      <span>Initialize Jump</span>
+                      <span>Generate Theme</span>
                     }
                  </button>
               </div>
