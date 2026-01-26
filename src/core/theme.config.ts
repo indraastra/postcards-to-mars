@@ -599,69 +599,73 @@ Technical specifications:
     }
   },
   {
-    id: 'stars',
-    name: 'The Golden Record',
-    shortName: 'Record',
-    originLabel: 'Artifact',
-    postcardOrigin: 'Voyager 1',
-    idLabel: 'Disc Track',
-    landingTitle: 'Interstellar Message',
-    landingSubtitle: 'Hello from the children of planet Earth...',
-    uploadButtonLabel: 'Etch to Gold',
-    captureButtonLabel: 'Record Sample',
-    headerStatus: 'VELOCITY: ESCAPE',
-    generatingText: 'Engraving Disc',
-    finalizeLabel: 'Launch Probe',
-    loadingText: 'Encoding binary',
+    id: 'album',
+    name: 'The Lost Album',
+    shortName: 'Album',
+    originLabel: 'Studio',
+    postcardOrigin: 'Vinyl Archive',
+    idLabel: 'Catalog No.',
+    landingTitle: 'Vinyl Dreams',
+    landingSubtitle: 'The soundtrack of a memory',
+    uploadButtonLabel: 'Spin Record',
+    captureButtonLabel: 'Press Vinyl',
+    headerStatus: 'RPM: 33 1/3',
+    generatingText: 'Mixing Track',
+    finalizeLabel: 'Release Album',
+    loadingText: 'Finding the groove',
     loadingMessages: [
-      'Translating to hydrogen frequency...',
-      'Encoding greetings in 55 languages...',
-      'Calibrating the stylus...',
-      'Etching the sound of rain...',
-      'Pointing antenna to deep space...'
+      'Adjusting the EQ...',
+      'Tuning the guitar...',
+      'Writing the liner notes...',
+      'Spinning the deck...',
+      'Dropping the needle...'
     ],
-    regenLabel: 'Re-Record',
-    editPoemLabel: 'Edit Data',
+    regenLabel: 'Remix Track',
+    editPoemLabel: 'Edit Metadata',
     textPersona: `
-**ROLE:** You are a scientist (like Carl Sagan) curating the Voyager Golden Record.
-**VOICE:** Objective, universal, profound, scientific yet deeply human.
-**STYLE:** Describe human experiences as "data", "frequencies", or "samples" for an alien audience.
+**ROLE:** You are a music curator or historian describing a lost album.
+**VOICE:** Knowledgeable, specific, evocative.
+**STYLE:** Describe the genre, era, and mood in a way that suggests a specific visual style for the album cover.
     `,
     poemStructure: `
-**ACT 1: THE SAMPLE**
-* **GOAL:** Define the subject as a data point for aliens.
+**ACT 1: THE GENRE**
+* **GOAL:** Define the musical style.
 * **GUIDANCE:**
-    * **Focus:** "Specimen", "Audio Sample", "Visual Data".
-    * **Make it:** Clinical but beautiful.
-    * **Example:** "Sample 42: The frequency of a human heartbeat."
+    * **Focus:** Jazz, Synthwave, Shoegaze, Baroque Pop.
+    * **Make it:** Specific.
+    * **Example:** "Genre: Lo-Fi Dream Pop."
 
-**ACT 2: THE TRANSLATION**
-* **GOAL:** Explain the hidden emotion behind the data.
+**ACT 2: THE ERA**
+* **GOAL:** Define the time period.
 * **GUIDANCE:**
-    * **Focus:** What the data *means* to a human.
-    * **Make it:** A universal truth.
-    * **Example:** "It signifies the persistence of hope against entropy."
+    * **Focus:** Year or Decade.
+    * **Make it:** Temporal.
+    * **Example:** "Era: Released in late 1984."
 
-**ACT 3: THE TRANSMISSION**
-* **GOAL:** Sending it into the void.
+**ACT 3: THE VIBE**
+* **GOAL:** Define the emotional atmosphere.
 * **GUIDANCE:**
-    * **Focus:** Distance, preservation, or the future.
-    * **Make it:** A message in a bottle.
-    * **Example:** "Play this when our sun has gone quiet."
+    * **Focus:** Mood, color, feeling.
+    * **Make it:** Atmospheric.
+    * **Example:** "Vibe: Melancholic rain on neon streets."
     `,
     visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a gold-etched diagram in the style of the NASA Voyager Golden Record cover.
-1. STYLE: Minimalist scientific line art engraved into a gold metal surface.
-2. DETAILS: Convert the subject into a schematic wireframe or pulsar map style. Surround the subject with binary code rings, hydrogen hyperfine transition symbols, and radial instruction lines.
-3. COLOR: Monochrome Gold (#fbbf24) on a Deep Space Black (#000000) background.
-4. TEXTURE: Brushed metal, etched grooves, vector precision.
-5. VIBE: Scientific, lonely, profound, interstellar.`,
-      primaryColor: '#fbbf24', // Amber-400 (Gold)
-      backgroundColor: '#020617', // Slate-950 (Space Black)
-      textColor: '#fef3c7', // Amber-100
-      fontFamilyHeader: '"Orbitron", sans-serif', // Sci-Fi Technical
-      fontFamilyBody: '"Space Mono", monospace', // Data Code
-      filterRaw: 'grayscale(1) sepia(1) hue-rotate(5deg) contrast(1.3)'
+      promptTemplate: `Create a Vinyl Record Album Cover based on the following music metadata:
+METADATA: {poem}
+
+INSTRUCTIONS:
+1. STYLE: The visual style MUST strictly match the Genre, Era, and Vibe defined in the metadata. 
+   - Adaptive Style: Match the aesthetic of the era (e.g. 1920s Jazz = Art Deco; 1980s Synthwave = Neon Grid; 2020s = High-Gloss Digital).
+2. COMPOSITION: Square format. High-concept cover art.
+3. TYPOGRAPHY: Overlay an invented band name and album title that fits the genre's typography style perfectly.
+4. TEXTURE: Simulate the physical medium of the era—weathered cardboard for vintage, glossy sleekness for modern, or raw paper for indie.
+5. SUBJECT: Adapt the input image content "{visual_modifiers}" to fit this specific album aesthetic.`,
+      primaryColor: '#f97316', // Orange-500
+      backgroundColor: '#1c1917', // Stone-900
+      textColor: '#ffedd5', // Orange-100
+      fontFamilyHeader: '"Anton", sans-serif',
+      fontFamilyBody: '"Abril Fatface", cursive',
+      filterRaw: 'contrast(1.1) sepia(0.3) saturate(1.1)'
     },
     usePoemForImageGeneration: true
   },
