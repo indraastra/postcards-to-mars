@@ -77,60 +77,58 @@ export class PostcardResultWrapperComponent {
             // Fast Path
             this.session.setArtifact(cached.imageUrl, cached.prompt, cached.version, cached.poem);
         } else {
-            // Slow Path - Regenerate
-            // For simplicity in this wrapper, we route to a "re-generating" state
-            // Or we utilize the 'generating' component by routing there?
-            // BUT 'generating' component expects to finalize a poem.
-            // In the original code, onThemeSwitched did:
-            // 1. Analyze (if no cache)
-            // 2. Generate Poem
-            // 3. Generate Image
-            // It basically re-ran the flow but skipping the Dialogue UI.
+            // Regeneration Path
+            // Regeneration Path
+            const mode = this.session.reflectionMode(); // Honor current mode
+            const placeholder = mode === 'visual' ? '' : 'Aligning narrative sensors...';
 
-            this.session.setArtifact(null!, '', '', 'Aligning narrative sensors...'); // Loading state in result?
-            // Actually, the Result component can show loading if stylizedImage is null?
-            // But looking at the original code, it navigated to 'generating' state effectively?
-            // No, it stayed in 'result' state but updated signals.
-
-            // Let's implement the generation logic here to keep Result wrapper self-contained.
-            const base64 = this.session.originalImage();
-            if (!base64) return;
-
-            // We'll mimic the "Analysis + Generation" flow but purely programmatically
-            // Since we are in the Result view, we might want to show some loading indicator.
-            // PostcardResult component accepts [isRegenerating].
-            // Maybe we can hijack that?
-
-            // NOTE: Using isRegenerating here might be misleading if we are switching whole context,
-            // but it's better than nothing.
+            this.session.setArtifact(null!, '', '', placeholder);
             this.isRegenerating.set(true);
 
-            try {
-                const analysis = await this.geminiService.analyzeImage(base64);
-                // Create auto poem
-                const autoPoem = analysis.acts.map(act => {
-                    const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
-                    const suggestion = act.suggestions[0];
-                    return `${cleanStarter} [${suggestion}]`;
-                }).join('\n');
+            const base64 = this.session.originalImage();
 
-                this.session.setFinalPoem(autoPoem);
+            if (!base64) {
+                this.isRegenerating.set(false);
+                return;
+            }
+
+            try {
+                // Pass mode to analysis
+                const analysis = await this.geminiService.analyzeImage(base64, mode);
+                let finalPoem = '';
+
+                if (mode === 'visual') {
+                    // Visual Mode: No poem, or empty string from service
+                    finalPoem = (analysis as any).caption || '';
+                } else {
+                    // Full Mode: Create auto poem from acts
+                    finalPoem = analysis.acts.map(act => {
+                        const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
+                        const suggestion = act.suggestions[0];
+                        return `${cleanStarter} [${suggestion}]`;
+                    }).join('\n');
+                }
+
+                this.session.setFinalPoem(finalPoem);
 
                 const modifiers = analysis.visual_tags.join(', ');
                 let imageRes;
 
-                if (this.session.theme().usePoemForImageGeneration) {
-                    imageRes = await this.geminiService.generateStylizedImage(base64, modifiers, autoPoem);
+                // If visual mode or theme doesn't use poem context
+                const usePoemContext = this.session.theme().usePoemForImageGeneration && mode === 'full';
+
+                if (usePoemContext) {
+                    imageRes = await this.geminiService.generateStylizedImage(base64, modifiers, finalPoem);
                 } else {
                     imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
                 }
 
                 if (imageRes.image) {
-                    this.session.setArtifact(imageRes.image, imageRes.prompt, imageRes.version, autoPoem);
+                    this.session.setArtifact(imageRes.image, imageRes.prompt, imageRes.version, finalPoem);
                     this.geminiService.cacheArtifact(newThemeId, {
                         themeId: newThemeId,
                         imageUrl: imageRes.image,
-                        poem: autoPoem,
+                        poem: finalPoem,
                         prompt: imageRes.prompt,
                         version: imageRes.version,
                         timestamp: Date.now()

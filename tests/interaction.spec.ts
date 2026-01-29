@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Postcards to Mars Flows', () => {
 
     test('full flow: upload -> poem -> result -> theme switch', async ({ page }) => {
+        test.setTimeout(120000); // Allow 2 minutes for real API calls
         // 1. Landing
         await page.goto('/');
         await expect(page).toHaveTitle(/Postcards To Mars/i);
@@ -41,11 +42,13 @@ test.describe('Postcards to Mars Flows', () => {
         // If we assume the app is running with an API key (it is), we can try.
         // But waiting for "Analyzing" might take time.
 
-        await expect(page).toHaveURL(/\/compose/, { timeout: 30000 });
+        // Wait for Analyzing -> Dialogue
+        await expect(page).toHaveURL(/\/analyzing/, { timeout: 30000 });
+        await expect(page).toHaveURL(/\/compose/, { timeout: 60000 });
 
         // 3. Dialogue Interaction
         // Wait for starter text "Today I..." (or whatever the theme is)
-        await expect(page.locator('app-dialogue')).toBeVisible();
+        await expect(page.locator('app-dialogue')).toBeVisible({ timeout: 20000 });
 
         // Click suggestions to proceed
         // Line 1
@@ -56,7 +59,7 @@ test.describe('Postcards to Mars Flows', () => {
         await page.locator('app-dialogue button').first().click();
 
         // 4. Generating -> Result
-        await expect(page).toHaveURL(/\/result/, { timeout: 60000 });
+        await expect(page).toHaveURL(/\/result/, { timeout: 90000 });
 
         // 5. Verify Poem Formatting
         const poemText = await page.locator('app-postcard-result div.text-lg').textContent();
@@ -76,7 +79,7 @@ test.describe('Postcards to Mars Flows', () => {
         // We might need to wait a bit for regeneration.
         await page.waitForTimeout(5000); // Wait for API
 
-        const newPoemText = await page.locator('app-postcard-result p').textContent();
+        const newPoemText = await page.locator('app-postcard-result div.text-lg').textContent();
         expect(newPoemText).not.toContain('\\n');
     });
 });

@@ -30,9 +30,9 @@ interface TextSegment {
       >
         
         <!-- Header text on card -->
-        <div class="w-full text-center mb-4 pt-2">
+        <div class="w-full text-center mb-4 pt-2 px-4">
           <span 
-            class="font-bold uppercase text-[10px] tracking-[0.3em] border-b pb-1 text-[var(--theme-text)] border-[var(--theme-text)]/40 font-[family-name:var(--font-header)]"
+            class="font-bold uppercase text-[10px] tracking-[0.3em] border-b pb-1 text-[var(--theme-text)] border-[var(--theme-text)]/40 font-[family-name:var(--font-header)] block truncate"
           >
             {{ theme().name }}
           </span>
@@ -49,19 +49,34 @@ interface TextSegment {
                  <div class="w-12 h-px bg-zinc-300 relative overflow-hidden">
                     <div class="absolute h-full bg-zinc-500 animate-progress"></div>
                  </div>
-                  <div class="flex flex-col items-center gap-1">
-                     <span class="text-[10px] uppercase tracking-widest font-bold">{{ theme().generatingText }}</span>
-                     <span class="text-[10px] uppercase tracking-widest opacity-90 font-medium">{{ loadingMessage() }}</span>
+                  <div class="flex flex-col items-center gap-1 w-64 mx-auto">
+                     <div class="h-5 w-full flex items-center justify-center">
+                        <span class="text-[10px] uppercase tracking-widest font-bold truncate block w-full text-center">{{ theme().generatingText }}</span>
+                     </div>
+                     <div class="h-5 w-full flex items-center justify-center">
+                       <span class="text-[10px] uppercase tracking-widest opacity-90 font-medium truncate block w-full text-center">
+                         {{ loadingMessage() }}
+                       </span>
+                     </div>
                   </div>
                </div>
             }
 
-            @if (isRegenerating()) {
+            @if (isRegenerating() && stylizedImageSrc()) {
               <div class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center gap-6 animate-fade-in">
                  <div class="w-24 h-px relative overflow-hidden" [style.background-color]="'var(--theme-text)'" style="opacity: 0.2">
                     <div class="absolute h-full animate-progress bg-[var(--theme-primary)]" style="opacity: 1 !important"></div>
                  </div>
-                 <p class="text-[10px] tracking-[0.3em] uppercase text-[var(--theme-primary)] animate-pulse">{{ theme().generatingText }}</p>
+                 <div class="flex flex-col items-center gap-1 w-64 mx-auto">
+                     <div class="h-5 w-full flex items-center justify-center">
+                        <p class="text-[10px] tracking-[0.3em] uppercase text-[var(--theme-primary)] animate-pulse truncate block w-full text-center">{{ theme().generatingText }}</p>
+                     </div>
+                     <div class="h-5 w-full flex items-center justify-center">
+                       <span class="text-[10px] uppercase tracking-widest text-[var(--theme-primary)] opacity-70 font-medium truncate block w-full text-center">
+                         {{ loadingMessage() }}
+                       </span>
+                     </div>
+                 </div>
               </div>
             }
 
@@ -82,18 +97,20 @@ interface TextSegment {
 
         <!-- The Poem Preview -->
         <div class="px-1 text-left">
-           <div 
-              class="text-lg leading-relaxed italic whitespace-pre-wrap pl-4 border-l-2 mb-8 font-[family-name:var(--font-body)] text-[var(--theme-text)] border-[var(--theme-primary)]/40 relative group/poem"
-              [innerHTML]="safePoemHtml()">
-           </div>
-           
-           <!-- Poem Editor Button (Moved here) -->
-           <button 
-              (click)="openEditor('poem')"
-              class="absolute bottom-24 right-6 bg-[var(--theme-bg)]/80 backdrop-blur-sm text-[var(--theme-text)] hover:text-[var(--theme-primary)] text-[9px] font-mono uppercase tracking-widest px-2 py-1 border border-[var(--theme-text)]/20 transition-colors z-20 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:border-[var(--theme-primary)]"
-           >
-             [ {{ theme().editPoemLabel }} ]
-           </button>
+           @if (poem()) {
+             <div 
+                class="text-lg leading-relaxed italic whitespace-pre-wrap pl-4 border-l-2 mb-8 font-[family-name:var(--font-body)] text-[var(--theme-text)] border-[var(--theme-primary)]/40 relative group/poem"
+                [innerHTML]="safePoemHtml()">
+             </div>
+             
+             <!-- Poem Editor Button (Moved here) -->
+             <button 
+                (click)="openEditor('poem')"
+                class="absolute bottom-24 right-6 bg-[var(--theme-bg)]/80 backdrop-blur-sm text-[var(--theme-text)] hover:text-[var(--theme-primary)] text-[9px] font-mono uppercase tracking-widest px-2 py-1 border border-[var(--theme-text)]/20 transition-colors z-20 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:border-[var(--theme-primary)]"
+             >
+               [ {{ theme().editPoemLabel }} ]
+             </button>
+           }
           
           <!-- Footer Metadata -->
           <div class="flex justify-between items-end border-t pt-3 border-[var(--theme-text)]/20">

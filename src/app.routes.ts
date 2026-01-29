@@ -7,8 +7,11 @@ import { PostcardResultWrapperComponent } from './components/postcard-result-wra
 import { ErrorComponent } from './components/error.component';
 import { ImageDebugComponent } from './components/image-debug.component';
 
+
+
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
+
     { path: 'analyzing', component: AnalysisComponent },
     { path: 'compose', component: DialogueComponent },
     { path: 'generating', component: GenerationComponent },

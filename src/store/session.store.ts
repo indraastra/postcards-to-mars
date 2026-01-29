@@ -12,6 +12,7 @@ export class SessionStore {
 
     // State
     readonly theme = signal<ThemeConfig>(THEMES[0]);
+    readonly reflectionMode = signal<'full' | 'visual'>('full'); // Renamed from transmissionMode to fit diegetic
     readonly originalImage = signal<string | null>(null);
     readonly visualTags = signal<string[]>([]);
 
@@ -40,6 +41,10 @@ export class SessionStore {
             this.theme.set(found);
             this.geminiService.activeTheme.set(found);
         }
+    }
+
+    setReflectionMode(mode: 'full' | 'visual') {
+        this.reflectionMode.set(mode);
     }
 
     setImage(base64: string) {
@@ -95,6 +100,7 @@ export class SessionStore {
     }
 
     reset() {
+        this.reflectionMode.set('full');
         this.originalImage.set(null);
         this.poemActs.set([]);
         this.poemHistory.set([]);

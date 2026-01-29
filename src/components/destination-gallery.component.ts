@@ -170,6 +170,38 @@ import { SessionStore } from '../store/session.store';
 
       </div>
 
+      <!-- Narrative Module Toggle -->
+      <div class="flex items-center justify-center gap-4 mt-8 mb-4">
+        <div class="flex items-center gap-3 bg-black/40 border border-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+          <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
+            {{ activeTheme().narrativeModuleLabel }}
+          </span>
+          
+          <button 
+            (click)="toggleReflectionMode()"
+            class="relative w-10 h-5 rounded-full border transition-colors duration-300 flex items-center px-0.5"
+            [class.border-rose-500]="reflectionMode() === 'full'"
+            [class.bg-rose-500_20]="reflectionMode() === 'full'"
+            [class.border-neutral-600]="reflectionMode() === 'visual'"
+            [class.bg-neutral-800]="reflectionMode() === 'visual'"
+          >
+            <div 
+                class="w-3.5 h-3.5 rounded-full bg-white shadow-md transform transition-transform duration-300"
+                [class.translate-x-5]="reflectionMode() === 'full'"
+                [class.bg-rose-400]="reflectionMode() === 'full'"
+                [class.translate-x-0]="reflectionMode() === 'visual'"
+                [class.bg-neutral-500]="reflectionMode() === 'visual'"
+            ></div>
+          </button>
+          
+          <span class="text-[10px] font-mono font-bold w-6 text-center inline-block"
+                [class.text-rose-400]="reflectionMode() === 'full'"
+                [class.text-neutral-500]="reflectionMode() === 'visual'">
+             {{ reflectionMode() === 'full' ? 'ON' : 'OFF' }}
+          </span>
+        </div>
+      </div>
+
       <!-- Custom Theme Modal -->
       @if (showCustomModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 animate-fade-in backdrop-blur-md">
@@ -234,6 +266,7 @@ export class DestinationGalleryComponent implements AfterViewInit {
   geminiService = inject(GeminiService);
   session = inject(SessionStore);
   activeTheme = this.session.theme;
+  reflectionMode = this.session.reflectionMode;
 
   showCustomModal = signal(false);
   customPrompt = signal('');
@@ -443,4 +476,9 @@ export class DestinationGalleryComponent implements AfterViewInit {
 
   // Output event to replace the "CameraUpload" separate component
   imageSelected = output<string>();
+
+  toggleReflectionMode() {
+    const current = this.reflectionMode();
+    this.session.setReflectionMode(current === 'full' ? 'visual' : 'full');
+  }
 }

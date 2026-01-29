@@ -128,6 +128,7 @@ export class GeminiService {
          - **Labels:** 
             - originLabel (e.g. "Sector"), postcardOrigin (e.g. "Earth"), idLabel (e.g. "Ref No").
             - regenLabel (e.g. "Retune"), editPoemLabel (e.g. "Rewrite").
+            - narrativeModuleLabel (e.g. "Narrative", "Log", "Protocol").
     `;
 
     try {
@@ -153,6 +154,7 @@ export class GeminiService {
               idLabel: { type: Type.STRING },
               regenLabel: { type: Type.STRING },
               editPoemLabel: { type: Type.STRING },
+              narrativeModuleLabel: { type: Type.STRING },
               textPersona: { type: Type.STRING },
               poemStructure: { type: Type.STRING },
               visualStyle: {
@@ -169,7 +171,7 @@ export class GeminiService {
                 required: ['promptTemplate', 'primaryColor', 'backgroundColor', 'textColor', 'fontFamilyHeader', 'fontFamilyBody', 'filterRaw']
               }
             },
-            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'captureButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'textPersona', 'poemStructure', 'visualStyle']
+            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'captureButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'narrativeModuleLabel', 'textPersona', 'poemStructure', 'visualStyle']
           }
         }
       });
@@ -193,12 +195,18 @@ export class GeminiService {
   // --------------------------------------------------------------------------- 
   // 1. ANALYZE IMAGE (Poem Structure + Visual Tags)
   // --------------------------------------------------------------------------- 
-  async analyzeImage(imageBase64: string): Promise<AnalysisResult> {
+  async analyzeImage(imageBase64: string, mode: 'full' | 'visual' = 'full'): Promise<AnalysisResult> {
     const cleanData = this.cleanBase64(imageBase64);
     const randomSeed = Math.floor(Math.random() * 1000000000);
     const theme = this.activeTheme();
 
-    const promptText = `${theme.textPersona}
+    let promptText = '';
+
+    if (mode === 'visual') {
+      promptText = `List 5 key visual tags describing this image (subject, composition, lighting). Return JSON: { "visual_tags": ["tag1", "tag2"] }`;
+    } else {
+      // FULL MODE (Original)
+      promptText = `${theme.textPersona}
 
 **TASK:** Analyze the image and return a JSON object containing:
 1. "acts": A cohesive 3-line poem structure.
@@ -232,6 +240,7 @@ ${theme.poemStructure}
 7.  **Formatting:** Suggestions should NOT include leading spaces.
 
 Return JSON object.`;
+    }
 
     try {
       const response = await this.getClient().models.generateContent({
@@ -240,7 +249,7 @@ Return JSON object.`;
           role: 'user',
           parts: [
             { inlineData: { mimeType: 'image/jpeg', data: cleanData } },
-            { text: promptText + "\nIMPORTANT: You must provide exactly 3 distinct suggestions for each act." }
+            { text: promptText + (mode === 'full' ? "\nIMPORTANT: You must provide exactly 3 distinct suggestions for each act." : "") }
           ]
         },
         config: {
@@ -259,7 +268,6 @@ Return JSON object.`;
                     suggestions: {
                       type: Type.ARRAY,
                       items: { type: Type.STRING },
-                      description: "List of exactly 3 distinct suggestions"
                     }
                   },
                   required: ['starter', 'suggestions']
@@ -268,36 +276,43 @@ Return JSON object.`;
               visual_tags: {
                 type: Type.ARRAY,
                 items: { type: Type.STRING }
-              }
+              },
+              caption: { type: Type.STRING } // New optional field
             },
-            required: ['acts', 'visual_tags']
+            required: ['visual_tags'] // Acts only required in full mode practically, but schema is loose
           }
         }
       });
 
       const result = JSON.parse(response.text || '{}');
 
-      // Post-processing acts
-      const processedActs = (result.acts || []).map((act: any, index: number) => {
-        let s = act.starter.trim();
+      // Post-processing
+      if (mode === 'full') {
+        const processedActs = (result.acts || []).map((act: any, index: number) => {
+          let s = act.starter.trim();
+          if (!s.includes('____')) s += ' ____';
+          if (s.endsWith('.')) s = s.slice(0, -1);
 
-        // Note: Removing strict "Today I" enforcement as themes now vary significantly
-        if (!s.includes('____')) s += ' ____';
-        if (s.endsWith('.')) s = s.slice(0, -1);
+          const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
+            let clean = sg.trim();
+            if (!/[.!?]$/.test(clean)) clean += '.';
+            return clean;
+          });
 
-        const cleanedSuggestions = (act.suggestions || []).map((sg: string) => {
-          let clean = sg.trim();
-          if (!/[.!?]$/.test(clean)) clean += '.';
-          return clean;
+          return { starter: s, suggestions: cleanedSuggestions };
         });
-
-        return { starter: s, suggestions: cleanedSuggestions };
-      });
-
-      return {
-        acts: processedActs.length === 3 ? processedActs : this.getFallbackActs(),
-        visual_tags: result.visual_tags || ["a memory from earth"]
-      };
+        return {
+          acts: processedActs.length === 3 ? processedActs : this.getFallbackActs(),
+          visual_tags: result.visual_tags || ["a memory from earth"]
+        };
+      } else {
+        // Visual Mode: Create a dummy act that just holds the caption as a "done" poem
+        return {
+          acts: [], // Empty acts signals visual mode skip in component logic if needed
+          visual_tags: result.visual_tags || ["visual memory"],
+          caption: result.caption || "" // Empty string for no text
+        } as any; // Cast to bypass strict type if needed, or update interface
+      }
 
     } catch (error) {
       console.error('Analysis failed', error);

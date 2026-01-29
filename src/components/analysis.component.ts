@@ -5,10 +5,10 @@ import { GeminiService } from '../services/gemini.service';
 import { SessionStore } from '../store/session.store';
 
 @Component({
-    selector: 'app-analysis',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-analysis',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div class="min-h-full w-full max-w-2xl mx-auto flex flex-col items-center justify-center px-4 pt-20 pb-8">
       <div class="flex flex-col items-center gap-6 text-center px-6 animate-fade-in">
         <!-- Linear Loader -->
@@ -32,7 +32,7 @@ import { SessionStore } from '../store/session.store';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .animate-progress {
       animation: progress 2s ease-in-out infinite;
       width: 100%;
@@ -52,85 +52,99 @@ import { SessionStore } from '../store/session.store';
   `]
 })
 export class AnalysisComponent implements OnInit, OnDestroy {
-    session = inject(SessionStore);
-    geminiService = inject(GeminiService);
-    router = inject(Router);
+  session = inject(SessionStore);
+  geminiService = inject(GeminiService);
+  router = inject(Router);
 
-    theme = this.session.theme;
-    loadingMessage = signal('Processing Signal...');
-    loadingInterval: any;
+  theme = this.session.theme;
+  loadingMessage = signal('Processing Signal...');
+  loadingInterval: any;
 
-    ngOnInit() {
-        // Redirect if no image
-        if (!this.session.originalImage()) {
-            this.router.navigate(['/']);
-            return;
-        }
-
-        this.startLoadingCycle();
-        this.startAnalysis();
+  ngOnInit() {
+    // Redirect if no image
+    if (!this.session.originalImage()) {
+      this.router.navigate(['/']);
+      return;
     }
 
-    ngOnDestroy() {
-        this.stopLoadingCycle();
+    this.startLoadingCycle();
+    this.startAnalysis();
+  }
+
+  ngOnDestroy() {
+    this.stopLoadingCycle();
+  }
+
+  startLoadingCycle() {
+    this.stopLoadingCycle();
+    let index = 0;
+    const messages = this.theme().loadingMessages;
+
+    if (messages && messages.length > 0) {
+      this.loadingMessage.set(messages[0]);
+    } else {
+      this.loadingMessage.set('Loading...');
     }
 
-    startLoadingCycle() {
-        this.stopLoadingCycle();
-        let index = 0;
-        const messages = this.theme().loadingMessages;
+    this.loadingInterval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      this.loadingMessage.set(messages[index]);
+    }, 1000);
+  }
 
-        if (messages && messages.length > 0) {
-            this.loadingMessage.set(messages[0]);
-        } else {
-            this.loadingMessage.set('Loading...');
-        }
-
-        this.loadingInterval = setInterval(() => {
-            index = (index + 1) % messages.length;
-            this.loadingMessage.set(messages[index]);
-        }, 1000);
+  stopLoadingCycle() {
+    if (this.loadingInterval) {
+      clearInterval(this.loadingInterval);
+      this.loadingInterval = null;
     }
+  }
 
-    stopLoadingCycle() {
-        if (this.loadingInterval) {
-            clearInterval(this.loadingInterval);
-            this.loadingInterval = null;
-        }
+  async startAnalysis() {
+    const base64 = this.session.originalImage();
+    const mode = this.session.reflectionMode();
+
+    if (!base64) return;
+
+    try {
+      const analysis = await this.geminiService.analyzeImage(base64, mode);
+      this.session.setAnalysis(analysis.acts, analysis.visual_tags);
+
+      // Parallel Image Generation Trigger
+      const modifiers = analysis.visual_tags.join(', ');
+
+      // In Visual Mode, we use the caption immediately
+      // In Visual Mode, we use the caption immediately (or empty string)
+      if (mode === 'visual') {
+        const caption = (analysis as any).caption || "";
+        this.session.setFinalPoem(caption);
+      }
+
+      const useSequential = this.theme().usePoemForImageGeneration && mode === 'full';
+
+      // Only use parallel generation if we have a sequential flow (Full Mode) AND the theme allows it
+      // Visual mode goes straight to 'Generating', so let that component handle it to avoid race conditions.
+      const shouldGenerateParallel = useSequential === false && mode === 'full';
+
+      if (shouldGenerateParallel) {
+        // Fire and forget - store result in cache/store later
+        this.geminiService.generateStylizedImage(base64, modifiers, undefined).then(res => {
+          if (res.image) {
+            this.session.updateArtifactImage(res.image, res.prompt);
+          }
+        });
+      }
+
+      if (mode === 'visual') {
+        // Skip Dialogue, go to Generating/Result
+        this.router.navigate(['/generating']);
+      } else {
+        this.router.navigate(['/compose']);
+      }
+
+    } catch (e) {
+      console.error('Analysis failed', e);
+      this.session.setError('Analysis failed. Please try again.');
+      this.router.navigate(['/error']);
     }
-
-    async startAnalysis() {
-        const base64 = this.session.originalImage();
-        if (!base64) return;
-
-        try {
-            const analysis = await this.geminiService.analyzeImage(base64);
-            this.session.setAnalysis(analysis.acts, analysis.visual_tags);
-
-            // Parallel Image Generation Trigger
-            const modifiers = analysis.visual_tags.join(', ');
-            const useSequential = this.theme().usePoemForImageGeneration;
-
-            if (!useSequential) {
-                // Fire and forget - store result in cache/store later?
-                // Actually we need to make sure this result is captured.
-                // For now, let's keep it simple: just update the store when done.
-                this.geminiService.generateStylizedImage(base64, modifiers).then(res => {
-                    if (res.image) {
-                        this.session.setArtifact(res.image, res.prompt, res.version, '');
-                        // Note: We don't have the poem yet, so setArtifact overwrite might be tricky if we override poem with empty string? 
-                        // Better: updateArtifactImage
-                        this.session.updateArtifactImage(res.image, res.prompt);
-                    }
-                });
-            }
-
-            this.router.navigate(['/compose']);
-
-        } catch (e) {
-            console.error('Analysis failed', e);
-            this.session.setError('Analysis failed. Please try again.');
-            this.router.navigate(['/error']);
-        }
-    }
+  }
 }

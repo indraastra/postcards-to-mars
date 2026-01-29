@@ -27,6 +27,7 @@ export interface ThemeConfig {
   };
   generatingText: string;
   finalizeLabel: string;
+  narrativeModuleLabel: string;
   usePoemForImageGeneration?: boolean;
 }
 
@@ -45,6 +46,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'LIFE SUPPORT: NOMINAL',
     generatingText: 'Transmission in Progress',
     finalizeLabel: 'Finalize Transmission',
+    narrativeModuleLabel: 'Narrative Module',
     loadingText: 'Processing Signal',
     loadingMessages: [
       'Aligning satellites...',
@@ -106,6 +108,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'EPSILON: RECURSIVE',
     generatingText: 'Compiling Algorithm',
     finalizeLabel: 'Execute Function',
+    narrativeModuleLabel: 'System Logic',
     loadingText: 'Initializing Recursion',
     loadingMessages: [
       'Calculating probability gears...',
@@ -167,6 +170,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'NEXT STOP: TOKYO',
     generatingText: 'Journey in Progress',
     finalizeLabel: 'Depart Station',
+    narrativeModuleLabel: 'Travelogue',
     loadingText: 'Steam rising',
     loadingMessages: [
       'Collecting soot sprites...',
@@ -228,6 +232,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'CONNECTION: SECURE',
     generatingText: 'Uploading to Grid',
     finalizeLabel: 'Send Packet',
+    narrativeModuleLabel: 'Data Stream',
     loadingText: 'Handshaking',
     loadingMessages: [
       'Bypassing firewalls...',
@@ -289,6 +294,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'LIGHT: GOLDEN HOUR',
     generatingText: 'Mixing Pigments',
     finalizeLabel: 'Sign Canvas',
+    narrativeModuleLabel: 'Poetic Muse',
     loadingText: 'Chasing the light',
     loadingMessages: [
       'Mixing cerulean blue...',
@@ -351,6 +357,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'LOGIC: RUBBERIZED',
     generatingText: 'Inflating Reality',
     finalizeLabel: 'Boing!',
+    narrativeModuleLabel: 'Chaos Theory',
     loadingText: 'Making it weird',
     loadingMessages: [
       'Tickling the atoms...',
@@ -417,6 +424,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'DEPTH: CALCULATED',
     generatingText: 'Cutting Paper',
     finalizeLabel: 'Paste Layer',
+    narrativeModuleLabel: 'Storybook',
     loadingText: 'Assembling Diorama',
     loadingMessages: [
       'Sharpening scissors...',
@@ -482,6 +490,7 @@ export const RAW_THEMES: ThemeConfig[] = [
     headerStatus: 'MADNESS: ABSOLUTE',
     generatingText: 'Falling Down Rabbit Hole',
     finalizeLabel: 'Wake Up',
+    narrativeModuleLabel: 'Inner Monologue',
     loadingText: 'Consulting the Caterpillar',
     loadingMessages: [
       'Chasing the White Rabbit...',
@@ -551,6 +560,7 @@ Technical specifications:
     headerStatus: 'OWL STATUS: EN ROUTE',
     generatingText: 'Casting Spell',
     finalizeLabel: 'Seal Scroll',
+    narrativeModuleLabel: 'Incantation',
     loadingText: 'Casting Revelio',
     loadingMessages: [
       'Mixing ink...',
@@ -612,6 +622,7 @@ Technical specifications:
     headerStatus: 'RPM: 33 1/3',
     generatingText: 'Mixing Track',
     finalizeLabel: 'Release Album',
+    narrativeModuleLabel: 'Liner Notes',
     loadingText: 'Finding the groove',
     loadingMessages: [
       'Adjusting the EQ...',
@@ -683,6 +694,7 @@ INSTRUCTIONS:
     headerStatus: 'INK: DRYING',
     generatingText: 'Scribing...',
     finalizeLabel: 'Seal Wax',
+    narrativeModuleLabel: 'Marginalia',
     loadingText: 'Sharpening Quill',
     loadingMessages: [
       'Chasing rabbits...',
@@ -750,6 +762,7 @@ INSTRUCTIONS:
     headerStatus: 'QUIZ: POP',
     generatingText: 'Solving Equation',
     finalizeLabel: 'Erase Board',
+    narrativeModuleLabel: 'The Proof',
     loadingText: 'Chalking the board',
     loadingMessages: [
       'Finding the hypotenuse...',
@@ -812,6 +825,7 @@ INSTRUCTIONS:
     headerStatus: 'SEAL: BROKEN',
     generatingText: 'Carving Relief',
     finalizeLabel: 'Seal the Tomb',
+    narrativeModuleLabel: 'Hieroglyphics',
     loadingText: 'Dusting off history...',
     loadingMessages: [
       'Deciphering Rosetta Stone...',
