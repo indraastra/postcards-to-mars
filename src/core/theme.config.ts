@@ -5,8 +5,7 @@ export interface ThemeConfig {
   originLabel: string;
   postcardOrigin: string;
   idLabel: string;
-  landingTitle: string;
-  landingSubtitle: string;
+  landingSubtitle: string; // Title removed (using name)
   uploadButtonLabel: string;
   captureButtonLabel: string;
   headerStatus: string;
@@ -26,7 +25,6 @@ export interface ThemeConfig {
     filterRaw: string;
   };
   generatingText: string;
-  finalizeLabel: string;
   narrativeModuleLabel: string;
   usePoemForImageGeneration?: boolean;
 }
@@ -39,13 +37,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Origin',
     postcardOrigin: 'Earth (Lost)',
     idLabel: 'Archive Id',
-    landingTitle: 'Colony 7 Uplink',
+
     landingSubtitle: 'Establishing connection',
     uploadButtonLabel: 'Begin Transmission',
     captureButtonLabel: 'Consult Archive',
     headerStatus: 'LIFE SUPPORT: NOMINAL',
     generatingText: 'Transmission in Progress',
-    finalizeLabel: 'Finalize Transmission',
+
     narrativeModuleLabel: 'Narrative Module',
     loadingText: 'Processing Signal',
     loadingMessages: [
@@ -101,13 +99,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Algorithm',
     postcardOrigin: 'The Infinite Workshop',
     idLabel: 'Hash',
-    landingTitle: 'Constructor API',
+
     landingSubtitle: 'Compiling infinite probabilities',
     uploadButtonLabel: 'Execute Algorithm',
     captureButtonLabel: 'Debug Logic',
     headerStatus: 'EPSILON: RECURSIVE',
     generatingText: 'Compiling Algorithm',
-    finalizeLabel: 'Execute Function',
+
     narrativeModuleLabel: 'System Logic',
     loadingText: 'Initializing Recursion',
     loadingMessages: [
@@ -163,13 +161,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Carriage',
     postcardOrigin: 'No. 6',
     idLabel: 'Ticket',
-    landingTitle: 'One-Way Ticket',
+
     landingSubtitle: 'The sea tracks stretch forever',
     uploadButtonLabel: 'Board Train',
     captureButtonLabel: 'Travel Log',
     headerStatus: 'NEXT STOP: TOKYO',
     generatingText: 'Journey in Progress',
-    finalizeLabel: 'Depart Station',
+
     narrativeModuleLabel: 'Travelogue',
     loadingText: 'Steam rising',
     loadingMessages: [
@@ -225,13 +223,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Sector',
     postcardOrigin: 'Night City',
     idLabel: 'Data Packet',
-    landingTitle: 'Grid Uplink',
+
     landingSubtitle: 'The city never sleeps',
     uploadButtonLabel: 'Jack In',
     captureButtonLabel: 'Scan Net',
     headerStatus: 'CONNECTION: SECURE',
     generatingText: 'Uploading to Grid',
-    finalizeLabel: 'Send Packet',
+
     narrativeModuleLabel: 'Data Stream',
     loadingText: 'Handshaking',
     loadingMessages: [
@@ -287,13 +285,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Easel',
     postcardOrigin: 'Giverny',
     idLabel: 'Study No.',
-    landingTitle: 'En Plein Air',
+
     landingSubtitle: 'Capturing the fleeting moment',
     uploadButtonLabel: 'Set Easel',
     captureButtonLabel: 'Capture Light',
     headerStatus: 'LIGHT: GOLDEN HOUR',
     generatingText: 'Mixing Pigments',
-    finalizeLabel: 'Sign Canvas',
+
     narrativeModuleLabel: 'Poetic Muse',
     loadingText: 'Chasing the light',
     loadingMessages: [
@@ -350,13 +348,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Zone',
     postcardOrigin: 'The Funhouse',
     idLabel: 'Warp No.',
-    landingTitle: 'Welcome to the Wackiness',
+
     landingSubtitle: 'Gravity is just a suggestion!',
     uploadButtonLabel: 'Unzip Gravity',
     captureButtonLabel: 'Snag a Glitch',
     headerStatus: 'LOGIC: RUBBERIZED',
     generatingText: 'Inflating Reality',
-    finalizeLabel: 'Boing!',
+
     narrativeModuleLabel: 'Chaos Theory',
     loadingText: 'Making it weird',
     loadingMessages: [
@@ -417,13 +415,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Layer',
     postcardOrigin: 'The Shoebox',
     idLabel: 'Cut No.',
-    landingTitle: 'The Paper Theater',
+
     landingSubtitle: 'A world of layers',
     uploadButtonLabel: 'Open Box',
     captureButtonLabel: 'Freeze Scene',
     headerStatus: 'DEPTH: CALCULATED',
     generatingText: 'Cutting Paper',
-    finalizeLabel: 'Paste Layer',
+
     narrativeModuleLabel: 'Storybook',
     loadingText: 'Assembling Diorama',
     loadingMessages: [
@@ -483,13 +481,13 @@ export const RAW_THEMES: ThemeConfig[] = [
     originLabel: 'Looking Glass',
     postcardOrigin: 'The Garden',
     idLabel: 'Curiosity',
-    landingTitle: 'Down the Rabbit Hole',
+
     landingSubtitle: 'Impossible things before breakfast',
     uploadButtonLabel: 'Drink Me',
     captureButtonLabel: 'Eat Me',
     headerStatus: 'MADNESS: ABSOLUTE',
     generatingText: 'Falling Down Rabbit Hole',
-    finalizeLabel: 'Wake Up',
+
     narrativeModuleLabel: 'Inner Monologue',
     loadingText: 'Consulting the Caterpillar',
     loadingMessages: [
@@ -553,13 +551,13 @@ Technical specifications:
     originLabel: 'Sent Via',
     postcardOrigin: 'Owl Post',
     idLabel: 'Owl Id',
-    landingTitle: 'Owl Post Service',
+
     landingSubtitle: 'Awaiting delivery via Owl Post',
     uploadButtonLabel: 'Send Owl',
     captureButtonLabel: 'Read Scroll',
     headerStatus: 'OWL STATUS: EN ROUTE',
     generatingText: 'Casting Spell',
-    finalizeLabel: 'Seal Scroll',
+
     narrativeModuleLabel: 'Incantation',
     loadingText: 'Casting Revelio',
     loadingMessages: [
@@ -615,13 +613,13 @@ Technical specifications:
     originLabel: 'Studio',
     postcardOrigin: 'Vinyl Archive',
     idLabel: 'Catalog No.',
-    landingTitle: 'Vinyl Dreams',
+
     landingSubtitle: 'The soundtrack of a memory',
     uploadButtonLabel: 'Spin Record',
     captureButtonLabel: 'Press Vinyl',
     headerStatus: 'RPM: 33 1/3',
     generatingText: 'Mixing Track',
-    finalizeLabel: 'Release Album',
+
     narrativeModuleLabel: 'Liner Notes',
     loadingText: 'Finding the groove',
     loadingMessages: [
@@ -687,13 +685,13 @@ INSTRUCTIONS:
     originLabel: 'Folio',
     postcardOrigin: 'The Monastery',
     idLabel: 'Verse',
-    landingTitle: 'The Scriptorium',
+
     landingSubtitle: 'Beware the snails',
     uploadButtonLabel: 'Open Tome',
     captureButtonLabel: 'Illuminate',
     headerStatus: 'INK: DRYING',
     generatingText: 'Scribing...',
-    finalizeLabel: 'Seal Wax',
+
     narrativeModuleLabel: 'Marginalia',
     loadingText: 'Sharpening Quill',
     loadingMessages: [
@@ -755,13 +753,13 @@ INSTRUCTIONS:
     originLabel: 'Theorem',
     postcardOrigin: 'The Classroom',
     idLabel: 'Theorem',
-    landingTitle: 'The Classroom',
+
     landingSubtitle: 'Where x marks the unknown',
     uploadButtonLabel: 'Solve for X',
     captureButtonLabel: 'Prove Logic',
     headerStatus: 'QUIZ: POP',
     generatingText: 'Solving Equation',
-    finalizeLabel: 'Erase Board',
+
     narrativeModuleLabel: 'The Proof',
     loadingText: 'Chalking the board',
     loadingMessages: [
@@ -818,13 +816,13 @@ INSTRUCTIONS:
     originLabel: 'Dynasty',
     postcardOrigin: 'The Valley of the Kings',
     idLabel: 'Cartouche No.',
-    landingTitle: 'The Tomb of Eternity',
+
     landingSubtitle: 'Unearthing the past...',
     uploadButtonLabel: 'Enter Tomb',
     captureButtonLabel: 'Translate Hieroglyphs',
     headerStatus: 'SEAL: BROKEN',
     generatingText: 'Carving Relief',
-    finalizeLabel: 'Seal the Tomb',
+
     narrativeModuleLabel: 'Hieroglyphics',
     loadingText: 'Dusting off history...',
     loadingMessages: [

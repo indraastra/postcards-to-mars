@@ -171,7 +171,7 @@ export class GeminiService {
                 required: ['promptTemplate', 'primaryColor', 'backgroundColor', 'textColor', 'fontFamilyHeader', 'fontFamilyBody', 'filterRaw']
               }
             },
-            required: ['name', 'shortName', 'landingTitle', 'landingSubtitle', 'uploadButtonLabel', 'captureButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'narrativeModuleLabel', 'textPersona', 'poemStructure', 'visualStyle']
+            required: ['name', 'shortName', 'landingSubtitle', 'uploadButtonLabel', 'captureButtonLabel', 'headerStatus', 'loadingText', 'loadingMessages', 'originLabel', 'postcardOrigin', 'idLabel', 'regenLabel', 'editPoemLabel', 'narrativeModuleLabel', 'textPersona', 'poemStructure', 'visualStyle']
           }
         }
       });
