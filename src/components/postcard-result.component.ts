@@ -429,8 +429,17 @@ export class PostcardResultComponent {
 
     // 3. Image
     const padding = 60;
-    const topMargin = 160;
     const imgSize = width - (padding * 2);
+
+    // Dynamic Top Margin: Center if no poem, otherwise standard top
+    let topMargin = 160;
+    if (!this.poem() || this.poem().trim() === '') {
+      // Calculation: Header is ~80, Footer is ~height-120.
+      // Available height = Height - Header - FooterSpace
+      // But simpler: just center vertically in the available canvas minus margins
+      const availableHeight = height - 200; // Rough padding
+      topMargin = (height - imgSize) / 2;
+    }
 
     const img = new Image();
     img.crossOrigin = "anonymous";

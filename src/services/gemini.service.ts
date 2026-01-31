@@ -35,6 +35,7 @@ export class GeminiService {
   // State
   activeTheme = signal<ThemeConfig>(THEMES[0]);
   customThemes = signal<ThemeConfig[]>([]); // Store custom themes
+  unlockedThemes = signal<ThemeConfig[]>([]); // Secret themes
 
   // Session State (Multiverse Cache)
   // Map<themeId, Artifact>
@@ -59,7 +60,12 @@ export class GeminiService {
   setTheme(themeId: string) {
     let theme = THEMES.find(t => t.id === themeId);
 
-    // Check custom themes if not found in built-ins
+    // Check unlocked themes
+    if (!theme) {
+      theme = this.unlockedThemes().find(t => t.id === themeId);
+    }
+
+    // Check custom themes
     if (!theme) {
       theme = this.customThemes().find(t => t.id === themeId);
     }
@@ -70,7 +76,7 @@ export class GeminiService {
   }
 
   getAllThemes() {
-    return [...THEMES, ...this.customThemes()];
+    return [...THEMES, ...this.unlockedThemes(), ...this.customThemes()];
   }
 
   getAppBackground(theme: ThemeConfig): string {
@@ -79,6 +85,13 @@ export class GeminiService {
 
   addCustomTheme(theme: ThemeConfig) {
     this.customThemes.update(themes => [...themes, theme]);
+  }
+
+  unlockTheme(theme: ThemeConfig) {
+    // Avoid duplicates
+    if (!this.unlockedThemes().find(t => t.id === theme.id)) {
+      this.unlockedThemes.update(themes => [...themes, theme]);
+    }
   }
 
   // Cache Management

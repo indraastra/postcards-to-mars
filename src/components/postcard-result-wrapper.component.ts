@@ -78,8 +78,14 @@ export class PostcardResultWrapperComponent {
             this.session.setArtifact(cached.imageUrl, cached.prompt, cached.version, cached.poem);
         } else {
             // Regeneration Path
-            // Regeneration Path
-            const mode = this.session.reflectionMode(); // Honor current mode
+            const theme = this.session.theme();
+            let mode = this.session.reflectionMode(); // Honor current mode
+
+            // Override mode if theme disables narrative
+            if (theme.disableNarrative) {
+                mode = 'visual';
+            }
+
             const placeholder = mode === 'visual' ? '' : 'Aligning narrative sensors...';
 
             this.session.setArtifact(null!, '', '', placeholder);

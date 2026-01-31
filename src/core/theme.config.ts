@@ -27,7 +27,11 @@ export interface ThemeConfig {
   generatingText: string;
   narrativeModuleLabel: string;
   usePoemForImageGeneration?: boolean;
+  disableNarrative?: boolean;
 }
+
+// Helper to append themes (for secret unlock)
+
 
 export const RAW_THEMES: ThemeConfig[] = [
   {
@@ -217,131 +221,6 @@ export const RAW_THEMES: ThemeConfig[] = [
     }
   },
   {
-    id: 'neon',
-    name: 'Neon of the Night',
-    shortName: 'Neon',
-    originLabel: 'Sector',
-    postcardOrigin: 'Night City',
-    idLabel: 'Data Packet',
-
-    landingSubtitle: 'The city never sleeps',
-    uploadButtonLabel: 'Jack In',
-    captureButtonLabel: 'Scan Net',
-    headerStatus: 'CONNECTION: SECURE',
-    generatingText: 'Uploading to Grid',
-
-    narrativeModuleLabel: 'Data Stream',
-    loadingText: 'Handshaking',
-    loadingMessages: [
-      'Bypassing firewalls...',
-      'Synthesizing neon...',
-      'Rendering chrome...',
-      'Route encrypted...',
-      'Establishing neural link...'
-    ],
-    regenLabel: 'Re-Glitch',
-    editPoemLabel: 'Hack Data',
-    textPersona: `
-**ROLE:** You are a courier in a cyberpunk megacity (like Blade Runner or Neuromancer).
-**VOICE:** Cool, detached, street-smart. Slang-heavy (tech-noir).
-**STYLE:** Focus on lights, rain, chrome, data, and the high-tech/low-life contrast.
-    `,
-    poemStructure: `
-**ACT 1: THE SIGNAL**
-* **GOAL:** Describe the subject as it appears in the neon light.
-* **GUIDANCE:**
-    * **Focus:** Color, reflection, or digital noise.
-    * **Make it:** Vivid and electric.
-    * **Example:** "Chrome reflects the neon rain like liquid television."
-
-**ACT 2: THE GLITCH**
-* **GOAL:** A moment of interference or human reality breaking through.
-* **GUIDANCE:**
-    * **Focus:** A heartbeat, a flaw, or a feeling of isolation.
-    * **Make it:** Noir and lonely.
-    * **Example:** "Even in high-def, loneliness looks the same."
-
-**ACT 3: THE UPLOAD**
-* **GOAL:** Sending this memory away into the cloud.
-* **GUIDANCE:**
-    * **Focus:** Data, memory, or fading away.
-    * **Make it:** Fleeting.
-    * **Example:** "Lost like tears in the digital rain."
-    `,
-    visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a 1980s Retrowave / Synthwave aesthetic artwork. Major themes: Cyberpunk, Outrun, Neon, Chrome. The lighting should be dramatic with heavy use of magenta, cyan, and violet. Add a glowing wireframe grid on the floor or background. If a person is present, give them cool sunglasses or a leather jacket with glowing accents. The texture should look like an airbrushed VHS cover or a sleek digital illustration. High contrast, glowing edges, CRT scanlines effect.`,
-      primaryColor: '#e879f9', // Fuchsia-400 (Neon Pink)
-      backgroundColor: '#2a0a3b', // Deep Purple Background
-      textColor: '#22d3ee', // Cyan-400 (Neon Blue)
-      fontFamilyHeader: '"Orbitron", sans-serif',
-      fontFamilyBody: '"Roboto Mono", monospace',
-      filterRaw: 'saturate(1.5) contrast(1.2)'
-    }
-  },
-  {
-    id: 'garden',
-    name: 'The Painted Garden',
-    shortName: 'Garden',
-    originLabel: 'Easel',
-    postcardOrigin: 'Giverny',
-    idLabel: 'Study No.',
-
-    landingSubtitle: 'Capturing the fleeting moment',
-    uploadButtonLabel: 'Set Easel',
-    captureButtonLabel: 'Capture Light',
-    headerStatus: 'LIGHT: GOLDEN HOUR',
-    generatingText: 'Mixing Pigments',
-
-    narrativeModuleLabel: 'Poetic Muse',
-    loadingText: 'Chasing the light',
-    loadingMessages: [
-      'Mixing cerulean blue...',
-      'Dabbing sunlight touches...',
-      'Softening the edges...',
-      'Observing the shadows...',
-      'Waiting for the clouds...'
-    ],
-    regenLabel: 'Scrape Canvas',
-    editPoemLabel: 'Rewrite Verse',
-    textPersona: `
-**ROLE:** You are a Romantic poet (like Keats) or an Impressionist painter writing a letter from a blooming garden.
-**VOICE:** Lyrical, sensory, emotional, vivid. Obsessed with light, color, and the fleeting nature of beauty.
-**STYLE:** Use words like "dappled", "gossamer", "verdant", "fleeting". Focus on the *impression* of the scene, not just the facts.
-    `,
-    poemStructure: `
-**ACT 1: THE PALETTE**
-* **GOAL:** Describe the colors and light of the scene.
-* **GUIDANCE:**
-    * **Focus:** How light hits the subject. "Dappled", "Awash", "Gilded".
-    * **Make it:** Vibrant and painterly.
-    * **Example:** "The light spills like liquid gold across the path."
-
-**ACT 2: THE BREATH**
-* **GOAL:** The sensory feeling of the moment.
-* **GUIDANCE:**
-    * **Focus:** Scent, warmth, or the breeze.
-    * **Make it:** Intimate and breathing.
-    * **Example:** "The air holds the sweet, heavy breath of noon."
-
-**ACT 3: THE IMMORTALITY**
-* **GOAL:** Freeze this fleeting moment forever.
-* **GUIDANCE:**
-    * **Focus:** Preservation, memory, or art.
-    * **Make it:** Poetic and profound.
-    * **Example:** "Let us keep this silence before it fades."
-    `,
-    visualStyle: {
-      promptTemplate: `Transform this image of {visual_modifiers} into a loose watercolor painting with soft edges.`,
-      primaryColor: '#db2777', // Pink-600 (Rose)
-      backgroundColor: '#fff1f2', // Rose-50
-      textColor: '#881337', // Rose-900
-      fontFamilyHeader: '"Playfair Display", serif',
-      fontFamilyBody: '"Lora", serif',
-      filterRaw: 'saturate(1.1) brightness(1.05) contrast(1.05)'
-    },
-    usePoemForImageGeneration: true
-  },
-  {
     id: 'inverse',
     name: 'Echoes from the Inverse',
     shortName: 'Inverse',
@@ -407,6 +286,131 @@ export const RAW_THEMES: ThemeConfig[] = [
       filterRaw: 'saturate(1.8) hue-rotate(-20deg) contrast(1.1)'
     },
     usePoemForImageGeneration: true
+  },
+  {
+    id: 'garden',
+    name: 'The Painted Garden',
+    shortName: 'Garden',
+    originLabel: 'Easel',
+    postcardOrigin: 'Giverny',
+    idLabel: 'Study No.',
+
+    landingSubtitle: 'Capturing the fleeting moment',
+    uploadButtonLabel: 'Set Easel',
+    captureButtonLabel: 'Capture Light',
+    headerStatus: 'LIGHT: GOLDEN HOUR',
+    generatingText: 'Mixing Pigments',
+
+    narrativeModuleLabel: 'Poetic Muse',
+    loadingText: 'Chasing the light',
+    loadingMessages: [
+      'Mixing cerulean blue...',
+      'Dabbing sunlight touches...',
+      'Softening the edges...',
+      'Observing the shadows...',
+      'Waiting for the clouds...'
+    ],
+    regenLabel: 'Scrape Canvas',
+    editPoemLabel: 'Rewrite Verse',
+    textPersona: `
+**ROLE:** You are a Romantic poet (like Keats) or an Impressionist painter writing a letter from a blooming garden.
+**VOICE:** Lyrical, sensory, emotional, vivid. Obsessed with light, color, and the fleeting nature of beauty.
+**STYLE:** Use words like "dappled", "gossamer", "verdant", "fleeting". Focus on the *impression* of the scene, not just the facts.
+    `,
+    poemStructure: `
+**ACT 1: THE PALETTE**
+* **GOAL:** Describe the colors and light of the scene.
+* **GUIDANCE:**
+    * **Focus:** How light hits the subject. "Dappled", "Awash", "Gilded".
+    * **Make it:** Vibrant and painterly.
+    * **Example:** "The light spills like liquid gold across the path."
+
+**ACT 2: THE BREATH**
+* **GOAL:** The sensory feeling of the moment.
+* **GUIDANCE:**
+    * **Focus:** Scent, warmth, or the breeze.
+    * **Make it:** Intimate and breathing.
+    * **Example:** "The air holds the sweet, heavy breath of noon."
+
+**ACT 3: THE IMMORTALITY**
+* **GOAL:** Freeze this fleeting moment forever.
+* **GUIDANCE:**
+    * **Focus:** Preservation, memory, or art.
+    * **Make it:** Poetic and profound.
+    * **Example:** "Let us keep this silence before it fades."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a loose watercolor painting with soft edges.`,
+      primaryColor: '#db2777', // Pink-600 (Rose)
+      backgroundColor: '#fff1f2', // Rose-50
+      textColor: '#881337', // Rose-900
+      fontFamilyHeader: '"Playfair Display", serif',
+      fontFamilyBody: '"Lora", serif',
+      filterRaw: 'saturate(1.1) brightness(1.05) contrast(1.05)'
+    },
+    usePoemForImageGeneration: true
+  },
+  {
+    id: 'neon',
+    name: 'Neon of the Night',
+    shortName: 'Neon',
+    originLabel: 'Sector',
+    postcardOrigin: 'Night City',
+    idLabel: 'Data Packet',
+
+    landingSubtitle: 'The city never sleeps',
+    uploadButtonLabel: 'Jack In',
+    captureButtonLabel: 'Scan Net',
+    headerStatus: 'CONNECTION: SECURE',
+    generatingText: 'Uploading to Grid',
+
+    narrativeModuleLabel: 'Data Stream',
+    loadingText: 'Handshaking',
+    loadingMessages: [
+      'Bypassing firewalls...',
+      'Synthesizing neon...',
+      'Rendering chrome...',
+      'Route encrypted...',
+      'Establishing neural link...'
+    ],
+    regenLabel: 'Re-Glitch',
+    editPoemLabel: 'Hack Data',
+    textPersona: `
+**ROLE:** You are a courier in a cyberpunk megacity (like Blade Runner or Neuromancer).
+**VOICE:** Cool, detached, street-smart. Slang-heavy (tech-noir).
+**STYLE:** Focus on lights, rain, chrome, data, and the high-tech/low-life contrast.
+    `,
+    poemStructure: `
+**ACT 1: THE SIGNAL**
+* **GOAL:** Describe the subject as it appears in the neon light.
+* **GUIDANCE:**
+    * **Focus:** Color, reflection, or digital noise.
+    * **Make it:** Vivid and electric.
+    * **Example:** "Chrome reflects the neon rain like liquid television."
+
+**ACT 2: THE GLITCH**
+* **GOAL:** A moment of interference or human reality breaking through.
+* **GUIDANCE:**
+    * **Focus:** A heartbeat, a flaw, or a feeling of isolation.
+    * **Make it:** Noir and lonely.
+    * **Example:** "Even in high-def, loneliness looks the same."
+
+**ACT 3: THE UPLOAD**
+* **GOAL:** Sending this memory away into the cloud.
+* **GUIDANCE:**
+    * **Focus:** Data, memory, or fading away.
+    * **Make it:** Fleeting.
+    * **Example:** "Lost like tears in the digital rain."
+    `,
+    visualStyle: {
+      promptTemplate: `Transform this image of {visual_modifiers} into a 1980s Retrowave / Synthwave aesthetic artwork. Major themes: Cyberpunk, Outrun, Neon, Chrome. The lighting should be dramatic with heavy use of magenta, cyan, and violet. Add a glowing wireframe grid on the floor or background. If a person is present, give them cool sunglasses or a leather jacket with glowing accents. The texture should look like an airbrushed VHS cover or a sleek digital illustration. High contrast, glowing edges, CRT scanlines effect.`,
+      primaryColor: '#e879f9', // Fuchsia-400 (Neon Pink)
+      backgroundColor: '#2a0a3b', // Deep Purple Background
+      textColor: '#22d3ee', // Cyan-400 (Neon Blue)
+      fontFamilyHeader: '"Orbitron", sans-serif',
+      fontFamilyBody: '"Roboto Mono", monospace',
+      filterRaw: 'saturate(1.5) contrast(1.2)'
+    }
   },
   {
     id: 'paper',

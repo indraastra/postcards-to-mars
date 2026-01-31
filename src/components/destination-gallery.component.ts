@@ -1,4 +1,4 @@
-import { Component, inject, signal, output, AfterViewInit } from '@angular/core';
+import { Component, inject, signal, output, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
@@ -18,7 +18,9 @@ import { SessionStore } from '../store/session.store';
         Desktop: Card w-96 (24rem). Center = 12rem. Padding = 50vw - 12rem.
       -->
       <div 
-        class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-9rem)] md:px-[calc(50vw-12rem)] py-12 -my-10 custom-scrollbar snap-x snap-mandatory scroll-smooth cursor-grab active:cursor-grabbing" 
+        class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-9rem)] md:px-[calc(50vw-12rem)] py-12 -my-10 custom-scrollbar scroll-smooth cursor-grab active:cursor-grabbing"
+        [class.snap-x]="!isAutoScrolling"
+        [class.snap-mandatory]="!isAutoScrolling"
         id="theme-carousel"
         (scroll)="onScroll($event)"
         (mousedown)="startDrag($event)"
@@ -170,37 +172,7 @@ import { SessionStore } from '../store/session.store';
 
       </div>
 
-      <!-- Narrative Module Toggle -->
-      <div class="flex items-center justify-center gap-4 mt-8 mb-4">
-        <div class="flex items-center gap-3 bg-black/40 border border-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-          <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-            {{ activeTheme().narrativeModuleLabel }}
-          </span>
-          
-          <button 
-            (click)="toggleReflectionMode()"
-            class="relative w-10 h-5 rounded-full border transition-colors duration-300 flex items-center px-0.5"
-            [class.border-rose-500]="reflectionMode() === 'full'"
-            [class.bg-rose-500_20]="reflectionMode() === 'full'"
-            [class.border-neutral-600]="reflectionMode() === 'visual'"
-            [class.bg-neutral-800]="reflectionMode() === 'visual'"
-          >
-            <div 
-                class="w-3.5 h-3.5 rounded-full bg-white shadow-md transform transition-transform duration-300"
-                [class.translate-x-5]="reflectionMode() === 'full'"
-                [class.bg-rose-400]="reflectionMode() === 'full'"
-                [class.translate-x-0]="reflectionMode() === 'visual'"
-                [class.bg-neutral-500]="reflectionMode() === 'visual'"
-            ></div>
-          </button>
-          
-          <span class="text-[10px] font-mono font-bold w-6 text-center inline-block"
-                [class.text-rose-400]="reflectionMode() === 'full'"
-                [class.text-neutral-500]="reflectionMode() === 'visual'">
-             {{ reflectionMode() === 'full' ? 'ON' : 'OFF' }}
-          </span>
-        </div>
-      </div>
+
 
       <!-- Custom Theme Modal -->
       @if (showCustomModal()) {
@@ -242,9 +214,18 @@ import { SessionStore } from '../store/session.store';
         </div>
       }
 
-    </div>
+      <!-- Custom Theme Modal -->
   `,
   styles: [`
+    .shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
     .custom-scrollbar::-webkit-scrollbar {
       height: 0px;
       background: transparent;
@@ -278,7 +259,49 @@ export class DestinationGalleryComponent implements AfterViewInit {
   scrollLeft = 0;
   wasDragging = false;
   scrollTimeout: any;
-  private lastManualSelectTime = 0;
+  // Lock for auto-scroll
+  isAutoScrolling = false;
+  // Flag to detect source of theme change (manual click vs scroll)
+  private isScrollDrivenUpdate = false;
+
+  constructor() {
+    effect(() => {
+      const theme = this.activeTheme();
+      const allThemes = this.geminiService.getAllThemes();
+      if (!theme) return;
+
+      // If this update came from the user scrolling ('snap to grid'),
+      // we do NOT want to programmatic scroll again (which fights the user).
+      if (this.isScrollDrivenUpdate) {
+        this.isScrollDrivenUpdate = false;
+        return;
+      }
+
+      // Flag that we are attempting to auto-scroll
+      this.isAutoScrolling = true;
+
+      const attemptScroll = (attempt = 0) => {
+        const el = document.getElementById(`theme-${theme.id}`);
+
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          // Reset flag after expected scroll duration (approx 800ms)
+          setTimeout(() => this.isAutoScrolling = false, 800);
+        } else if (attempt < 10) {
+          // Retry up to 10 times (approx 500ms total wait for DOM)
+          setTimeout(() => attemptScroll(attempt + 1), 50);
+        } else {
+          // Give up
+          this.isAutoScrolling = false;
+        }
+      };
+
+      // Start attempts
+      attemptScroll();
+    });
+  }
+
+
 
   ngAfterViewInit() {
     // Scroll to the active theme immediately on load
@@ -292,6 +315,7 @@ export class DestinationGalleryComponent implements AfterViewInit {
   }
 
   onScroll(e: Event) {
+    // console.log('[DestinationGallery] Scroll event fired.');
     if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
 
     // Debounce check for centered card
@@ -301,12 +325,10 @@ export class DestinationGalleryComponent implements AfterViewInit {
   }
 
   checkSelection(container: HTMLElement) {
-    // If we are currently dragging, don't auto-select yet
-    if (this.isDragging) return;
-
-    // If a manual selection happened recently (e.g. click), ignore scroll updates 
-    // to prevent the active theme from flickering back to the previous one during smooth scroll.
-    if (Date.now() - this.lastManualSelectTime < 800) return;
+    // If we are currently dragging OR auto-scrolling, don't auto-select
+    if (this.isDragging || this.isAutoScrolling) {
+      return;
+    }
 
     const containerRect = container.getBoundingClientRect();
     const containerCenter = containerRect.left + containerRect.width / 2;
@@ -327,17 +349,20 @@ export class DestinationGalleryComponent implements AfterViewInit {
       }
     });
 
-    // Valid threshold to consider it "centered" (snap usually handles this)
-    // Mobile card width ~288px (w-72), Desktop ~384px (w-96). 
-    // Half width is 144px/192px. If distance is < 100px, it's definitely the focused one.
     if (closestThemeId && minDistance < 150) {
       if (this.activeTheme().id !== closestThemeId) {
+        this.isScrollDrivenUpdate = true;
         this.session.setTheme(closestThemeId);
       }
     }
   }
 
+
+
   startDrag(e: MouseEvent) {
+    // If user interacts, cancel auto-scroll lock immediately
+    this.isAutoScrolling = false;
+
     const slider = e.currentTarget as HTMLElement;
     this.isDragging = true;
     this.wasDragging = false;
@@ -374,16 +399,8 @@ export class DestinationGalleryComponent implements AfterViewInit {
 
   selectTheme(id: string) {
     if (!this.wasDragging) {
-      this.lastManualSelectTime = Date.now();
+      this.isScrollDrivenUpdate = false;
       this.session.setTheme(id);
-
-      // Center the selected card
-      setTimeout(() => {
-        const el = document.getElementById(`theme-${id}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-      }, 0);
     }
   }
 
@@ -477,8 +494,4 @@ export class DestinationGalleryComponent implements AfterViewInit {
   // Output event to replace the "CameraUpload" separate component
   imageSelected = output<string>();
 
-  toggleReflectionMode() {
-    const current = this.reflectionMode();
-    this.session.setReflectionMode(current === 'full' ? 'visual' : 'full');
-  }
 }

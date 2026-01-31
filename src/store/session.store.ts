@@ -36,7 +36,10 @@ export class SessionStore {
 
     // Actions
     setTheme(themeId: string) {
-        const found = THEMES.find(t => t.id === themeId);
+        // Search in the dynamic service list, not just the static constant
+        const allThemes = this.geminiService.getAllThemes();
+        const found = allThemes.find(t => t.id === themeId);
+
         if (found) {
             this.theme.set(found);
             this.geminiService.activeTheme.set(found);

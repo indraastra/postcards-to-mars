@@ -113,17 +113,18 @@ export class AnalysisComponent implements OnInit, OnDestroy {
       const modifiers = analysis.visual_tags.join(', ');
 
       // In Visual Mode, we use the caption immediately
-      // In Visual Mode, we use the caption immediately (or empty string)
       if (mode === 'visual') {
         const caption = (analysis as any).caption || "";
         this.session.setFinalPoem(caption);
       }
 
+      const isVisualBypass = mode === 'visual' || this.theme().disableNarrative;
+
       const useSequential = this.theme().usePoemForImageGeneration && mode === 'full';
 
       // Only use parallel generation if we have a sequential flow (Full Mode) AND the theme allows it
       // Visual mode goes straight to 'Generating', so let that component handle it to avoid race conditions.
-      const shouldGenerateParallel = useSequential === false && mode === 'full';
+      const shouldGenerateParallel = useSequential === false && mode === 'full' && !isVisualBypass;
 
       if (shouldGenerateParallel) {
         // Fire and forget - store result in cache/store later
@@ -134,7 +135,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         });
       }
 
-      if (mode === 'visual') {
+      if (isVisualBypass) {
         // Skip Dialogue, go to Generating/Result
         this.router.navigate(['/generating']);
       } else {
