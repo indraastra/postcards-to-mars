@@ -145,7 +145,9 @@ export class AppComponent implements OnInit {
       // Unlock via service
       this.geminiService.unlockTheme(theme);
 
-      this.closeSecretInput();
+      // Keep open so they see the success state
+      // this.closeSecretInput(); 
+
       this.session.setTheme(theme.id);
       this.unlockStatus.set('success');
 
