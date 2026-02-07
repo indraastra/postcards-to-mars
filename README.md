@@ -83,9 +83,10 @@ src/
 
 ## 🧠 Architecture Highlights
 
-*   **Thematic Engine:** The app uses a "Universal Receiver" pattern. The UI components (`postcard-result`) are generic skeletons that accept a `ThemeConfig` object. This allows us to radically change the look and feel (fonts, colors, borders) without rewriting HTML.
-*   **Parallel AI Processing:** To mask latency, the Image Generation (`Img2Img`) triggers immediately in the background while the user is engaging with the Poem Generation (`Text-to-Text`) flow.
-*   **Diegetic UI:** The interface pretends to be a terminal uplink, using terms like "Calibration," "Artifacts," and "Signal Tuning" to immerse the user.
+*   **Thematic Engine:** The app uses a "Universal Receiver" pattern. The UI components (`postcard-result`) are generic skeletons that accept a `ThemeConfig` object.
+*   **Reactive State Management:** Uses Angular **Signals** and a central `SessionStore`. Artifacts are cached in a reactive `Signal<Map>` to ensure instant UI updates across the photo reel and result views without manual refresh logic.
+*   **Parallel AI Processing:** To mask latency, Image Generation triggers immediately in the background while the user engages with the Poem Generation flow.
+*   **Diegetic UI:** The interface pretends to be a terminal uplink, immersing the user in the narrative.
 
 ## 🤝 Contributing
 

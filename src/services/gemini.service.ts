@@ -1,25 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 import { GoogleGenAI, Type } from '@google/genai';
-import { THEMES, ThemeConfig } from '../core/theme.config';
+import { ThemeConfig } from '../core/theme.config';
+import { AnalysisResult, Artifact, PoemAct } from '../core/types';
 
-export interface PoemAct {
-  starter: string;
-  suggestions: string[];
-}
-
-export interface AnalysisResult {
-  acts: PoemAct[];
-  visual_tags: string[];
-}
-
-export interface Artifact {
-  themeId: string;
-  imageUrl: string;
-  poem: string;
-  prompt: string;
-  version: string;
-  timestamp: number;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -31,10 +14,6 @@ export class GeminiService {
   private readonly TEXT_MODEL = 'gemini-3-flash-preview';
   private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
   private readonly REASONING_MODEL = 'gemini-3-flash-preview';
-
-  // Session State (Multiverse Cache)
-  // Map<themeId, Artifact>
-  private artifactCache = new Map<string, Artifact>();
 
   constructor() { }
 
@@ -56,17 +35,10 @@ export class GeminiService {
     return '#000000';
   }
 
-  // Cache Management
-  cacheArtifact(themeId: string, artifact: Artifact) {
-    this.artifactCache.set(themeId, artifact);
-  }
-
-  getArtifact(themeId: string): Artifact | undefined {
-    return this.artifactCache.get(themeId);
-  }
-
   clearCache() {
-    this.artifactCache.clear();
+    // No-op for now as cache is moved to SessionStore, 
+    // but keeping method to avoid breaking other callers immediately if any.
+    // Ideally remove if clean.
   }
 
   private cleanBase64(data: string): string {
@@ -303,12 +275,7 @@ Return JSON object.`;
   async generateStylizedImage(originalBase64: string, theme: ThemeConfig, visualModifiers: string, poemContext?: string): Promise<{ image: string | null; prompt: string; version: string }> {
     const cleanData = this.cleanBase64(originalBase64);
 
-    // Check Cache First
-    const cached = this.getArtifact(theme.id);
-    if (cached) {
-      console.log(`[Cache Hit] Returning artifact for ${theme.id}`);
-      return { image: cached.imageUrl, prompt: cached.prompt, version: cached.version };
-    }
+    // Cache check removed - handled by SessionStore
 
     const BASE_PROMPT_CONSTRAINTS = `
     

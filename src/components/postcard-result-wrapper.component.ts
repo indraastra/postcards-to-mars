@@ -7,6 +7,7 @@ import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
 import { AnalyticsService } from '../services/analytics.service';
+import { Artifact } from '../core/types';
 
 @Component({
     selector: 'app-result-wrapper',
@@ -54,20 +55,9 @@ export class PostcardResultWrapperComponent {
             const newImage = await this.geminiService.generateImageFromPrompt(original, newPrompt);
 
             if (newImage) {
-                // Update Store
+                // Update Store (which now auto-updates cache)
                 this.session.updateArtifactImage(newImage, newPrompt);
                 this.analytics.trackRegeneration(this.session.theme().id, 'image');
-
-                // Update Cache
-                const theme = this.session.theme();
-                this.geminiService.cacheArtifact(theme.id, {
-                    themeId: theme.id,
-                    imageUrl: newImage,
-                    poem: this.session.finalPoem(),
-                    prompt: newPrompt,
-                    version: this.session.promptVersion(),
-                    timestamp: Date.now()
-                });
             }
         } catch (e) {
             console.error('Regeneration failed', e);
@@ -81,79 +71,73 @@ export class PostcardResultWrapperComponent {
     }
 
     async onThemeSwitched(newThemeId: string) {
+        // 1. Set the new theme
         this.session.setTheme(newThemeId);
 
-        const cached = this.geminiService.getArtifact(newThemeId);
-        if (cached) {
-            // Fast Path
-            this.session.setArtifact(cached.imageUrl, cached.prompt, cached.version, cached.poem);
-        } else {
-            // Regeneration Path
-            const theme = this.session.theme();
-            let mode = this.session.reflectionMode();
+        // 2. Check if we already have a valid artifact for this theme (Cache Hit)
+        // SessionStore.setTheme automatically restores it if available.
+        if (this.session.hasArtifact()) {
+            return; // Done! Instant switch.
+        }
 
-            if (theme.disableNarrative) {
-                mode = 'visual';
+        // 3. Regeneration Path (Cache Miss)
+        const theme = this.session.theme();
+        let mode = this.session.reflectionMode();
+
+        if (theme.disableNarrative) {
+            mode = 'visual';
+        }
+
+        const placeholder = mode === 'visual' ? '' : 'Aligning narrative sensors...';
+
+        this.session.setArtifact(null!, '', '', placeholder);
+        this.isRegenerating.set(true);
+
+        const base64 = this.session.originalImage();
+
+        if (!base64) {
+            this.isRegenerating.set(false);
+            return;
+        }
+
+        try {
+            // Pass mode and theme to analysis
+            const analysis = await this.geminiService.analyzeImage(base64, theme, mode);
+            let finalPoem = '';
+
+            if (mode === 'visual') {
+                finalPoem = (analysis as any).caption || '';
+            } else {
+                finalPoem = analysis.acts.map(act => {
+                    const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
+                    const suggestion = act.suggestions[0];
+                    return `${cleanStarter} [${suggestion}]`;
+                }).join('\n');
             }
 
-            const placeholder = mode === 'visual' ? '' : 'Aligning narrative sensors...';
+            this.session.setFinalPoem(finalPoem);
 
-            this.session.setArtifact(null!, '', '', placeholder);
-            this.isRegenerating.set(true);
+            const modifiers = analysis.visual_tags.join(', ');
+            let imageRes;
 
-            const base64 = this.session.originalImage();
+            const usePoemContext = this.session.theme().usePoemForImageGeneration && mode === 'full';
 
-            if (!base64) {
-                this.isRegenerating.set(false);
-                return;
+            if (usePoemContext) {
+                imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers, finalPoem);
+            } else {
+                imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers);
             }
 
-            try {
-                // Pass mode and theme to analysis
-                const analysis = await this.geminiService.analyzeImage(base64, theme, mode);
-                let finalPoem = '';
-
-                if (mode === 'visual') {
-                    finalPoem = (analysis as any).caption || '';
-                } else {
-                    finalPoem = analysis.acts.map(act => {
-                        const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
-                        const suggestion = act.suggestions[0];
-                        return `${cleanStarter} [${suggestion}]`;
-                    }).join('\n');
-                }
-
-                this.session.setFinalPoem(finalPoem);
-
-                const modifiers = analysis.visual_tags.join(', ');
-                let imageRes;
-
-                const usePoemContext = this.session.theme().usePoemForImageGeneration && mode === 'full';
-
-                if (usePoemContext) {
-                    imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers, finalPoem);
-                } else {
-                    imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers);
-                }
-
-                if (imageRes.image) {
-                    this.session.setArtifact(imageRes.image, imageRes.prompt, imageRes.version, finalPoem);
-                    this.analytics.trackGeneration(newThemeId, mode === 'visual' ? 'visual' : 'full', usePoemContext);
-                    this.geminiService.cacheArtifact(newThemeId, {
-                        themeId: newThemeId,
-                        imageUrl: imageRes.image,
-                        poem: finalPoem,
-                        prompt: imageRes.prompt,
-                        version: imageRes.version,
-                        timestamp: Date.now()
-                    });
-                }
-
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.isRegenerating.set(false);
+            if (imageRes.image) {
+                // Setting artifact auto-updates the SessionStore cache
+                this.session.setArtifact(imageRes.image, imageRes.prompt, imageRes.version, finalPoem);
+                this.analytics.trackGeneration(newThemeId, mode === 'visual' ? 'visual' : 'full', usePoemContext);
             }
+
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.isRegenerating.set(false);
         }
     }
 }

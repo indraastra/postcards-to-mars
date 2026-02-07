@@ -96,9 +96,9 @@ import { SessionStore } from '../store/session.store';
           >
 
             <!-- Thumbnail Logic -->
-            @if (getArtifact(theme.id); as artifact) {
+            @if (artifactCache().get(theme.id); as artifact) {
                <!-- Show Generated Image -->
-               <img [src]="artifact.imageUrl" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                <img [src]="artifact.imageUrl" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" style="image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden;">
             } @else {
                <!-- Show Theme Color Placeholder -->
                <div class="absolute inset-0 opacity-80" [style.background-color]="theme.visualStyle.backgroundColor"></div>
@@ -199,9 +199,8 @@ export class FilmStripComponent {
     this.isCollapsed.update(v => !v);
   }
 
-  getArtifact(themeId: string) {
-    return this.geminiService.getArtifact(themeId);
-  }
+  // Expose cache directly for template reactivity
+  artifactCache = this.session.artifactCache;
 
   startDrag(e: MouseEvent) {
     const slider = e.currentTarget as HTMLElement;

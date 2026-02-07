@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GeminiService } from '../services/gemini.service';
 import { SessionStore } from '../store/session.store';
+import { ThemeConfig } from '../core/theme.config';
 
 @Component({
     selector: 'app-generation',
@@ -110,16 +111,6 @@ export class GenerationComponent implements OnInit, OnDestroy {
                 const result = await this.geminiService.generateStylizedImage(original, this.theme(), modifiers, poem);
                 if (result.image) {
                     this.session.setArtifact(result.image, result.prompt, result.version, poem);
-
-                    // Cache
-                    this.geminiService.cacheArtifact(this.theme().id, {
-                        themeId: this.theme().id,
-                        imageUrl: result.image,
-                        poem: poem,
-                        prompt: result.prompt,
-                        version: result.version,
-                        timestamp: Date.now()
-                    });
                 }
                 this.router.navigate(['/result']);
             } catch (e) {
