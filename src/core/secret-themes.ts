@@ -40,13 +40,13 @@ const SANDS_THEME: ThemeConfig = {
 3. **The Promise:** End with a promise that the same stars watch over them.
 `,
     visualStyle: {
-        promptTemplate: "A hot, arid, desert-like scene featuring {visual_modifiers} composed of shifting sand and sun-bleached textures. The lighting should be harsh, bright, and golden, evoking the feeling of high noon in the deep desert. Use a palette of burnt orange, ochre, and blinding white. Add a shimmering heat haze effect. The subject should feel ancient and weathered. Include subtle silhouettes of camels or caravan tracks in the distance.",
+        promptTemplate: "Transform this image of {visual_modifiers} into an intricate, large-scale sand sculpture found on a beach. The subject should generally appear as if it is made entirely of packed sand, with grainy textures and soft edges. The setting is a golden hour beach with long shadows. The sculpture is detailed but ephemeral, ready to be washed away by the tide. The lighting is warm and low-angle, emphasizing the texture of the sand grains.",
         primaryColor: '#eab308', // Starlight Gold (keeping gold as primary accent)
         backgroundColor: '#1e1b4b', // Indigo 950 (Deep night sky)
         textColor: '#fef3c7', // Amber 100 (Warm white)
         fontFamilyHeader: '"Playfair Display", serif',
         fontFamilyBody: '"Lora", serif',
-        filterRaw: 'contrast(1.2) brightness(0.9) saturate(1.1)' // Night look
+        filterRaw: 'sepia(0.3) contrast(1.1) brightness(1.05)'
     }
 };
 
@@ -121,34 +121,34 @@ const LONDON_FROST_THEME: ThemeConfig = {
     regenLabel: 'Re-Ink Block',
     editPoemLabel: 'Rewrite Verse',
     textPersona: `
-**ROLE:** You are a romantic flâneur walking through a snowy London, specifically the high points of the North (Alexandra Palace, Hampstead Heath) or the quiet waters of the East (Walthamstow Wetlands).
-**VOICE:** Observational, quiet, appreciative. Mixing the urban brick with the natural snow.
-**STYLE:** Focus on the specific geography of London (The Palace, The Ponds, The Reservoirs).
-`,
+    **ROLE:** You are a romantic observer walking through a quiet, snowy winter landscape.
+    **VOICE:** Observational, quiet, appreciative.
+    **STYLE:** Focus on soft snow, silence, and organic details of nature.
+    `,
     poemStructure: `
-**ACT 1: THE VISTA**
-* **GOAL:** Establish the location and the view.
-* **GUIDANCE:**
-* **Focus:** Looking out over the city from a high point, or across a frozen reservoir.
-* **Make it:** Specific (Ally Pally, The Heath).
-* **Example:** "From the Palace hill, the city is a sleeping giant."
-
-**ACT 2: THE FROST**
-* **GOAL:** Describe the texture of winter on the city.
-* **GUIDANCE:**
-* **Focus:** Ice on red brick, breath in the air, the crunch of snow.
-* **Make it:** Tactile.
-* **Example:** "Frost clings to the iron gates like lace."
-
-**ACT 3: THE WALTZ**
-* **GOAL:** A moment of movement or connection.
-* **GUIDANCE:**
-* **Focus:** Skaters, walking arm in arm, or the "dance" of winter.
-* **Make it:** Romantic and shared.
-* **Example:** "We skate on the edge of the thaw, hand in hand."
-`,
+    **ACT 1: THE VISTA**
+    * **GOAL:** Establish the quiet winter scenery.
+    * **GUIDANCE:**
+    * **Focus:** Looking out over a frozen landscape, a park, or a quiet street.
+    * **Make it:** Soft and hushed.
+    * **Example:** "The world is wrapped in a blanket of white silence."
+    
+    **ACT 2: THE FROST**
+    * **GOAL:** Describe the texture of winter.
+    * **GUIDANCE:**
+    * **Focus:** Ice on a window, breath in the air, the crunch of snow.
+    * **Make it:** Tactile.
+    * **Example:** "Frost blooms on the glass like a frozen garden."
+    
+    **ACT 3: THE WALTZ**
+    * **GOAL:** A moment of warmth or connection.
+    * **GUIDANCE:**
+    * **Focus:** A lit window, a shared scarf, or a hand held in a pocket.
+    * **Make it:** Romantic and shared.
+    * **Example:** "We skate on the edge of the thaw, hand in hand."
+    `,
     visualStyle: {
-        promptTemplate: "Transform this image of {visual_modifiers} into a Shin-hanga style Japanese woodblock print set in a snowy Victorian London. FUSION STYLE: Combine the red brick architecture and ironwork of London landmarks (Alexandra Palace, Hampstead Heath) with the flat composition, bold outlines, and bokashi gradients of Hiroshige. FEATURES: Heavy falling snow, glowing gas lamps, deep Prussian blue skies, stark white snow, and brick red accents. COMPOSITION: Flatten the perspective, use wood grain texture, and emphasize the contrast between the warmth of the lamps and the cold of the snow.",
+        promptTemplate: "Transform this image of {visual_modifiers} into a Shin-hanga style Japanese woodblock print set in a snowy winter landscape. FUSION STYLE: Combine the organic forms of nature (snow-laden trees, frozen ponds, winding paths) with the flat composition, bold outlines, and bokashi gradients of Hiroshige. FEATURES: Heavy falling snow, warm glowing windows in the distance, deep Prussian blue skies, and stark white snow. COMPOSITION: Flatten the perspective, use wood grain texture, and emphasize the peaceful silence of winter.",
         primaryColor: '#b91c1c', // Brick Red
         backgroundColor: '#eff6ff', // Ice Blue
         textColor: '#172554', // Deep Indigo

@@ -21,20 +21,21 @@
                 [class.grayscale]="activeTheme().id !== theme.id"
                 [style.background-color]="theme.visualStyle.backgroundColor">
 
-                <!-- Dog-Ear Favorite Toggle (Top Left) -->
+                <!-- Dog-Ear Favorite Toggle (Bottom Right) -->
                 <!-- Only visible on hover or if favored -->
-                <button class="absolute top-0 left-0 z-30 w-12 h-12 transition-all duration-300 focus:outline-none"
+                <button class="absolute bottom-0 right-0 z-30 w-12 h-12 transition-all duration-300 focus:outline-none"
                     (click)="$event.stopPropagation(); toggleFavorite($event, theme.id)" title="Favorite Destination">
 
                     <!-- Triangle Background (The Fold) -->
-                    <div class="absolute top-0 left-0 w-full h-full transition-all duration-300 origin-top-left"
+                    <div class="absolute bottom-0 right-0 w-full h-full transition-all duration-300 origin-bottom-right"
                         [class.scale-0]="!themeService.isFavorite(theme.id) && !activeTheme().id"
-                        [class.group-hover/inner:scale-100]="true" style="clip-path: polygon(0 0, 100% 0, 0 100%);"
-                        [style.background-color]="themeService.isFavorite(theme.id) ? '#fbbf24' : 'rgba(255,255,255,0.2)'">
+                        [class.group-hover/inner:scale-100]="true"
+                        style="clip-path: polygon(100% 0, 100% 100%, 0 100%);"
+                        [style.background-color]="themeService.isFavorite(theme.id) ? theme.visualStyle.primaryColor : 'rgba(255,255,255,0.2)'">
                     </div>
 
                     <!-- Heart Icon (Inside the fold) -->
-                    <div class="absolute top-1 left-1 text-black/50 transition-all duration-300"
+                    <div class="absolute bottom-1 right-1 text-black/50 transition-all duration-300"
                         [class.opacity-100]="themeService.isFavorite(theme.id)"
                         [class.opacity-0]="!themeService.isFavorite(theme.id) && !activeTheme().id"
                         [class.group-hover/inner:opacity-50]="!themeService.isFavorite(theme.id)">
@@ -58,8 +59,7 @@
                     <div class="flex justify-between items-start w-full gap-4">
 
                         <!-- Destination Text -->
-                        <div class="flex flex-col gap-1 mt-1 ml-6 transition-all duration-300"
-                            [class.ml-8]="themeService.isFavorite(theme.id)">
+                        <div class="flex flex-col gap-1 mt-1 transition-all duration-300">
                             <p class="text-[9px] uppercase tracking-[0.25em] font-mono opacity-60"
                                 [style.color]="theme.visualStyle.textColor">
                                 Destination:

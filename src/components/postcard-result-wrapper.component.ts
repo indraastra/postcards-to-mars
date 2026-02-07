@@ -35,6 +35,13 @@ export class PostcardResultWrapperComponent {
 
     isRegenerating = signal(false);
 
+    ngOnInit() {
+        // If we don't have an original image (e.g. page refresh), go back to home
+        if (!this.session.originalImage()) {
+            this.router.navigate(['/']);
+        }
+    }
+
     async onRegenerateImage(newPrompt: string) {
         const original = this.session.originalImage();
         if (!original) return;
