@@ -1,10 +1,10 @@
 <div class="h-[100dvh] w-full relative overflow-hidden font-sans selection:bg-white/20 selection:text-white"
-  [style.background-color]="geminiService.getAppBackground(geminiService.activeTheme())"
-  [style.--theme-bg]="geminiService.getAppBackground(geminiService.activeTheme())"
-  [style.--theme-primary]="geminiService.activeTheme().visualStyle.primaryColor"
-  [style.--theme-text]="geminiService.activeTheme().visualStyle.textColor"
-  [style.--font-header]="geminiService.activeTheme().visualStyle.fontFamilyHeader"
-  [style.color]="geminiService.activeTheme().id === 'mars' ? '#d1d5db' : geminiService.activeTheme().visualStyle.textColor">
+  [style.background-color]="geminiService.getAppBackground(session.theme())"
+  [style.--theme-bg]="geminiService.getAppBackground(session.theme())"
+  [style.--theme-primary]="session.theme().visualStyle.primaryColor"
+  [style.--theme-text]="session.theme().visualStyle.textColor"
+  [style.--font-header]="session.theme().visualStyle.fontFamilyHeader"
+  [style.color]="session.theme().id === 'mars' ? '#d1d5db' : session.theme().visualStyle.textColor">
 
   <!-- Global Scanline Overlay -->
   <div class="fixed inset-0 pointer-events-none z-0 opacity-10"
@@ -22,11 +22,11 @@
     <div class="flex flex-col">
       <span class="text-[10px] font-bold tracking-[0.2em] uppercase leading-none transition-colors"
         [style.color]="'var(--theme-primary)'" [style.font-family]="'var(--font-header)'">
-        {{ geminiService.activeTheme().name }}
+        {{ session.theme().name }}
       </span>
       <span class="text-[8px] font-mono opacity-60 leading-none mt-1 tracking-wider transition-colors"
         [style.color]="'var(--theme-primary)'">
-        {{ geminiService.activeTheme().headerStatus }}
+        {{ session.theme().headerStatus }}
       </span>
     </div>
 

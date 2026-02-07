@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
+import { ThemeService } from '../services/theme.service';
 
 interface GenerationLog {
     visualModifiers: string;
@@ -18,6 +19,7 @@ interface GenerationLog {
 })
 export class ImageDebugComponent {
     geminiService = inject(GeminiService);
+    themeService = inject(ThemeService);
 
     // Inputs
     uploadedImage = signal<string | null>(null);
@@ -41,7 +43,9 @@ export class ImageDebugComponent {
 
             // Automatic Analysis
             try {
-                const analysis = await this.geminiService.analyzeImage(base64);
+                // Use default theme for debug analysis
+                const defaultTheme = this.themeService.allThemes()[0];
+                const analysis = await this.geminiService.analyzeImage(base64, defaultTheme);
                 this.visualModifiers.set(analysis.visual_tags.join(', '));
             } catch (err) {
                 console.error('Analysis failed', err);

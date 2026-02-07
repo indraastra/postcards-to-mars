@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { PoemAct, Artifact, GeminiService } from '../services/gemini.service';
+import { ThemeService } from '../services/theme.service';
 import { ThemeConfig, THEMES } from '../core/theme.config';
 
 export type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' | 'error';
@@ -7,8 +8,12 @@ export type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 're
 @Injectable({
     providedIn: 'root'
 })
+@Injectable({
+    providedIn: 'root'
+})
 export class SessionStore {
     private geminiService = inject(GeminiService);
+    private themeService = inject(ThemeService);
 
     // State
     readonly theme = signal<ThemeConfig>(THEMES[0]);
@@ -36,13 +41,12 @@ export class SessionStore {
 
     // Actions
     setTheme(themeId: string) {
-        // Search in the dynamic service list, not just the static constant
-        const allThemes = this.geminiService.getAllThemes();
-        const found = allThemes.find(t => t.id === themeId);
+        // Use ThemeService to find the theme from the unified list
+        const found = this.themeService.getTheme(themeId);
 
         if (found) {
             this.theme.set(found);
-            this.geminiService.activeTheme.set(found);
+            // GeminiService is now stateless regarding themes, so no need to set it there
         }
     }
 

@@ -2,7 +2,8 @@ import { Component, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
-import { THEMES } from '../core/theme.config';
+import { ThemeService } from '../services/theme.service';
+import { SessionStore } from '../store/session.store';
 
 @Component({
   selector: 'app-film-strip',
@@ -83,7 +84,7 @@ import { THEMES } from '../core/theme.config';
         (mousemove)="moveDrag($event)"
       >
         
-        @for (theme of geminiService.getAllThemes(); track theme.id) {
+        @for (theme of themeService.allThemes(); track theme.id) {
           <button 
             (click)="switchTheme(theme.id)"
             class="relative flex-shrink-0 w-16 h-20 border rounded-sm overflow-hidden transition-all duration-300 group snap-start bg-black"
@@ -152,9 +153,11 @@ import { THEMES } from '../core/theme.config';
 })
 export class FilmStripComponent {
   geminiService = inject(GeminiService);
+  themeService = inject(ThemeService);
+  session = inject(SessionStore);
   themeSwitch = output<string>(); // Emits themeId
 
-  activeTheme = this.geminiService.activeTheme;
+  activeTheme = this.session.theme;
   isCollapsed = signal(false);
 
   // Custom Theme State
@@ -185,8 +188,8 @@ export class FilmStripComponent {
     this.isGenerating.set(false);
 
     if (theme) {
-      this.geminiService.addCustomTheme(theme);
-      this.geminiService.setTheme(theme.id);
+      this.themeService.addCustomTheme(theme);
+      this.session.setTheme(theme.id);
       this.closeCustomModal();
       this.themeSwitch.emit(theme.id); // Trigger auto-generation on result page
     }

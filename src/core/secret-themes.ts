@@ -3,14 +3,14 @@ import { ThemeConfig } from './theme.config';
 const SANDS_THEME: ThemeConfig = {
     id: 'sands',
     name: 'Sonnets in the Sand',
-    shortName: 'The Sands',
+    shortName: 'Arabia',
     originLabel: 'Scribe',
     postcardOrigin: 'The Empty Quarter',
     idLabel: 'Seal No.',
-    landingSubtitle: 'Whispers under the stars',
+    landingSubtitle: "Resting under the stars",
     uploadButtonLabel: 'Seal Message',
     captureButtonLabel: 'View Night',
-    headerStatus: 'CONNECTION: ESTABLISHED',
+    headerStatus: 'DESERT: ENDLESS',
     generatingText: 'Consulting the stars...',
     narrativeModuleLabel: 'Night Whisper',
     loadingText: 'Mapping Constellations',
@@ -24,14 +24,14 @@ const SANDS_THEME: ThemeConfig = {
     regenLabel: 'Rewrite Star',
     editPoemLabel: 'Edit Sonnet',
     textPersona: `
-**ROLE:** You are writing a deeply romantic sonnet/letter to a lover far away, from the perspective of someone in the quiet, starry desert night.
+**ROLE:** You are writing a deeply romantic sonnet/letter to a lover far away, from the perspective of someone traveling with a caravan in the quiet, starry desert night.
 **VOICE:** Whispering, lyrical, intimate, peaceful.
-**THEMES:** The vastness of the night sky, the warmth of a fire, silence, endurance of love across distance.
+**THEMES:** The vastness of the night sky, the warmth of a fire, silence, endurance of love across distance, the slow pace of the camels.
 **KEY ELEMENTS:**
 - Focus on the *stars* and the *night sky* (indigo, silver, gold).
 - Contrast the cool night with the warmth of memory or a fire.
 - Mention "Habibi" or "My Love".
-- Avoid harsh daylight imagery; this is a nocturnal theme.
+- Mention the "Caravan" or the "Journey".
 `,
     poemStructure: `
 **STRUCTURE:**
@@ -40,7 +40,7 @@ const SANDS_THEME: ThemeConfig = {
 3. **The Promise:** End with a promise that the same stars watch over them.
 `,
     visualStyle: {
-        promptTemplate: "A hot, arid, desert-like scene featuring {visual_modifiers} composed of shifting sand and sun-bleached textures. The lighting should be harsh, bright, and golden, evoking the feeling of high noon in the deep desert. Use a palette of burnt orange, ochre, and blinding white. Add a shimmering heat haze effect. The subject should feel ancient and weathered, as if it has been standing in the wind for centuries.",
+        promptTemplate: "A hot, arid, desert-like scene featuring {visual_modifiers} composed of shifting sand and sun-bleached textures. The lighting should be harsh, bright, and golden, evoking the feeling of high noon in the deep desert. Use a palette of burnt orange, ochre, and blinding white. Add a shimmering heat haze effect. The subject should feel ancient and weathered. Include subtle silhouettes of camels or caravan tracks in the distance.",
         primaryColor: '#eab308', // Starlight Gold (keeping gold as primary accent)
         backgroundColor: '#1e1b4b', // Indigo 950 (Deep night sky)
         textColor: '#fef3c7', // Amber 100 (Warm white)
@@ -50,33 +50,33 @@ const SANDS_THEME: ThemeConfig = {
     }
 };
 
-const VAN_GOGH_THEME: ThemeConfig = {
-    id: 'van-gogh',
+const BUTTERFLY_THEME: ThemeConfig = {
+    id: 'butterfly',
     name: 'Saffron & Amethyst',
-    shortName: 'Van Gogh',
-    originLabel: 'Canvas',
-    postcardOrigin: 'Arles, France',
-    idLabel: 'Study No.',
-    landingSubtitle: 'Nature is not silent',
-    uploadButtonLabel: 'Set Easel',
-    captureButtonLabel: 'Capture Light',
-    headerStatus: 'PALETTE: VIBRANT',
-    generatingText: 'Applying thick paint...',
-    narrativeModuleLabel: 'Artist Letters',
-    loadingText: 'Mixing Oils',
+    shortName: 'Butterfly',
+    originLabel: 'Aria',
+    postcardOrigin: 'Nagasaki Harbor',
+    idLabel: 'Act No.',
+    landingSubtitle: 'Un bel dì, vedremo',
+    uploadButtonLabel: 'Wait',
+    captureButtonLabel: 'Watch Horizon',
+    headerStatus: 'ARIA: SOARING',
+    generatingText: 'Singing Aria...',
+    narrativeModuleLabel: 'The Aria',
+    loadingText: 'Waiting for the ship',
     loadingMessages: [
-        'Squeezing yellow ochre...',
-        'Swirling the sky...',
-        'Planting wild irises...',
-        'Chasing the sun...',
-        'Applying thick impasto...'
+        'Scanning the horizon...',
+        'Watching the robin nest...',
+        'Counting the cherry blossoms...',
+        'Singing to the sea...',
+        'Waiting for the cannon shot...'
     ],
-    regenLabel: 'Scrape Canvas',
-    editPoemLabel: 'Refine Brushwork',
+    regenLabel: 'Sing Again',
+    editPoemLabel: 'Rewrite Aria',
     textPersona: `
-**ROLE:** You are Vincent van Gogh writing to your brother Theo about a new painting.
-**VOICE:** Passionate, intense, humble, observant.
-**THEMES:** The vibration of color, the consolation of nature, the simple beauty of flowers.
+**ROLE:** You are Cio-Cio-San (Madama Butterfly), writing a letter of undying hope and tragic love while waiting for a ship to return.
+**VOICE:** Passionate, intense, fragile but determined, operatic.
+**THEMES:** The vibration of color, the consolation of nature, the simple beauty of flowers, and the certainty of love's return.
 `,
     poemStructure: `
 **VISUAL NOTES (NO NARRATIVE):**
@@ -97,9 +97,72 @@ const VAN_GOGH_THEME: ThemeConfig = {
     disableNarrative: true
 };
 
+const LONDON_FROST_THEME: ThemeConfig = {
+    id: 'london-frost',
+    name: 'The Edge of Winter',
+    shortName: 'Valentine',
+    originLabel: 'Vantage',
+    postcardOrigin: 'The Heath',
+    idLabel: 'Print No.',
+    landingSubtitle: 'Snowfall on the capital',
+    uploadButtonLabel: 'Walk Path',
+    captureButtonLabel: 'Etch Scene',
+    headerStatus: 'FROST: ETERNAL',
+    generatingText: 'Carving Woodblock...',
+    narrativeModuleLabel: 'Winter Walk',
+    loadingText: 'Falling Snow',
+    loadingMessages: [
+        'Looking from Alexandra Palace...',
+        'Walking the reservoirs...',
+        'Watching the swans freeze...',
+        'Inking the woodblock...',
+        'Pressing the paper...'
+    ],
+    regenLabel: 'Re-Ink Block',
+    editPoemLabel: 'Rewrite Verse',
+    textPersona: `
+**ROLE:** You are a romantic flâneur walking through a snowy London, specifically the high points of the North (Alexandra Palace, Hampstead Heath) or the quiet waters of the East (Walthamstow Wetlands).
+**VOICE:** Observational, quiet, appreciative. Mixing the urban brick with the natural snow.
+**STYLE:** Focus on the specific geography of London (The Palace, The Ponds, The Reservoirs).
+`,
+    poemStructure: `
+**ACT 1: THE VISTA**
+* **GOAL:** Establish the location and the view.
+* **GUIDANCE:**
+* **Focus:** Looking out over the city from a high point, or across a frozen reservoir.
+* **Make it:** Specific (Ally Pally, The Heath).
+* **Example:** "From the Palace hill, the city is a sleeping giant."
+
+**ACT 2: THE FROST**
+* **GOAL:** Describe the texture of winter on the city.
+* **GUIDANCE:**
+* **Focus:** Ice on red brick, breath in the air, the crunch of snow.
+* **Make it:** Tactile.
+* **Example:** "Frost clings to the iron gates like lace."
+
+**ACT 3: THE WALTZ**
+* **GOAL:** A moment of movement or connection.
+* **GUIDANCE:**
+* **Focus:** Skaters, walking arm in arm, or the "dance" of winter.
+* **Make it:** Romantic and shared.
+* **Example:** "We skate on the edge of the thaw, hand in hand."
+`,
+    visualStyle: {
+        promptTemplate: "Transform this image of {visual_modifiers} into a Shin-hanga style Japanese woodblock print set in a snowy Victorian London. FUSION STYLE: Combine the red brick architecture and ironwork of London landmarks (Alexandra Palace, Hampstead Heath) with the flat composition, bold outlines, and bokashi gradients of Hiroshige. FEATURES: Heavy falling snow, glowing gas lamps, deep Prussian blue skies, stark white snow, and brick red accents. COMPOSITION: Flatten the perspective, use wood grain texture, and emphasize the contrast between the warmth of the lamps and the cold of the snow.",
+        primaryColor: '#b91c1c', // Brick Red
+        backgroundColor: '#eff6ff', // Ice Blue
+        textColor: '#172554', // Deep Indigo
+        fontFamilyHeader: '"Cinzel", serif',
+        fontFamilyBody: '"Spectrale", serif',
+        filterRaw: 'contrast(1.1) saturate(1.2) sepia(0.2)'
+    },
+    usePoemForImageGeneration: true
+};
+
 const SECRET_THEMES: Record<string, ThemeConfig> = {
     '20260131': SANDS_THEME,
-    '20260129': VAN_GOGH_THEME
+    '20260129': BUTTERFLY_THEME,
+    '20260214': LONDON_FROST_THEME
 };
 
 export const getSecretTheme = (code: string): ThemeConfig | undefined => {

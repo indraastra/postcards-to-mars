@@ -106,7 +106,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     if (!base64) return;
 
     try {
-      const analysis = await this.geminiService.analyzeImage(base64, mode);
+      const analysis = await this.geminiService.analyzeImage(base64, this.theme(), mode);
       this.session.setAnalysis(analysis.acts, analysis.visual_tags);
 
       // Parallel Image Generation Trigger
@@ -128,7 +128,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
       if (shouldGenerateParallel) {
         // Fire and forget - store result in cache/store later
-        this.geminiService.generateStylizedImage(base64, modifiers, undefined).then(res => {
+        this.geminiService.generateStylizedImage(base64, this.theme(), modifiers).then(res => {
           if (res.image) {
             this.session.updateArtifactImage(res.image, res.prompt);
           }

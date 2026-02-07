@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet, Router } from '@angular/router';
 import { GeminiService } from './services/gemini.service';
+import { ThemeService } from './services/theme.service';
 import { SessionStore } from './store/session.store';
-
-
 
 type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' | 'error' | 'debug';
 
@@ -17,8 +16,7 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' |
     FormsModule
   ],
   templateUrl: './app.component.html',
-  styles: [
-    `
+  styles: [`
     .animate-progress {
       animation: progress 2s ease-in-out infinite;
     }
@@ -46,13 +44,13 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' |
       width: 100%;
       height: 100%;
       background: linear-gradient(
-        to right, 
-        transparent 0%, 
-        rgba(251, 191, 36, 0.4) 50%, 
+        to right,
+        transparent 0%,
+        rgba(251, 191, 36, 0.4) 50%,
         transparent 100%
       );
       transform: skewX(-25deg);
-      animation: ripple 3s infinite 2s; /* 2s delay, 3s duration */
+      animation: ripple 3s infinite 2s;
     }
     @keyframes ripple {
       0% { left: -150%; opacity: 0; }
@@ -63,6 +61,7 @@ type AppState = 'landing' | 'analyzing' | 'dialogue' | 'generating' | 'result' |
 })
 export class AppComponent implements OnInit {
   geminiService = inject(GeminiService);
+  themeService = inject(ThemeService);
   session = inject(SessionStore);
   router = inject(Router);
 
@@ -84,8 +83,8 @@ export class AppComponent implements OnInit {
       import('./core/secret-themes').then(({ getAllSecretThemes }) => {
         const secrets = getAllSecretThemes();
         secrets.forEach(theme => {
-          console.log(`[Debug] Unlocked: ${theme.name}`);
-          this.geminiService.unlockTheme(theme);
+          console.log('[Debug] Unlocked: ' + theme.name);
+          this.themeService.unlockTheme(theme);
         });
       });
     }
@@ -143,10 +142,7 @@ export class AppComponent implements OnInit {
 
     if (theme) {
       // Unlock via service
-      this.geminiService.unlockTheme(theme);
-
-      // Keep open so they see the success state
-      // this.closeSecretInput(); 
+      const unlocked = this.themeService.unlockTheme(theme);
 
       this.session.setTheme(theme.id);
       this.unlockStatus.set('success');
@@ -155,6 +151,7 @@ export class AppComponent implements OnInit {
     } else {
       // Invalid
       this.unlockStatus.set('error');
+      // Shake animation trigger logic handled in template via class binding on error
       setTimeout(() => this.unlockStatus.set('idle'), 500);
       this.secretCode.set('');
     }

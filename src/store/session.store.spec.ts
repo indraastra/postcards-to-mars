@@ -2,6 +2,7 @@ import '../test-setup';
 import { TestBed } from '@angular/core/testing';
 import { SessionStore } from './session.store';
 import { GeminiService } from '../services/gemini.service';
+import { ThemeService } from '../services/theme.service';
 
 describe('SessionStore', () => {
     let store: SessionStore;
@@ -9,14 +10,19 @@ describe('SessionStore', () => {
 
     beforeEach(() => {
         geminiServiceMock = {
-            activeTheme: { set: vi.fn() } as any,
             clearCache: vi.fn()
+        };
+
+        const themeServiceMock = {
+            allThemes: () => [],
+            getTheme: () => null
         };
 
         TestBed.configureTestingModule({
             providers: [
                 SessionStore,
-                { provide: GeminiService, useValue: geminiServiceMock }
+                { provide: GeminiService, useValue: geminiServiceMock },
+                { provide: ThemeService, useValue: themeServiceMock } // Add injection
             ]
         });
 

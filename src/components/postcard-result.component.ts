@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { GeminiService } from '../services/gemini.service';
+import { SessionStore } from '../store/session.store';
 
 interface TextSegment {
   text: string;
@@ -227,10 +228,15 @@ interface TextSegment {
 // This is actually cleaner than injecting store everywhere.
 // So I will SKIP editing PostcardResultComponent logic for now.
 // I will just verify it compiles.
+// I will just verify it compiles.
+
+// ... class declaration ...
+
 export class PostcardResultComponent {
   geminiService = inject(GeminiService);
   sanitizer = inject(DomSanitizer);
-  theme = this.geminiService.activeTheme;
+  session = inject(SessionStore);
+  theme = this.session.theme;
 
   poem = input.required<string>();
   stylizedImageSrc = input.required<string | null>();

@@ -32,11 +32,6 @@ export class GeminiService {
   private readonly IMAGE_MODEL = 'gemini-3-pro-image-preview';
   private readonly REASONING_MODEL = 'gemini-3-flash-preview';
 
-  // State
-  activeTheme = signal<ThemeConfig>(THEMES[0]);
-  customThemes = signal<ThemeConfig[]>([]); // Store custom themes
-  unlockedThemes = signal<ThemeConfig[]>([]); // Secret themes
-
   // Session State (Multiverse Cache)
   // Map<themeId, Artifact>
   private artifactCache = new Map<string, Artifact>();
@@ -57,41 +52,8 @@ export class GeminiService {
     return this.ai;
   }
 
-  setTheme(themeId: string) {
-    let theme = THEMES.find(t => t.id === themeId);
-
-    // Check unlocked themes
-    if (!theme) {
-      theme = this.unlockedThemes().find(t => t.id === themeId);
-    }
-
-    // Check custom themes
-    if (!theme) {
-      theme = this.customThemes().find(t => t.id === themeId);
-    }
-
-    if (theme) {
-      this.activeTheme.set(theme);
-    }
-  }
-
-  getAllThemes() {
-    return [...THEMES, ...this.unlockedThemes(), ...this.customThemes()];
-  }
-
   getAppBackground(theme: ThemeConfig): string {
     return '#000000';
-  }
-
-  addCustomTheme(theme: ThemeConfig) {
-    this.customThemes.update(themes => [...themes, theme]);
-  }
-
-  unlockTheme(theme: ThemeConfig) {
-    // Avoid duplicates
-    if (!this.unlockedThemes().find(t => t.id === theme.id)) {
-      this.unlockedThemes.update(themes => [...themes, theme]);
-    }
   }
 
   // Cache Management
@@ -135,13 +97,13 @@ export class GeminiService {
        6. **UI Labels & Text:** 
           - **Landing Title/Subtitle:** Creative welcome text.
           - **Buttons:** Label for Upload (e.g. "Open Channel") and Capture (e.g. "Save Artifact").
-         - **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE").
-         - **Loading Text:** Main loading state (e.g. "PROCESSING...").
-         - **Loading Messages:** An array of 5 thematic strings for the loading cycle (e.g. "Aligning...", "Tuning...").
-         - **Labels:** 
-            - originLabel (e.g. "Sector"), postcardOrigin (e.g. "Earth"), idLabel (e.g. "Ref No").
-            - regenLabel (e.g. "Retune"), editPoemLabel (e.g. "Rewrite").
-            - narrativeModuleLabel (e.g. "Narrative", "Log", "Protocol").
+          - **Header Status:** A short, all-caps diegetic status message (e.g., "SIGNAL: STABLE").
+          - **Loading Text:** Main loading state (e.g. "PROCESSING...").
+          - **Loading Messages:** An array of 5 thematic strings for the loading cycle (e.g. "Aligning...", "Tuning...").
+          - **Labels:** 
+             - originLabel (e.g. "Sector"), postcardOrigin (e.g. "Earth"), idLabel (e.g. "Ref No").
+             - regenLabel (e.g. "Retune"), editPoemLabel (e.g. "Rewrite").
+             - narrativeModuleLabel (e.g. "Narrative", "Log", "Protocol").
     `;
 
     try {
@@ -208,10 +170,9 @@ export class GeminiService {
   // --------------------------------------------------------------------------- 
   // 1. ANALYZE IMAGE (Poem Structure + Visual Tags)
   // --------------------------------------------------------------------------- 
-  async analyzeImage(imageBase64: string, mode: 'full' | 'visual' = 'full'): Promise<AnalysisResult> {
+  async analyzeImage(imageBase64: string, theme: ThemeConfig, mode: 'full' | 'visual' = 'full'): Promise<AnalysisResult> {
     const cleanData = this.cleanBase64(imageBase64);
     const randomSeed = Math.floor(Math.random() * 1000000000);
-    const theme = this.activeTheme();
 
     let promptText = '';
 
@@ -339,9 +300,8 @@ Return JSON object.`;
   // --------------------------------------------------------------------------- 
   // 2. GENERATE STYLIZED IMAGE (Img2Img)
   // --------------------------------------------------------------------------- 
-  async generateStylizedImage(originalBase64: string, visualModifiers: string, poemContext?: string): Promise<{ image: string | null; prompt: string; version: string }> {
+  async generateStylizedImage(originalBase64: string, theme: ThemeConfig, visualModifiers: string, poemContext?: string): Promise<{ image: string | null; prompt: string; version: string }> {
     const cleanData = this.cleanBase64(originalBase64);
-    const theme = this.activeTheme();
 
     // Check Cache First
     const cached = this.getArtifact(theme.id);
@@ -412,3 +372,4 @@ Return JSON object.`;
     ];
   }
 }
+

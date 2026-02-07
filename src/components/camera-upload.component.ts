@@ -1,8 +1,12 @@
 import { Component, output, signal, input, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
 
 @Component({
   selector: 'app-camera-upload',
+  standalone: true,
+  imports: [CommonModule],
   template: `
     <div class="flex flex-col items-center justify-center space-y-2 md:space-y-4 p-4 text-center animate-fade-in relative z-10 w-full max-w-md mx-auto">
       
@@ -62,8 +66,9 @@ import { GeminiService } from '../services/gemini.service';
   `]
 })
 export class CameraUploadComponent {
+  session = inject(SessionStore);
   geminiService = inject(GeminiService);
-  activeTheme = this.geminiService.activeTheme;
+  activeTheme = this.session.theme;
 
   imageSelected = output<string>();
   errorMessage = signal<string>('');

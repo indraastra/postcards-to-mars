@@ -55,7 +55,7 @@ describe('GeminiService', () => {
 
         // Trigger client initialization through a method call
         // We mock the response to avoid actual API calls
-        await service.analyzeImage('base64data');
+        await service.analyzeImage('base64data', {} as any);
 
         // Now it should be initialized
         expect((service as any).ai).toBeDefined();
@@ -69,7 +69,7 @@ describe('GeminiService', () => {
         (window as any).env.apiKey = undefined;
 
         // Expect method call to fail
-        await expect(service.analyzeImage('base64data')).resolves.toEqual(
+        await expect(service.analyzeImage('base64data', {} as any)).resolves.toEqual(
             expect.objectContaining({ acts: expect.any(Array) }) // It catches error and returns fallback
         );
 
@@ -85,10 +85,11 @@ describe('GeminiService', () => {
         service = TestBed.inject(GeminiService);
         (window as any).env.apiKey = 'test-key';
 
-        await service.analyzeImage('data1');
+        const mockTheme = { textPersona: 'p', poemStructure: 's' } as any;
+        await service.analyzeImage('data1', mockTheme);
         const firstInstance = (service as any).ai;
 
-        await service.analyzeImage('data2');
+        await service.analyzeImage('data2', mockTheme);
         const secondInstance = (service as any).ai;
 
         expect(firstInstance).toBe(secondInstance);

@@ -107,7 +107,7 @@ export class GenerationComponent implements OnInit, OnDestroy {
             const poem = this.session.finalPoem();
 
             try {
-                const result = await this.geminiService.generateStylizedImage(original, modifiers, poem);
+                const result = await this.geminiService.generateStylizedImage(original, this.theme(), modifiers, poem);
                 if (result.image) {
                     this.session.setArtifact(result.image, result.prompt, result.version, poem);
 

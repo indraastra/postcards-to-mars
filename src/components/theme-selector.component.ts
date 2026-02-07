@@ -1,102 +1,271 @@
-import { Component, output, inject } from '@angular/core';
+import { Component, inject, signal, output, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
-import { ThemeConfig } from '../core/theme.config';
+import { ThemeService } from '../services/theme.service';
+import { SessionStore } from '../store/session.store';
 
 @Component({
   selector: 'app-theme-selector',
-  imports: [CommonModule],
-  template: `
-    <div class="flex flex-col items-center justify-center gap-6 p-4 animate-fade-in w-full max-w-md mx-auto">
-      
-      <div class="text-center space-y-1 mb-2">
-        <h2 class="text-xs font-mono text-rose-500 tracking-[0.2em] uppercase">Phase 2: Calibration</h2>
-        <p class="text-sm font-serif text-gray-400 italic">Select your destination frequency...</p>
-      </div>
-
-      <div class="w-full grid gap-3">
-        @for (theme of themes; track theme.id) {
-          <button 
-            (click)="selectTheme(theme)"
-            class="group relative w-full text-left p-4 border transition-all duration-300 overflow-hidden"
-            [class.border-rose-500]="activeTheme().id === theme.id"
-            [class.bg-rose-900_10]="activeTheme().id === theme.id"
-            [class.border-white_10]="activeTheme().id !== theme.id"
-            [class.hover:border-white_30]="activeTheme().id !== theme.id"
-          >
-            <!-- Background Hover Effect -->
-            <div class="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-            <div class="relative z-10 flex items-center justify-between">
-              <div>
-                <h3 
-                  class="font-mono text-sm uppercase tracking-widest mb-1 transition-colors"
-                  [class.text-rose-400]="activeTheme().id === theme.id"
-                  [class.text-gray-300]="activeTheme().id !== theme.id"
-                >
-                  {{ theme.name }}
-                </h3>
-                <p class="text-[10px] text-gray-500 font-sans tracking-wide">
-                   // {{ getThemeDescription(theme.id) }}
-                </p>
-              </div>
-
-              <!-- Selection Indicator -->
-              <div class="flex items-center justify-center w-6 h-6 border rounded-full transition-all"
-                [class.border-rose-500]="activeTheme().id === theme.id"
-                [class.border-gray-700]="activeTheme().id !== theme.id"
-              >
-                @if (activeTheme().id === theme.id) {
-                  <div class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
-                }
-              </div>
-            </div>
-          </button>
-        }
-      </div>
-
-      <button 
-        (click)="confirm()"
-        class="mt-4 w-full bg-rose-700 hover:bg-rose-600 text-white px-6 py-4 rounded-sm shadow-lg shadow-rose-900/40 transition-all font-mono uppercase tracking-widest text-xs group"
-      >
-        <span class="group-hover:animate-pulse">●</span> Initialize Link
-      </button>
-
-    </div>
-  `,
-  styles: [`
-    .animate-fade-in {
-      animation: fadeIn 0.5s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  `]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './theme-selector.component.html',
+  styleUrls: ['./theme-selector.component.css']
 })
-export class ThemeSelectorComponent {
+export class ThemeSelectorComponent implements AfterViewInit {
   geminiService = inject(GeminiService);
-  themeSelected = output<void>();
+  themeService = inject(ThemeService);
+  session = inject(SessionStore);
+  activeTheme = this.session.theme;
+  reflectionMode = this.session.reflectionMode;
 
-  themes = this.geminiService.getAllThemes();
-  activeTheme = this.geminiService.activeTheme;
+  showCustomModal = signal(false);
+  customPrompt = signal('');
+  isGenerating = signal(false);
 
-  selectTheme(theme: ThemeConfig) {
-    this.geminiService.setTheme(theme.id);
+  // Drag State
+  isDragging = false;
+  startX = 0;
+  scrollLeft = 0;
+  wasDragging = false;
+  scrollTimeout: any;
+  // Lock for auto-scroll
+  isAutoScrolling = false;
+  // Flag to detect source of theme change (manual click vs scroll)
+  private isScrollDrivenUpdate = false;
+
+  constructor() {
+    effect(() => {
+      const theme = this.activeTheme();
+      const allThemes = this.themeService.allThemes();
+      if (!theme) return;
+
+      // If this update came from the user scrolling ('snap to grid'),
+      // we do NOT want to programmatic scroll again (which fights the user).
+      if (this.isScrollDrivenUpdate) {
+        this.isScrollDrivenUpdate = false;
+        return;
+      }
+
+      // Flag that we are attempting to auto-scroll
+      this.isAutoScrolling = true;
+
+      const attemptScroll = (attempt = 0) => {
+        const el = document.getElementById(`theme-${theme.id}`);
+
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          // Reset flag after expected scroll duration (approx 800ms)
+          setTimeout(() => this.isAutoScrolling = false, 800);
+        } else if (attempt < 10) {
+          // Retry up to 10 times (approx 500ms total wait for DOM)
+          setTimeout(() => attemptScroll(attempt + 1), 50);
+        } else {
+          // Give up
+          this.isAutoScrolling = false;
+        }
+      };
+
+      // Start attempts
+      attemptScroll();
+    });
   }
 
-  confirm() {
-    this.themeSelected.emit();
+
+
+  ngAfterViewInit() {
+    // Scroll to the active theme immediately on load
+    setTimeout(() => {
+      const id = this.activeTheme().id;
+      const el = document.getElementById(`theme-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+      }
+    }, 0);
   }
 
-  getThemeDescription(id: string): string {
-    switch (id) {
-      case 'mars': return 'Colony 7, Sector 4';
-      case 'tokyo': return 'Night Train, Line JR-9';
-      case 'noir': return 'Case File #492, Downtown';
-      case 'wild': return 'Deep Forest, Zone X';
-      case 'retro': return 'The Summer of \'98';
-      default: return 'Unknown Frequency';
+  onScroll(e: Event) {
+    // console.log('[DestinationGallery] Scroll event fired.');
+    if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
+
+    // Debounce check for centered card
+    this.scrollTimeout = setTimeout(() => {
+      this.checkSelection(e.target as HTMLElement);
+    }, 150);
+  }
+
+  checkSelection(container: HTMLElement) {
+    // If we are currently dragging OR auto-scrolling, don't auto-select
+    if (this.isDragging || this.isAutoScrolling) {
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+
+    let closestThemeId: string | null = null;
+    let minDistance = Infinity;
+
+    // Iterate over all theme cards
+    const cards = container.querySelectorAll('[id^="theme-"]');
+    cards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestThemeId = card.id.replace('theme-', '');
+      }
+    });
+
+    if (closestThemeId && minDistance < 150) {
+      if (this.activeTheme().id !== closestThemeId) {
+        this.isScrollDrivenUpdate = true;
+        this.session.setTheme(closestThemeId);
+      }
     }
   }
+
+
+
+  startDrag(e: MouseEvent) {
+    // If user interacts, cancel auto-scroll lock immediately
+    this.isAutoScrolling = false;
+
+    const slider = e.currentTarget as HTMLElement;
+    this.isDragging = true;
+    this.wasDragging = false;
+    slider.classList.add('active');
+    this.startX = e.pageX - slider.offsetLeft;
+    this.scrollLeft = slider.scrollLeft;
+  }
+
+  stopDrag() {
+    this.isDragging = false;
+    // wasDragging remains true until the next startDrag reset, 
+    // but we need to ensure clicks happen immediately after mouseup if it wasn't a drag.
+    // Actually, simple click vs drag detection: check distance moved?
+    // Let's stick to the current flow: MouseUp stops drag.
+    // If we want to prevent click, we can use a small timeout or distance check.
+    // Better approach: capture click event and stop it?
+    // Let's rely on a small timeout to clear 'wasDragging' if needed, 
+    // or just rely on the fact that if isDragging was true and we moved, wasDragging is true.
+    setTimeout(() => this.wasDragging = false, 50);
+  }
+
+  moveDrag(e: MouseEvent) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    const slider = e.currentTarget as HTMLElement;
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - this.startX) * 2; // scroll-fast
+    slider.scrollLeft = this.scrollLeft - walk;
+
+    if (Math.abs(walk) > 5) {
+      this.wasDragging = true;
+    }
+  }
+
+  selectTheme(id: string) {
+    if (!this.wasDragging) {
+      this.isScrollDrivenUpdate = false;
+      this.session.setTheme(id);
+    }
+  }
+
+  toggleFavorite(event: MouseEvent, themeId: string) {
+    event.stopPropagation(); // Prevent theme selection
+    this.themeService.toggleFavorite(themeId);
+  }
+
+  openCustomModal() {
+    if (!this.wasDragging) {
+      this.showCustomModal.set(true);
+    }
+  }
+
+  closeCustomModal() {
+    this.showCustomModal.set(false);
+    this.customPrompt.set('');
+  }
+
+  async generateCustomTheme() {
+    if (!this.customPrompt()) return;
+
+    this.isGenerating.set(true);
+
+    try {
+      const newTheme = await this.geminiService.generateCustomTheme(this.customPrompt());
+      if (newTheme) {
+        this.themeService.addCustomTheme(newTheme);
+        this.session.setTheme(newTheme.id);
+        this.closeCustomModal();
+      }
+    } catch (err) {
+      console.error('Failed to generate theme', err);
+    } finally {
+      this.isGenerating.set(false);
+    }
+  }
+
+  // File Input Handler
+  handleFileInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Basic validation
+      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+        console.error('INVALID_FORMAT');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        this.resizeImage(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Basic Image Resizing
+  private resizeImage(base64Str: string) {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+      const MAX_SIZE = 1600;
+
+      if (width > MAX_SIZE || height > MAX_SIZE) {
+        if (width > height) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        } else {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        this.imageSelected.emit(base64Str);
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      this.imageSelected.emit(resizedDataUrl);
+    };
+  }
+
+  // Output event to replace the "CameraUpload" separate component
+  imageSelected = output<string>();
+
 }

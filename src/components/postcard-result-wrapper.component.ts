@@ -5,6 +5,7 @@ import { PostcardResultComponent } from './postcard-result.component';
 import { FilmStripComponent } from './film-strip.component';
 import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
     selector: 'app-result-wrapper',
@@ -29,6 +30,7 @@ import { GeminiService } from '../services/gemini.service';
 export class PostcardResultWrapperComponent {
     session = inject(SessionStore);
     geminiService = inject(GeminiService);
+    themeService = inject(ThemeService);
     router = inject(Router);
 
     isRegenerating = signal(false);
@@ -53,13 +55,12 @@ export class PostcardResultWrapperComponent {
                     imageUrl: newImage,
                     poem: this.session.finalPoem(),
                     prompt: newPrompt,
-                    version: this.session.promptVersion(), // Keep version or update? Keeping for now.
+                    version: this.session.promptVersion(),
                     timestamp: Date.now()
                 });
             }
         } catch (e) {
             console.error('Regeneration failed', e);
-            // Optional: Notify user of failure via a toast or store error
         } finally {
             this.isRegenerating.set(false);
         }
@@ -79,9 +80,8 @@ export class PostcardResultWrapperComponent {
         } else {
             // Regeneration Path
             const theme = this.session.theme();
-            let mode = this.session.reflectionMode(); // Honor current mode
+            let mode = this.session.reflectionMode();
 
-            // Override mode if theme disables narrative
             if (theme.disableNarrative) {
                 mode = 'visual';
             }
@@ -99,15 +99,13 @@ export class PostcardResultWrapperComponent {
             }
 
             try {
-                // Pass mode to analysis
-                const analysis = await this.geminiService.analyzeImage(base64, mode);
+                // Pass mode and theme to analysis
+                const analysis = await this.geminiService.analyzeImage(base64, theme, mode);
                 let finalPoem = '';
 
                 if (mode === 'visual') {
-                    // Visual Mode: No poem, or empty string from service
                     finalPoem = (analysis as any).caption || '';
                 } else {
-                    // Full Mode: Create auto poem from acts
                     finalPoem = analysis.acts.map(act => {
                         const cleanStarter = act.starter.replace(/_{2,}/g, '').trim();
                         const suggestion = act.suggestions[0];
@@ -120,13 +118,12 @@ export class PostcardResultWrapperComponent {
                 const modifiers = analysis.visual_tags.join(', ');
                 let imageRes;
 
-                // If visual mode or theme doesn't use poem context
                 const usePoemContext = this.session.theme().usePoemForImageGeneration && mode === 'full';
 
                 if (usePoemContext) {
-                    imageRes = await this.geminiService.generateStylizedImage(base64, modifiers, finalPoem);
+                    imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers, finalPoem);
                 } else {
-                    imageRes = await this.geminiService.generateStylizedImage(base64, modifiers);
+                    imageRes = await this.geminiService.generateStylizedImage(base64, theme, modifiers);
                 }
 
                 if (imageRes.image) {

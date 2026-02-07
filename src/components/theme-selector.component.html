@@ -1,0 +1,203 @@
+<div class="w-full h-full flex flex-col gap-2 animate-fade-in relative z-20 overflow-visible">
+
+    <!-- Theme Carousel -->
+    <!-- 
+    Padding Logic:
+    Mobile: Card w-72 (18rem). Center = 9rem. Padding = 50vw - 9rem.
+    Desktop: Card w-96 (24rem). Center = 12rem. Padding = 50vw - 12rem.
+  -->
+    <div class="flex gap-4 w-full overflow-x-auto px-[calc(50vw-9rem)] md:px-[calc(50vw-12rem)] py-12 -my-10 custom-scrollbar scroll-smooth cursor-grab active:cursor-grabbing"
+        [class.snap-x]="!isAutoScrolling" [class.snap-mandatory]="!isAutoScrolling" id="theme-carousel"
+        (scroll)="onScroll($event)" (mousedown)="startDrag($event)" (mouseleave)="stopDrag()" (mouseup)="stopDrag()"
+        (mousemove)="moveDrag($event)">
+        @for (theme of themeService.allThemes(); track theme.id) {
+        <div class="relative group/card flex-shrink-0 snap-center">
+
+            <!-- Main Card Container (Interactive Div) -->
+            <div id="theme-{{theme.id}}" (click)="selectTheme(theme.id)"
+                class="relative w-72 h-52 md:w-96 md:h-64 rounded-sm overflow-hidden transition-all duration-500 snap-center bg-[#f4f1ea] shadow-lg hover:shadow-xl hover:-translate-y-1 border border-white/10 hover:border-white/20 cursor-pointer group/inner"
+                [class.scale-105]="activeTheme().id === theme.id" [class.opacity-60]="activeTheme().id !== theme.id"
+                [class.hover:opacity-100]="activeTheme().id !== theme.id"
+                [class.grayscale]="activeTheme().id !== theme.id"
+                [style.background-color]="theme.visualStyle.backgroundColor">
+
+                <!-- Dog-Ear Favorite Toggle (Top Left) -->
+                <!-- Only visible on hover or if favored -->
+                <button class="absolute top-0 left-0 z-30 w-12 h-12 transition-all duration-300 focus:outline-none"
+                    (click)="$event.stopPropagation(); toggleFavorite($event, theme.id)" title="Favorite Destination">
+
+                    <!-- Triangle Background (The Fold) -->
+                    <div class="absolute top-0 left-0 w-full h-full transition-all duration-300 origin-top-left"
+                        [class.scale-0]="!themeService.isFavorite(theme.id) && !activeTheme().id"
+                        [class.group-hover/inner:scale-100]="true" style="clip-path: polygon(0 0, 100% 0, 0 100%);"
+                        [style.background-color]="themeService.isFavorite(theme.id) ? '#fbbf24' : 'rgba(255,255,255,0.2)'">
+                    </div>
+
+                    <!-- Heart Icon (Inside the fold) -->
+                    <div class="absolute top-1 left-1 text-black/50 transition-all duration-300"
+                        [class.opacity-100]="themeService.isFavorite(theme.id)"
+                        [class.opacity-0]="!themeService.isFavorite(theme.id) && !activeTheme().id"
+                        [class.group-hover/inner:opacity-50]="!themeService.isFavorite(theme.id)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="currentColor" stroke="none">
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                    </div>
+                </button>
+
+                <!-- Card Texture/Noise -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none z-0"
+                    style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E');">
+                </div>
+
+                <!-- Content Container -->
+                <div class="absolute inset-0 p-5 flex flex-col justify-between text-left z-10 pointer-events-none">
+
+                    <!-- Top Row: Stamp & Destination -->
+                    <div class="flex justify-between items-start w-full gap-4">
+
+                        <!-- Destination Text -->
+                        <div class="flex flex-col gap-1 mt-1 ml-6 transition-all duration-300"
+                            [class.ml-8]="themeService.isFavorite(theme.id)">
+                            <p class="text-[9px] uppercase tracking-[0.25em] font-mono opacity-60"
+                                [style.color]="theme.visualStyle.textColor">
+                                Destination:
+                            </p>
+                            <p class="text-sm font-bold tracking-wider font-mono uppercase"
+                                [style.color]="theme.visualStyle.textColor">
+                                {{ theme.shortName }}
+                            </p>
+                        </div>
+
+                        <!-- Postcard Stamp (Active Indicator) -->
+                        <div class="shrink-0 w-12 h-14 border-2 flex items-center justify-center transition-all duration-500"
+                            [class.border-dotted]="activeTheme().id !== theme.id"
+                            [class.border-solid]="activeTheme().id === theme.id"
+                            [class.rotate-3]="activeTheme().id !== theme.id"
+                            [class.rotate-0]="activeTheme().id === theme.id"
+                            [class.opacity-50]="activeTheme().id !== theme.id"
+                            [class.opacity-100]="activeTheme().id === theme.id"
+                            [style.border-color]="theme.visualStyle.textColor">
+                            <div class="w-8 h-8 rounded-full border transition-all duration-500"
+                                [class.border-dashed]="activeTheme().id !== theme.id"
+                                [class.border-none]="activeTheme().id === theme.id"
+                                [style.border-color]="theme.visualStyle.textColor"
+                                [style.background-color]="activeTheme().id === theme.id ? theme.visualStyle.primaryColor : 'transparent'"
+                                [class.opacity-40]="activeTheme().id !== theme.id"
+                                [class.opacity-100]="activeTheme().id === theme.id"></div>
+                        </div>
+                    </div>
+
+                    <!-- Middle: Title -->
+                    <div class="flex-grow flex items-center justify-center py-2">
+                        <h3 class="text-2xl md:text-3xl font-bold leading-none text-center transform -rotate-2 group-hover/inner:rotate-0 transition-transform duration-500"
+                            [style.font-family]="theme.visualStyle.fontFamilyHeader"
+                            [style.color]="theme.visualStyle.textColor">
+                            {{ theme.name }}
+                        </h3>
+                    </div>
+
+                    <!-- Bottom: Subtitle -->
+                    <div class="flex justify-between items-end border-t pt-3"
+                        [style.border-color]="theme.visualStyle.textColor + '40'"> <!-- 40 is hex opacity -->
+
+                        <p class="text-xs md:text-sm italic leading-relaxed opacity-90 max-w-full"
+                            [style.font-family]="theme.visualStyle.fontFamilyBody"
+                            [style.color]="theme.visualStyle.textColor">
+                            "{{ theme.landingSubtitle }}"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- Custom Theme Card -->
+        <button (click)="openCustomModal()"
+            class="relative flex-shrink-0 w-72 h-52 md:w-96 md:h-64 rounded-lg overflow-hidden transition-all duration-300 group snap-center border-2 border-dashed border-white/20 hover:border-white/50 bg-black/40 hover:bg-black/60">
+            <div
+                class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-400 group-hover:text-white transition-colors">
+                <span class="text-4xl font-mono font-light">+</span>
+                <span class="text-xs uppercase tracking-[0.2em] font-mono">Create New Theme</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- Helper Text -->
+    <div class="text-center font-mono text-[10px] uppercase tracking-widest text-white/50 animate-pulse mt-2">
+        <<< Swipe to Explore Destinations>>>
+    </div>
+
+    <!-- Action Area -->
+    <div
+        class="flex flex-col items-stretch gap-3 min-w-[14rem] md:min-w-[20rem] max-w-[90vw] mx-auto mt-4 z-30 relative">
+
+        <!-- Primary: CAPTURE -->
+        <label
+            class="group relative cursor-pointer w-full flex items-center justify-center gap-4 px-6 py-4 overflow-hidden rounded-lg shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+            <!-- Background -->
+            <div class="absolute inset-0 opacity-90 transition-opacity group-hover:opacity-100"
+                [style.background-color]="activeTheme().visualStyle.primaryColor"></div>
+
+            <!-- Content -->
+            <span
+                class="relative z-10 flex items-center gap-3 font-mono text-sm uppercase tracking-[0.2em] font-bold text-white whitespace-nowrap">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+                <span>[ {{ activeTheme().uploadButtonLabel }} ]</span>
+            </span>
+
+            <input type="file" accept="image/*" capture="environment" class="hidden" (change)="handleFileInput($event)">
+        </label>
+
+        <!-- Secondary: UPLOAD -->
+        <label
+            class="group relative cursor-pointer w-full flex items-center justify-center px-6 py-3 overflow-hidden rounded-lg transition-all duration-300 border border-white/20 hover:border-white/50 bg-black/60 hover:bg-black/80 backdrop-blur-md">
+            <span
+                class="font-mono text-xs uppercase tracking-[0.2em] font-medium text-white/80 group-hover:text-white transition-colors whitespace-nowrap">
+                / {{ activeTheme().captureButtonLabel }}
+            </span>
+
+            <input type="file" accept="image/*" class="hidden" (change)="handleFileInput($event)">
+        </label>
+
+    </div>
+
+
+
+    <!-- Custom Theme Modal -->
+    @if (showCustomModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 animate-fade-in backdrop-blur-md">
+        <div class="w-full max-w-lg bg-[#0f0f11] border border-white/10 p-1 shadow-2xl">
+            <div class="bg-[#1a1a1d] p-6 flex flex-col gap-6">
+
+                <div class="flex justify-between items-start border-b border-white/10 pb-4">
+                    <div>
+                        <h3 class="text-white font-mono text-sm tracking-[0.2em] uppercase mb-1">Design New Theme</h3>
+                        <p class="text-gray-500 text-[10px] font-mono">Describe the visual style you want to create.</p>
+                    </div>
+                    <button (click)="closeCustomModal()"
+                        class="text-gray-500 hover:text-white font-mono text-xs p-2">[X]</button>
+                </div>
+
+                <div class="relative">
+                    <textarea [(ngModel)]="customPrompt"
+                        class="w-full h-32 bg-black/50 border border-white/10 p-4 font-mono text-xs text-gray-300 focus:outline-none focus:border-rose-500/50 leading-relaxed resize-none transition-colors"
+                        placeholder="e.g. A solarpunk utopia with floating gardens..."
+                        [disabled]="isGenerating()"></textarea>
+                </div>
+
+                <button (click)="generateCustomTheme()" [disabled]="!customPrompt() || isGenerating()"
+                    class="w-full py-4 bg-rose-900/20 hover:bg-rose-900/40 border border-rose-800/30 hover:border-rose-500/50 text-rose-400 font-mono text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                    @if (isGenerating()) {
+                    <div class="w-2 h-2 bg-rose-500 rounded-full animate-bounce"></div>
+                    <span>Creating Theme...</span>
+                    } @else {
+                    <span>Generate Theme</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+    <!-- Custom Theme Modal -->

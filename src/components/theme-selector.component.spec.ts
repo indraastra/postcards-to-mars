@@ -1,62 +1,70 @@
 import '../test-setup';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DestinationGalleryComponent } from './destination-gallery.component';
+import { ThemeSelectorComponent } from './theme-selector.component';
 import { GeminiService } from '../services/gemini.service';
+import { ThemeService } from '../services/theme.service';
 import { SessionStore } from '../store/session.store';
 import { signal } from '@angular/core';
 
-describe('DestinationGalleryComponent', () => {
-    let component: DestinationGalleryComponent;
-    let fixture: ComponentFixture<DestinationGalleryComponent>;
+describe('ThemeSelectorComponent', () => {
+    let component: ThemeSelectorComponent;
+    let fixture: ComponentFixture<ThemeSelectorComponent>;
     let mockGeminiService: any;
+    let mockThemeService: any;
     let mockSessionStore: any;
 
     beforeEach(async () => {
         mockGeminiService = {
-            getAllThemes: () => [
-                {
-                    id: 'mars',
-                    name: 'Mars',
-                    visualStyle: { primaryColor: '#000', textColor: '#fff', fontFamilyHeader: 'sans', fontFamilyBody: 'sans', backgroundColor: '#fff' }
-                },
+            generateCustomTheme: () => Promise.resolve({ id: 'custom' }),
+            addCustomTheme: () => { } // Still needed? ThemeSelector calls themeService.addCustomTheme usually
+        };
+
+        const fullTheme = {
+            id: 'mars',
+            name: 'Mars',
+            visualStyle: { primaryColor: '#000', textColor: '#fff', fontFamilyHeader: 'sans', fontFamilyBody: 'sans', backgroundColor: '#fff' }
+        };
+
+        mockThemeService = {
+            allThemes: () => [
+                fullTheme,
                 {
                     id: 'unlocked',
                     name: 'Unlocked',
                     visualStyle: { primaryColor: '#000', textColor: '#fff', fontFamilyHeader: 'sans', fontFamilyBody: 'sans', backgroundColor: '#fff' }
                 }
             ],
-            generateCustomTheme: () => Promise.resolve({ id: 'custom' }),
-            addCustomTheme: () => { },
-            unlockTheme: () => { }
-        };
-
-        const fullTheme = {
-            id: 'mars',
-            visualStyle: { primaryColor: '#000', textColor: '#fff', fontFamilyHeader: 'sans', fontFamilyBody: 'sans', backgroundColor: '#fff' }
+            isFavorite: () => false,
+            toggleFavorite: () => { },
+            addCustomTheme: () => { }
         };
 
         mockSessionStore = {
             theme: signal(fullTheme),
             reflectionMode: signal('visual'),
             setTheme: (id: string) => {
-                // Find in gemini mock or return default full theme
-                const t = mockGeminiService.getAllThemes().find((x: any) => x.id === id) || fullTheme;
+                const t = mockThemeService.allThemes().find((x: any) => x.id === id) || fullTheme;
                 mockSessionStore.theme.set(t);
             },
             setReflectionMode: () => { }
         };
 
         await TestBed.configureTestingModule({
-            imports: [DestinationGalleryComponent],
+            imports: [ThemeSelectorComponent],
             providers: [
                 { provide: GeminiService, useValue: mockGeminiService },
+                { provide: ThemeService, useValue: mockThemeService },
                 { provide: SessionStore, useValue: mockSessionStore }
             ]
         }).compileComponents();
 
-        fixture = TestBed.createComponent(DestinationGalleryComponent);
+        fixture = TestBed.createComponent(ThemeSelectorComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
     });
 
     it('should scroll to the new theme when active theme changes', async () => {
