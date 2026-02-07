@@ -6,6 +6,7 @@ import { FilmStripComponent } from './film-strip.component';
 import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Component({
     selector: 'app-result-wrapper',
@@ -31,6 +32,7 @@ export class PostcardResultWrapperComponent {
     session = inject(SessionStore);
     geminiService = inject(GeminiService);
     themeService = inject(ThemeService);
+    analytics = inject(AnalyticsService);
     router = inject(Router);
 
     isRegenerating = signal(false);
@@ -54,6 +56,7 @@ export class PostcardResultWrapperComponent {
             if (newImage) {
                 // Update Store
                 this.session.updateArtifactImage(newImage, newPrompt);
+                this.analytics.trackRegeneration(this.session.theme().id, 'image');
 
                 // Update Cache
                 const theme = this.session.theme();
@@ -135,6 +138,7 @@ export class PostcardResultWrapperComponent {
 
                 if (imageRes.image) {
                     this.session.setArtifact(imageRes.image, imageRes.prompt, imageRes.version, finalPoem);
+                    this.analytics.trackGeneration(newThemeId, mode === 'visual' ? 'visual' : 'full', usePoemContext);
                     this.geminiService.cacheArtifact(newThemeId, {
                         themeId: newThemeId,
                         imageUrl: imageRes.image,

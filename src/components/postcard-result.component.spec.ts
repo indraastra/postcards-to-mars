@@ -1,9 +1,10 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PostcardResultComponent } from './postcard-result.component';
 import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
 import { signal } from '@angular/core';
+import { vi, describe, it, beforeEach, afterEach, expect } from 'vitest';
 
 describe('PostcardResultComponent Loading Messages', () => {
     let component: PostcardResultComponent;
@@ -13,6 +14,8 @@ describe('PostcardResultComponent Loading Messages', () => {
     let themeSignal: any;
 
     beforeEach(async () => {
+        vi.useFakeTimers();
+
         themeSignal = signal({
             id: 'theme1',
             name: 'Theme 1',
@@ -51,11 +54,16 @@ describe('PostcardResultComponent Loading Messages', () => {
         fixture.detectChanges();
     });
 
-    it('should update loading messages when theme changes', fakeAsync(() => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it('should update loading messages when theme changes', () => {
         // Initial State
         // Component initializes loading cycle in constructor.
-        // Wait for first tick
-        tick(0);
+
+        // Advance time slightly to ensure interval might tick if needed, or just check initial state
+        vi.advanceTimersByTime(1);
         expect(component.loadingMessage()).toBe('Loading Theme 1...');
 
         // Change Theme
@@ -68,17 +76,13 @@ describe('PostcardResultComponent Loading Messages', () => {
 
         fixture.detectChanges();
 
-        // The component "should" react to this change and restart the cycle
-        // We expect this to FAIL currently because startLoadingCycle is only called in constructor
-
-        // Reset cycle manually if needed in the real code, but here we just check if it updated
-        tick(600); // Wait for potential interval tick
-
-        // With the bug, this will still be from Theme 1 or not updated correctly
-        // We want it to be 'Loading Theme 2...'
+        // The effect should trigger the startLoadingCycle immediately
+        // We advance time to simulate the interval tick if needed, 
+        // but startLoadingCycle sets the first message immediately.
+        // Let's verify it picked up the new message.
         expect(component.loadingMessage()).toBe('Loading Theme 2...');
 
         // Clean up
         if (component.loadingInterval) clearInterval(component.loadingInterval);
-    }));
+    });
 });

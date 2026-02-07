@@ -23,6 +23,8 @@ The engine supports 5 distinct narrative and visual "frequencies." Each theme ch
 *   **Framework:** Angular 19 (Standalone Components, Signals)
 *   **AI Model:** Google Gemini 2.0 Flash (Text & Vision)
 *   **Styling:** Tailwind CSS + Dynamic CSS Variables
+*   **Analytics:** Google Analytics 4 (GA4)
+*   **Testing:** Vitest
 *   **Build Tool:** Vite / Angular CLI
 
 ## 🚀 Getting Started
@@ -56,7 +58,13 @@ The engine supports 5 distinct narrative and visual "frequencies." Each theme ch
     ```bash
     npm start
     ```
+    ```
     The app will launch at `http://localhost:4200`.
+
+5.  **Run Tests:**
+    ```bash
+    npm test
+    ```
 
 ## 📂 Project Structure
 

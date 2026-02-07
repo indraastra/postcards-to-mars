@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
 import { SessionStore } from '../store/session.store';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Component({
   selector: 'app-theme-selector',
@@ -15,6 +16,7 @@ export class ThemeSelectorComponent implements AfterViewInit {
   geminiService = inject(GeminiService);
   themeService = inject(ThemeService);
   session = inject(SessionStore);
+  analytics = inject(AnalyticsService);
   activeTheme = this.session.theme;
   reflectionMode = this.session.reflectionMode;
 
@@ -176,6 +178,7 @@ export class ThemeSelectorComponent implements AfterViewInit {
   toggleFavorite(event: MouseEvent, themeId: string) {
     event.stopPropagation(); // Prevent theme selection
     this.themeService.toggleFavorite(themeId);
+    this.analytics.trackFavorite(themeId, this.themeService.isFavorite(themeId));
   }
 
   openCustomModal() {
@@ -199,9 +202,11 @@ export class ThemeSelectorComponent implements AfterViewInit {
       if (newTheme) {
         this.themeService.addCustomTheme(newTheme);
         this.session.setTheme(newTheme.id);
+        this.analytics.trackCustomTheme(this.customPrompt(), true);
         this.closeCustomModal();
       }
     } catch (err) {
+      this.analytics.trackCustomTheme(this.customPrompt(), false);
       console.error('Failed to generate theme', err);
     } finally {
       this.isGenerating.set(false);

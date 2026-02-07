@@ -1,7 +1,9 @@
 import '../test-setup';
 import { TestBed } from '@angular/core/testing';
 import { ThemeService } from './theme.service';
+import { SessionStore } from '../store/session.store';
 import { THEMES, ThemeConfig } from '../core/theme.config';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('ThemeService', () => {
     let service: ThemeService;

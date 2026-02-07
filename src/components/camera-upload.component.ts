@@ -2,6 +2,7 @@ import { Component, output, signal, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionStore } from '../store/session.store';
 import { GeminiService } from '../services/gemini.service';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Component({
   selector: 'app-camera-upload',
@@ -68,6 +69,7 @@ import { GeminiService } from '../services/gemini.service';
 export class CameraUploadComponent {
   session = inject(SessionStore);
   geminiService = inject(GeminiService);
+  analytics = inject(AnalyticsService);
   activeTheme = this.session.theme;
 
   imageSelected = output<string>();
@@ -82,6 +84,7 @@ export class CameraUploadComponent {
 
       if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
         this.errorMessage.set('INVALID_FORMAT');
+        this.analytics.trackError('camera_upload', 'invalid_format');
         input.value = '';
         return;
       }
@@ -95,6 +98,7 @@ export class CameraUploadComponent {
 
       reader.onerror = () => {
         this.errorMessage.set('READ_FAILURE');
+        this.analytics.trackError('camera_upload', 'read_failure');
       };
 
       reader.readAsDataURL(file);
@@ -128,6 +132,7 @@ export class CameraUploadComponent {
       if (!ctx) {
         // Fallback if canvas context fails
         this.imageSelected.emit(base64Str);
+        this.analytics.trackError('camera_upload', 'canvas_context_failure');
         return;
       }
 
@@ -141,6 +146,7 @@ export class CameraUploadComponent {
 
     img.onerror = () => {
       this.errorMessage.set('IMAGE_PROCESSING_ERROR');
+      this.analytics.trackError('camera_upload', 'image_processing_error');
     };
   }
 }

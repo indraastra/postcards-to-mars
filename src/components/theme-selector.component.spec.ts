@@ -1,9 +1,11 @@
 import '../test-setup';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ThemeSelectorComponent } from './theme-selector.component';
-import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
 import { SessionStore } from '../store/session.store';
+import { GeminiService } from '../services/gemini.service';
+import { By } from '@angular/platform-browser';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { signal } from '@angular/core';
 
 describe('ThemeSelectorComponent', () => {

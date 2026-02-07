@@ -4,6 +4,7 @@ import { DialogueComponent } from './dialogue.component';
 import { SessionStore } from '../store/session.store';
 import { Router } from '@angular/router';
 import { signal, WritableSignal } from '@angular/core';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 describe('DialogueComponent', () => {
     let component: DialogueComponent;

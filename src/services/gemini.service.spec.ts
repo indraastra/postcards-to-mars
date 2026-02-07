@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { GeminiService } from './gemini.service';
 import { GoogleGenAI } from '@google/genai';
-import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Mock GoogleGenAI class
 vi.mock('@google/genai', () => {

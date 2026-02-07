@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { GeminiService } from '../services/gemini.service';
 import { SessionStore } from '../store/session.store';
+import { AnalyticsService } from '../services/analytics.service';
 
 interface TextSegment {
   text: string;
@@ -236,6 +237,7 @@ export class PostcardResultComponent {
   geminiService = inject(GeminiService);
   sanitizer = inject(DomSanitizer);
   session = inject(SessionStore);
+  analytics = inject(AnalyticsService);
   theme = this.session.theme;
 
   poem = input.required<string>();
@@ -329,6 +331,7 @@ export class PostcardResultComponent {
       this.regenerate.emit(this.editablePrompt());
     } else {
       this.poemChange.emit(this.editablePoem());
+      this.analytics.trackRegeneration(this.theme().id, 'poem');
     }
   }
 
@@ -349,6 +352,7 @@ export class PostcardResultComponent {
           title: this.theme().name,
           text: 'A memory artifact.'
         });
+        this.analytics.trackShare(this.theme().id, 'share_api');
       } catch (err) {
         console.log('Share failed', err);
       }
@@ -369,6 +373,7 @@ export class PostcardResultComponent {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    this.analytics.trackShare(this.theme().id, 'download');
   }
 
   private parsePoemToWords(poem: string): TextSegment[] {

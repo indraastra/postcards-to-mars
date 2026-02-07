@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { SessionStore } from './session.store';
 import { GeminiService } from '../services/gemini.service';
 import { ThemeService } from '../services/theme.service';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('SessionStore', () => {
     let store: SessionStore;
