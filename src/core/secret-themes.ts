@@ -40,7 +40,7 @@ const SANDS_THEME: ThemeConfig = {
 3. **The Promise:** End with a promise that the same stars watch over them.
 `,
     visualStyle: {
-        promptTemplate: "Transform this image of {visual_modifiers} into an intricate, large-scale sand sculpture found on a beach. The subject should generally appear as if it is made entirely of packed sand, with grainy textures and soft edges. The setting is a golden hour beach with long shadows. The sculpture is detailed but ephemeral, ready to be washed away by the tide. The lighting is warm and low-angle, emphasizing the texture of the sand grains.",
+        promptTemplate: "Transform this image of {visual_modifiers} into an intricate, large-scale sand sculpture found in a vast desert. The subject should generally appear as if it is made entirely of packed sand, with grainy textures and soft edges. The setting is a golden hour desert oasis with palm trees and long shadows. The sculpture is detailed but ephemeral, ready to be blown away by the wind. The lighting is warm and low-angle, emphasizing the texture of the sand grains.",
         primaryColor: '#eab308', // Starlight Gold (keeping gold as primary accent)
         backgroundColor: '#1e1b4b', // Indigo 950 (Deep night sky)
         textColor: '#fef3c7', // Amber 100 (Warm white)

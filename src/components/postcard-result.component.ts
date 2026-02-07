@@ -276,8 +276,16 @@ export class PostcardResultComponent {
       }
     });
 
-    // Start loading cycle
-    this.startLoadingCycle();
+    // Reactive Loading Cycle
+    effect(() => {
+      // Access theme() to track dependency
+      const themeId = this.theme().id;
+
+      // Cleanup old interval
+      if (this.loadingInterval) clearInterval(this.loadingInterval);
+
+      this.startLoadingCycle();
+    });
   }
 
   ngOnDestroy() {
@@ -296,7 +304,7 @@ export class PostcardResultComponent {
     this.loadingInterval = setInterval(() => {
       index = (index + 1) % messages.length;
       this.loadingMessage.set(messages[index]);
-    }, 600);
+    }, 2000); // Slower cycle for readability
   }
 
   openEditor(mode: 'stylisation' | 'poem') {
