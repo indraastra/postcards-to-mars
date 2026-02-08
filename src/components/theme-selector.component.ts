@@ -179,6 +179,19 @@ export class ThemeSelectorComponent implements AfterViewInit {
     event.stopPropagation(); // Prevent theme selection
     this.themeService.toggleFavorite(themeId);
     this.analytics.trackFavorite(themeId, this.themeService.isFavorite(themeId));
+
+    // If this theme is currently selected, scroll to its new position after DOM updates
+    if (this.activeTheme().id === themeId) {
+      // Reset auto-scroll lock to allow the scroll to happen
+      this.isAutoScrolling = false;
+      // Wait for Angular to re-render with the new theme order
+      setTimeout(() => {
+        const el = document.getElementById(`theme-${themeId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 100);
+    }
   }
 
   openCustomModal() {
