@@ -148,7 +148,7 @@ const LONDON_FROST_THEME: ThemeConfig = {
     * **Example:** "We skate on the edge of the thaw, hand in hand."
     `,
     visualStyle: {
-        promptTemplate: "Transform this image of {visual_modifiers} into a Shin-hanga style Japanese woodblock print set in a snowy winter landscape. FUSION STYLE: Combine the organic forms of nature (snow-laden trees, frozen ponds, winding paths) with the flat composition, bold outlines, and bokashi gradients of Hiroshige. FEATURES: Heavy falling snow, warm glowing windows in the distance, deep Prussian blue skies, and stark white snow. COMPOSITION: Flatten the perspective, use wood grain texture, and emphasize the peaceful silence of winter.",
+        promptTemplate: "Transform this image of {visual_modifiers} into a Shin-hanga style Japanese woodblock print set in a snowy winter London landscape. FUSION STYLE: Combine the organic forms of nature (snow-laden trees, frozen ponds, winding paths) with iconic London architecture (Victorian buildings, bridges, lampposts) using the flat composition, bold outlines, and bokashi gradients of Hiroshige. FEATURES: Heavy falling snow over London rooftops and streets, warm glowing windows in the distance, deep Prussian blue skies, and stark white snow blanketing the capital. COMPOSITION: Flatten the perspective, use wood grain texture, and emphasize the peaceful silence of winter in the city.",
         primaryColor: '#b91c1c', // Brick Red
         backgroundColor: '#eff6ff', // Ice Blue
         textColor: '#172554', // Deep Indigo
