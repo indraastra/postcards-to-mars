@@ -206,45 +206,107 @@
   </div>
   }
 
-  <!-- Secret Code Input -->
+  <!-- Secret Code Input (Enhanced CRT Terminal Style) -->
   @if (showSecretInput()) {
-  <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 animate-fade-in cursor-default"
+  <div
+    class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in font-mono"
     (click)="closeSecretInput()">
-    <div class="flex flex-col items-center gap-6 transition-all duration-300 transform"
+    <div
+      class="max-w-lg w-full border-2 border-amber-900/30 bg-[#050505] p-1 relative shadow-[0_0_60px_rgba(251,191,36,0.15)] transition-all duration-300"
       (click)="$event.stopPropagation()" [class.scale-110]="unlockStatus() === 'success'"
       [class.shake]="unlockStatus() === 'error'">
 
-      @if (unlockStatus() === 'success') {
-      <div class="flex flex-col items-center gap-4 animate-fade-in">
-        <div
-          class="w-16 h-16 rounded-full border-2 border-amber-400 flex items-center justify-center text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+      <!-- Inner CRT Frame -->
+      <div class="border border-amber-800/20 bg-zinc-900/5 p-10 relative overflow-hidden">
+
+        <!-- Scanlines -->
+        <div class="absolute inset-0 pointer-events-none opacity-10"
+          style="background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); background-size: 100% 2px, 3px 100%;">
         </div>
-        <h3 class="text-amber-100 font-mono text-xl tracking-[0.3em] uppercase">Theme Unlocked</h3>
-      </div>
-      } @else {
-      <div class="flex items-center gap-2">
-        <input #secretInput type="text" [(ngModel)]="secretCode" (keyup.enter)="checkSecretCode()"
-          class="bg-transparent border-b border-white/20 text-center font-mono text-xl uppercase tracking-[0.5em] text-white focus:outline-none focus:border-white/50 pb-2 w-64 placeholder:text-white/10 transition-colors"
-          placeholder="e.g. 19631122" />
 
-        <button (click)="checkSecretCode()"
-          class="p-2 rounded-full border border-white/20 text-white/50 hover:text-white hover:bg-white/10 transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-      </div>
+        <!-- Success State -->
+        @if (unlockStatus() === 'success') {
+        <div class="flex flex-col items-center gap-6 animate-fade-in relative z-10">
+          <div
+            class="w-20 h-20 rounded-full border-2 border-amber-400 flex items-center justify-center text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.6)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="text-amber-100 font-mono text-xl tracking-[0.3em] uppercase">Signal Acquired</h3>
+          <p class="text-amber-500/60 text-[10px] tracking-[0.2em] uppercase">New Transmission Channel Unlocked</p>
+        </div>
+        } @else {
+        <!-- Input State -->
+        <div class="flex flex-col items-center gap-8 relative z-10">
 
-      <p class="text-white/30 font-mono text-[10px] tracking-widest uppercase">
-        {{ unlockStatus() === 'error' ? 'Invalid Code' : 'Type Code & Enter' }}
-      </p>
+          <!-- Header -->
+          <div class="flex flex-col items-center gap-2 text-center">
+            <div class="flex items-center gap-2 text-amber-500/40">
+              <span class="w-1.5 h-1.5 bg-amber-500/40 rounded-full animate-pulse"></span>
+              <h2 class="text-[10px] tracking-[0.3em] uppercase">Access Terminal</h2>
+              <span class="w-1.5 h-1.5 bg-amber-500/40 rounded-full animate-pulse"></span>
+            </div>
+            <p class="text-amber-500/60 text-[9px] tracking-widest uppercase mt-1">
+              Enter Temporal Coordinates
+            </p>
+          </div>
+
+          <!-- Cryptic Counter: Remaining Signals -->
+          <div class="flex items-center gap-3 px-6 py-3 border border-amber-900/20 bg-black/20">
+            <div class="flex items-center gap-1">
+              @for (i of [0, 1, 2]; track i) {
+              @if (i < remainingSecretThemes()) { <div
+                class="w-2 h-6 bg-amber-500/80 shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+            </div>
+            } @else {
+            <div class="w-2 h-6 bg-amber-900/20 border border-amber-900/30"></div>
+            }
+            }
+          </div>
+          <div class="flex flex-col">
+            <span class="text-amber-400/90 text-[9px] tracking-[0.25em] uppercase font-bold leading-none">
+              @if (remainingSecretThemes() === 0) {
+              All Discovered
+              } @else {
+              Undiscovered
+              }
+            </span>
+            <span class="text-amber-700/50 text-[7px] tracking-[0.2em] uppercase leading-none mt-0.5">
+              Hidden Destinations
+            </span>
+          </div>
+        </div>
+
+        <!-- Input Field -->
+        <div class="flex items-center gap-3 w-full">
+          <input #secretInput type="text" [(ngModel)]="secretCode" (keyup.enter)="checkSecretCode()"
+            class="flex-1 bg-transparent border-b-2 border-amber-800/30 text-center font-mono text-2xl uppercase tracking-[0.5em] text-amber-100 focus:outline-none focus:border-amber-500/60 pb-2 placeholder:text-amber-900/30 transition-colors"
+            placeholder="YYYYMMDD" />
+
+          <button (click)="checkSecretCode()"
+            class="p-3 rounded border border-amber-800/30 text-amber-500/50 hover:text-amber-400 hover:bg-amber-950/30 hover:border-amber-700/50 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Status Message -->
+        @if (unlockStatus() === 'error') {
+        <p class="text-red-500/80 font-mono text-[10px] tracking-[0.2em] uppercase">
+          ⚠ Invalid Coordinates
+        </p>
+        }
+
+
+      </div>
       }
+
     </div>
   </div>
-  }
+</div>
+}
 </div>

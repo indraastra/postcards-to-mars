@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnDestroy, OnInit, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, inject, signal, computed, OnDestroy, OnInit, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet, Router } from '@angular/router';
@@ -67,6 +67,19 @@ export class AppComponent implements OnInit {
 
   showAbout = signal(false);
   showSettings = signal(false);
+
+  // Computed: Remaining secret themes count
+  remainingSecretThemes = computed(() => {
+    const unlockedIds = this.themeService.unlockedThemes().map(t => t.id);
+    // Import at module level to get all secret themes
+    // We'll hardcode the total count since import() is async
+    const totalSecretThemes = 3; // SANDS, BUTTERFLY, LONDON_FROST
+    const unlockedSecretCount = unlockedIds.filter(id =>
+      ['sands', 'butterfly', 'london-frost'].includes(id)
+    ).length;
+    return totalSecretThemes - unlockedSecretCount;
+  });
+
 
   ngOnInit() {
     // Hidden Debug Route Check
